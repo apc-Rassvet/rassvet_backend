@@ -9,6 +9,8 @@
 * для frontand-разработки: HTML, CSS, JavaScript, Next.js, Storybook.
 * для backend-разработки: python 3.11+, Django, PostgreSQL
 ## Доска. Правила работы.
+[Ссылка на доску](https://github.com/orgs/apc-Rassvet/projects/2)
+
 Задачи берем из TODO (если исполнитель не назначен, назначаем себя исполнителем asignees в правом верхнем углу).  
 
 Перемещаем задачу в колонку In progress. 
