@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'ru-RU'
+
 USE_I18N = True
 
 TIME_ZONE = 'UTC'
@@ -127,10 +129,17 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'api.RassvetUser'
+
+LOGIN_URL = '/admin/login/'
+
+# =================================================
+# !!! Изменить на почтовый клиент после отладки !!!
+# =================================================
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = 'smtp.example.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'ваш_email@example.com'
-EMAIL_HOST_PASSWORD = 'ваш_пароль'
-DEFAULT_FROM_EMAIL = 'ваш_email@example.com'
+EMAIL_HOST_USER = 'my_email@example.com'
+EMAIL_HOST_PASSWORD = 'mypassword'
+DEFAULT_FROM_EMAIL = 'my_email@example.com'
