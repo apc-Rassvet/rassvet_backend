@@ -10,12 +10,8 @@ class VideoAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     list_editable = ('is_active',)
     fieldsets = (
-        ('Основная информация', {
-            'fields': ('title', 'url', 'description')
-        }),
-        ('Настройки', {
-            'fields': ('is_active', 'created_at', 'updated_at')
-        }),
+        ('Основная информация', {'fields': ('title', 'url', 'description')}),
+        ('Настройки', {'fields': ('is_active', 'created_at', 'updated_at')}),
     )
 
 
@@ -27,10 +23,9 @@ class GratitudeAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
     list_editable = ('order', 'is_active')
     fieldsets = (
-        ('Основная информация', {
-            'fields': ('title', 'content', 'file')
-        }),
-        ('Настройки отображения', {
-            'fields': ('order', 'is_active', 'created_at')
-        }),
+        ('Основная информация', {'fields': ('title', 'content', 'file')}),
+        (
+            'Настройки отображения',
+            {'fields': ('order', 'is_active', 'created_at')},
+        ),
     )

@@ -1,10 +1,12 @@
 from django.db import models
 from django.core.validators import URLValidator
+from rassvet import constants
 
 
 class Video(models.Model):
-    """Модель для 'Видео' в разделе 'О нас'"""
-    title = models.CharField('Заголовок', max_length=200)
+    """Модель для 'Видео' в разделе 'О нас'."""
+
+    title = models.CharField('Заголовок', max_length=constants.LENGTH_TITLE)
     url = models.URLField('Ссылка на видео', validators=[URLValidator()])
     description = models.TextField('Описание', blank=True)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
@@ -26,13 +28,16 @@ class Video(models.Model):
 
 
 class Gratitude(models.Model):
-    """Модель для 'Благодарности' в разделе 'О нас'"""
-    title = models.CharField('Заголовок', max_length=200)
+    """Модель для 'Благодарности' в разделе 'О нас'."""
+
+    title = models.CharField('Заголовок', max_length=constants.LENGTH_TITLE)
     content = models.TextField('Содержание', blank=True)
     file = models.FileField('Файл благодарности', upload_to='gratitudes/')
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
-    order = models.PositiveIntegerField('Порядок отображения', default=0)
+    order = models.PositiveIntegerField(
+        'Порядок отображения', default=constants.DEFAULT_ORDER
+    )
     is_active = models.BooleanField('Активно', default=True)
 
     class Meta:

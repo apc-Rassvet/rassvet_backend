@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters
 from api.models import Video, Gratitude
-from api.pagination import StandardPagination
+from api.pagination import GratitudePagination
 from api.serializers import VideoSerializer, GratitudeSerializer
 
 
@@ -18,4 +18,4 @@ class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['order', 'created_at']
     ordering = ['order', '-created_at']
-    pagination_class = StandardPagination
+    pagination_class = GratitudePagination
