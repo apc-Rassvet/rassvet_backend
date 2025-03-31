@@ -12,7 +12,7 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
 
-class GratitudeViewSet(viewsets.ModelViewSet):
+class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Gratitude.objects.filter(is_active=True)
     serializer_class = GratitudeSerializer
     filter_backends = [filters.OrderingFilter]

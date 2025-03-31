@@ -11,6 +11,11 @@ class Video(models.Model):
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
     is_active = models.BooleanField('Активно', default=True)
 
+    def save(self, *args, **kwargs):
+        if self.is_active:
+            Video.objects.filter(is_active=True).update(is_active=False)
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Видео'
         verbose_name_plural = 'Видео'
@@ -24,8 +29,7 @@ class Gratitude(models.Model):
     """Модель для 'Благодарности' в разделе 'О нас'"""
     title = models.CharField('Заголовок', max_length=200)
     content = models.TextField('Содержание', blank=True)
-    author = models.CharField('Автор', max_length=100)
-    file = models.FileField('Файл благодарности', upload_to='testimonials/')
+    file = models.FileField('Файл благодарности', upload_to='gratitudes/')
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
     order = models.PositiveIntegerField('Порядок отображения', default=0)

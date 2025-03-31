@@ -24,7 +24,6 @@ class GratitudeSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "content",
-            "author",
             "file",
             "file_url",
             "created_at",
@@ -32,7 +31,7 @@ class GratitudeSerializer(serializers.ModelSerializer):
             "order",
         ]
 
-    def get_file_url(self, obj):
+    def get_file_url(self, obj) -> str | None:
         """
         Формирует абсолютный URL для файла, если он существует.
         """
