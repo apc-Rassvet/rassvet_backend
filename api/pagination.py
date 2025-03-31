@@ -1,0 +1,8 @@
+from rest_framework.pagination import PageNumberPagination
+
+
+class StandardPagination(PageNumberPagination):
+    """Стандартная пагинация с настраиваемыми параметрами"""
+    page_size = 3
+    page_size_query_param = 'page_size'
+    max_page_size = 100

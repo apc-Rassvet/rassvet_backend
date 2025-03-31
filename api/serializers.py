@@ -15,7 +15,7 @@ class VideoSerializer(serializers.ModelSerializer):
         ]
 
 
-class GratitudelSerializer(serializers.ModelSerializer):
+class GratitudeSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
 
     class Meta:
