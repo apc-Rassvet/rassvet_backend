@@ -1,6 +1,11 @@
 from rest_framework import serializers
+from .models import  AddressCollection, CollectionPhoto, CollectionTextBlock
 
-from .models import AddressCollection, CollectionPhoto, CollectionTextBlock
+
+class AddressCollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AddressCollection
+        fields = '__all__'
 
 
 class CollectionPhotoSerializer(serializers.ModelSerializer):
@@ -9,16 +14,7 @@ class CollectionPhotoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CollectionTextBlockSerializer(serializers.ModelSerializer):
+class CollectionTextSerializer(serializers.ModelSerializer):
     class Meta:
         model = CollectionTextBlock
-        fields = '__all__'
-
-
-class AddressCollectionSerializer(serializers.ModelSerializer):
-    photos = CollectionPhotoSerializer(many=True, read_only=True)
-    text_blocks = CollectionTextBlockSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = AddressCollection
         fields = '__all__'

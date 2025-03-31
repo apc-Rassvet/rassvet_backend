@@ -4,7 +4,7 @@ from .models import AddressCollection, CollectionPhoto, CollectionTextBlock
 from .serializers import (
     AddressCollectionSerializer,
     CollectionPhotoSerializer,
-    CollectionTextBlockSerializer,
+    CollectionTextSerializer,
 )
 
 
@@ -19,11 +19,6 @@ class CollectionPhotoViewSet(viewsets.ModelViewSet):
     serializer_class = CollectionPhotoSerializer
 
 
-class CollectionTextViewSet(viewsets.ModelViewSet):
+class CollectionTextBlockViewSet(viewsets.ModelViewSet):
     queryset = CollectionTextBlock.objects.all()
-    serializer_class = CollectionTextBlockSerializer
-
-
-from django.shortcuts import render
-
-# Create your views here.
+    serializer_class = CollectionTextSerializer
