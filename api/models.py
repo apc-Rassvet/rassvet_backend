@@ -19,7 +19,7 @@ class Team(models.Model):
 
 def upload_file(instance, filename):
     """Метод для генерации пути к файлу."""
-    return f'documents/{instance.team_member.id}/{filename}'
+    return f'team/{instance.team_member.id}/{filename}'
 
 
 class Document(models.Model):
