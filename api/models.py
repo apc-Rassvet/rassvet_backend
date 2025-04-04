@@ -1,6 +1,11 @@
 from django.db import models
 
 
+def upload_file(instance, filename):
+    """Метод для генерации пути к файлу."""
+    return f'team/{instance.team_member.id}/{filename}'
+
+
 class Team(models.Model):
     """Модель для хранения информации о членах команды."""
 
@@ -29,11 +34,6 @@ class TypeDocument(models.Model):
     class Meta:
         verbose_name = 'Тип документа'
         verbose_name_plural = 'Типы документов'
-
-
-def upload_file(instance, filename):
-    """Метод для генерации пути к файлу."""
-    return f'team/{instance.team_member.id}/{filename}'
 
 
 class Document(models.Model):
