@@ -7,7 +7,8 @@ class Team(models.Model):
     name = models.CharField(max_length=255, verbose_name='ФИО')
     image = models.ImageField(upload_to='team', verbose_name='Фото')
     position = models.CharField(max_length=255, verbose_name='Должность')
-    telephone = models.CharField(max_length=20, verbose_name='Телефон')
+    paginate = models.SmallIntegerField(verbose_name='Позиция на странице')
+    discription = models.TextField(verbose_name='Описание')
 
     def __str__(self):
         return self.name
@@ -15,6 +16,19 @@ class Team(models.Model):
     class Meta:
         verbose_name = 'Член команда'
         verbose_name_plural = 'Команда'
+
+
+class TypeDocument(models.Model):
+    """Типы документов."""
+
+    type = models.CharField(max_length=255, verbose_name='Тип документа')
+
+    def __str__(self):
+        return self.type
+
+    class Meta:
+        verbose_name = 'Тип документа'
+        verbose_name_plural = 'Типы документов'
 
 
 def upload_file(instance, filename):
@@ -30,10 +44,19 @@ class Document(models.Model):
         upload_to=upload_file,
         verbose_name='Файл документа'
     )
+    type = models.ForeignKey(
+        TypeDocument, on_delete=models.CASCADE,
+        related_name='documents',
+        verbose_name='Тип документа'
+    )
     team_member = models.ForeignKey(
         Team, on_delete=models.CASCADE,
         related_name='documents',
         verbose_name='Член команды'
+    )
+    on_main_page = models.BooleanField(
+        default=False,
+        verbose_name='Отображать на главной странице'
     )
 
     def __str__(self):

@@ -1,11 +1,12 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from .views import TeamViewSet
+from .views import TeamListView, TeamDetailView
 
-router = routers.DefaultRouter()
-router.register(r'teams', TeamViewSet)
+# router = routers.DefaultRouter()
+# router.register(r'teams', TeamListView)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('teams/', TeamListView.as_view(), name='team-list'),
+    path('teams/<int:pk>/', TeamDetailView.as_view(), name='team-detail'),
 ]
