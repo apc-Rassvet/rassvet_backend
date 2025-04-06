@@ -1,10 +1,10 @@
 from rest_framework.pagination import PageNumberPagination
-from rassvet import constants
+from .constants import GRATITUDE_PAGE_SIZE, GRATITUDE_MAX_PAGES
 
 
 class GratitudePagination(PageNumberPagination):
     """Пагинация для благодарностей в разделе 'О нас'."""
 
-    page_size = constants.GRATITUDE_PAGE_SIZE
+    page_size = GRATITUDE_PAGE_SIZE
     page_size_query_param = 'page_size'
-    max_page_size = constants.GRATITUDE_MAX_PAGES
+    max_page_size = GRATITUDE_MAX_PAGES

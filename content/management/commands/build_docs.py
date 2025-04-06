@@ -1,7 +1,9 @@
+import os
+
 from django.core.management.base import BaseCommand
+
 from drf_spectacular.generators import SchemaGenerator
 from drf_spectacular.renderers import OpenApiYamlRenderer
-import os
 
 
 class Command(BaseCommand):

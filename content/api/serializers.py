@@ -1,25 +1,13 @@
 from rest_framework import serializers
-from api.models import Gratitude, Video
 
-
-class VideoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Video
-        fields = [
-            'id',
-            'title',
-            'url',
-            'description',
-            'created_at',
-            'is_active',
-        ]
+from .. import models
 
 
 class GratitudeSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
 
     class Meta:
-        model = Gratitude
+        model = models.Gratitude
         fields = [
             'id',
             'title',
@@ -41,3 +29,16 @@ class GratitudeSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(obj.file.url)
             return obj.file.url
         return None
+
+
+class VideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Video
+        fields = [
+            'id',
+            'title',
+            'url',
+            'description',
+            'created_at',
+            'is_active',
+        ]
