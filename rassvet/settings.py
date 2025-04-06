@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -129,7 +129,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'api.RassvetUser'
+AUTH_USER_MODEL = 'users.RassvetUser'
 
 LOGIN_URL = '/admin/login/'
 
