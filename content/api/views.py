@@ -20,3 +20,19 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['created_at', 'title']
     ordering = ['-created_at']
+
+
+class AddressCollectionViewSet(viewsets.ModelViewSet):
+    queryset = models.AddressCollection.objects.all().order_by('order')
+    serializer_class = serializers.AddressCollectionSerializer
+    filterset_fields = ['status']
+
+
+class CollectionPhotoViewSet(viewsets.ModelViewSet):
+    queryset = models.CollectionPhoto.objects.all()
+    serializer_class = serializers.CollectionPhotoSerializer
+
+
+class CollectionTextBlockViewSet(viewsets.ModelViewSet):
+    queryset = models.CollectionTextBlock.objects.all()
+    serializer_class = serializers.CollectionTextSerializer

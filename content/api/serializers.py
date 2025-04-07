@@ -42,3 +42,21 @@ class VideoSerializer(serializers.ModelSerializer):
             'created_at',
             'is_active',
         ]
+
+
+class AddressCollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.AddressCollection
+        fields = '__all__'
+
+
+class CollectionPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CollectionPhoto
+        fields = '__all__'
+
+
+class CollectionTextSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CollectionTextBlock
+        fields = '__all__'
