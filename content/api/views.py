@@ -20,3 +20,11 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['created_at', 'title']
     ordering = ['-created_at']
+
+
+class PartnersViewSet(viewsets.ModelViewSet):
+    queryset = models.Partners.objects.all()
+    serializer_class = serializers.PartnersSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['name', 'created_at']
+    ordering = ['-created_at']

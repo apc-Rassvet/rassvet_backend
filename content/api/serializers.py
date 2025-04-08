@@ -42,3 +42,17 @@ class VideoSerializer(serializers.ModelSerializer):
             'created_at',
             'is_active',
         ]
+
+
+class PartnersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Partners
+        fields = [
+            'id',
+            'name',
+            'logo',
+            'description',
+            'created_at',
+            'updated_at'
+        ]
+        read_only_fields = ['created_at', 'updated_at']
