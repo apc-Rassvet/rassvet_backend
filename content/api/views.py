@@ -1,4 +1,5 @@
 from rest_framework import viewsets, filters
+from rest_framework.pagination import LimitOffsetPagination
 
 from .. import models
 from .. import pagination
@@ -22,9 +23,10 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
 
-class PartnersViewSet(viewsets.ModelViewSet):
+class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Partners.objects.all()
     serializer_class = serializers.PartnersSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['name', 'created_at']
     ordering = ['-created_at']
+    pagination_class = LimitOffsetPagination
