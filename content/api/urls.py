@@ -8,6 +8,7 @@ api_urls: list = []
 v1_router_api = routers.DefaultRouter()
 v1_router_api.register('videos', views.VideoViewSet, basename='video')
 v1_router_api.register('gratitudes', views.GratitudeViewSet, basename='gratitude')
+v1_router_api.register(r'reviews', views.ReviewViewSet, basename='review')
 
 api_urls.extend(v1_router_api.urls)
 
