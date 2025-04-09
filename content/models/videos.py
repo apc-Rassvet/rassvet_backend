@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import URLValidator
+
 from ..constants import LENGTH_VIDEO_TITLE
 
 

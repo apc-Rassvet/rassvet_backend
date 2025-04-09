@@ -15,18 +15,25 @@ class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = pagination.GratitudePagination
 
 
+class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Partner.objects.all()
+    serializer_class = serializers.PartnersSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['name', 'created_at']
+    ordering = ['-created_at']
+    pagination_class = LimitOffsetPagination
+
+
+class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Review.objects.filter(is_active=True)
+    serializer_class = serializers.ReviewSerializer
+    pagination_class = pagination.ReviewPagination
+    ordering = ['-created_at']
+
+
 class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Video.objects.filter(is_active=True)
     serializer_class = serializers.VideoSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['created_at', 'title']
     ordering = ['-created_at']
-
-
-class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Partners.objects.all()
-    serializer_class = serializers.PartnersSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['name', 'created_at']
-    ordering = ['-created_at']
-    pagination_class = LimitOffsetPagination

@@ -31,6 +31,35 @@ class GratitudeSerializer(serializers.ModelSerializer):
         return None
 
 
+class PartnersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Partner
+        fields = [
+            'id',
+            'name',
+            'logo',
+            'description',
+            'created_at',
+            'updated_at'
+        ]
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Review
+        fields = [
+            'id',
+            'title',
+            'content',
+            'author_name',
+            'created_at',
+            'updated_at',
+            'is_active'
+        ]
+        read_only_fields = ['created_at', 'updated_at']
+
+
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Video
@@ -42,17 +71,3 @@ class VideoSerializer(serializers.ModelSerializer):
             'created_at',
             'is_active',
         ]
-
-
-class PartnersSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Partners
-        fields = [
-            'id',
-            'name',
-            'logo',
-            'description',
-            'created_at',
-            'updated_at'
-        ]
-        read_only_fields = ['created_at', 'updated_at']

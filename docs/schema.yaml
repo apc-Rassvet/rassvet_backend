@@ -5,7 +5,7 @@ info:
 paths:
   /api/v1/gratitudes/:
     get:
-      operationId: v1_gratitudes_list
+      operationId: api_v1_gratitudes_list
       parameters:
       - name: ordering
         required: false
@@ -26,7 +26,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -40,7 +40,7 @@ paths:
           description: ''
   /api/v1/gratitudes/{id}/:
     get:
-      operationId: v1_gratitudes_retrieve
+      operationId: api_v1_gratitudes_retrieve
       parameters:
       - in: path
         name: id
@@ -49,7 +49,7 @@ paths:
         description: A unique integer value identifying this Благодарность.
         required: true
       tags:
-      - v1
+      - api
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -61,9 +61,113 @@ paths:
               schema:
                 $ref: '#/components/schemas/Gratitude'
           description: ''
+  /api/v1/partners/:
+    get:
+      operationId: api_v1_partners_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPartnersList'
+          description: ''
+  /api/v1/partners/{id}/:
+    get:
+      operationId: api_v1_partners_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Партнер.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partners'
+          description: ''
+  /api/v1/reviews/:
+    get:
+      operationId: api_v1_reviews_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReviewList'
+          description: ''
+  /api/v1/reviews/{id}/:
+    get:
+      operationId: api_v1_reviews_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Отзыв.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
   /api/v1/videos/:
     get:
-      operationId: v1_videos_list
+      operationId: api_v1_videos_list
       parameters:
       - name: ordering
         required: false
@@ -78,7 +182,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -92,7 +196,7 @@ paths:
           description: ''
   /api/v1/videos/{id}/:
     get:
-      operationId: v1_videos_retrieve
+      operationId: api_v1_videos_retrieve
       parameters:
       - in: path
         name: id
@@ -101,7 +205,7 @@ paths:
         description: A unique integer value identifying this Видео.
         required: true
       tags:
-      - v1
+      - api
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -180,6 +284,52 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Gratitude'
+    PaginatedPartnersList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Partners'
+    PaginatedReviewList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
     PaginatedVideoList:
       type: object
       required:
@@ -203,6 +353,78 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Video'
+    Partners:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название партнера*
+          description: Обязательное поле
+          maxLength: 255
+        logo:
+          type: string
+          format: uri
+          title: Логотип партнера*
+          description: Обязательное поле
+        description:
+          type: string
+          title: Описание*
+          description: Обязательное поле
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - description
+      - id
+      - logo
+      - name
+      - updated_at
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          title: Заголовок
+          maxLength: 200
+        content:
+          type: string
+          title: Текст отзыва
+        author_name:
+          type: string
+          nullable: true
+          title: Имя автора
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Дата создания
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Дата обновления
+        is_active:
+          type: boolean
+          title: Активный
+      required:
+      - content
+      - created_at
+      - id
+      - title
+      - updated_at
     Video:
       type: object
       properties:

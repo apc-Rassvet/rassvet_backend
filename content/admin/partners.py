@@ -1,8 +1,10 @@
 from django.contrib import admin
-from ..models.partners import Partners
+from django.utils.html import format_html
+
+from ..models.partners import Partner
 
 
-@admin.register(Partners)
+@admin.register(Partner)
 class PartnersAdmin(admin.ModelAdmin):
     list_display = ('name', 'logo_preview', 'created_at', 'updated_at')
     list_filter = ('created_at', 'updated_at')
@@ -18,10 +20,8 @@ class PartnersAdmin(admin.ModelAdmin):
         }),
     )
 
+    @admin.display(description='Логотип')
     def logo_preview(self, obj):
-        from django.utils.html import format_html
         if obj.logo:
             return format_html('<img src="{}" width="50" />', obj.logo.url)
-        return "—"
-    logo_preview.short_description = 'Логотип'
-    
+        return '—'
