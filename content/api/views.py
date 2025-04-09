@@ -1,12 +1,8 @@
-from rest_framework import viewsets, filters, permissions, status
-from rest_framework.response import Response
-from django.contrib.auth import get_user_model
+from rest_framework import viewsets, filters
 
 from .. import models
 from .. import pagination
 from . import serializers
-
-User = get_user_model()
 
 
 class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -26,8 +22,8 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
 
-class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
+class ReviewViewSet(viewsets.ModelViewSet):
     queryset = models.Review.objects.filter(is_active=True)
     serializer_class = serializers.ReviewSerializer
-    pagination_class = pagination.GratitudePagination
+    pagination_class = pagination.ReviewPagination
     ordering = ['-created_at']

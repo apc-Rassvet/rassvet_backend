@@ -1,9 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from .. import models
-from ..constants import REVIEW_TITLE_VALIDATE
-
-User = get_user_model()
 
 
 class GratitudeSerializer(serializers.ModelSerializer):
@@ -48,8 +44,6 @@ class VideoSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField()
-
     class Meta:
         model = models.Review
         fields = [
@@ -58,6 +52,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             'content',
             'author_name',
             'created_at',
+            'updated_at',
             'is_active'
         ]
-        read_only_fields = ['created_at']
+        read_only_fields = ['created_at', 'updated_at']
