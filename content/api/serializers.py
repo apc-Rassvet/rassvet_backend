@@ -56,3 +56,16 @@ class PartnersSerializer(serializers.ModelSerializer):
             'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
+
+
+class MissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Mission
+        fields = [
+            'mission_text',
+            'ambitions_text',
+            'five_year_goal',
+            'tasks_text',
+            'updated_at'
+        ]
+        read_only_fields = ['updated_at']
