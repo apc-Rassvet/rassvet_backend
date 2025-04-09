@@ -26,16 +26,8 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = models.Review.objects.filter(is_active=True).order_by('-created_at')
+class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Review.objects.filter(is_active=True)
     serializer_class = serializers.ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.is_active = False
-        instance.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    pagination_class = pagination.GratitudePagination
+    ordering = ['-created_at']
