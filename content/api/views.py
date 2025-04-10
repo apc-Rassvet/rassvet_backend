@@ -1,7 +1,7 @@
 from rest_framework import viewsets, filters
 
-from .. import models
-from .. import pagination
+from content import models
+from content import pagination
 from . import serializers
 
 
@@ -22,17 +22,7 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
 
-class AddressCollectionViewSet(viewsets.ModelViewSet):
-    queryset = models.AddressCollection.objects.all().order_by('order')
+class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.TargetedFundraising.objects.order_by('order')
     serializer_class = serializers.AddressCollectionSerializer
     filterset_fields = ['status']
-
-
-class CollectionPhotoViewSet(viewsets.ModelViewSet):
-    queryset = models.CollectionPhoto.objects.all()
-    serializer_class = serializers.CollectionPhotoSerializer
-
-
-class CollectionTextBlockViewSet(viewsets.ModelViewSet):
-    queryset = models.CollectionTextBlock.objects.all()
-    serializer_class = serializers.CollectionTextSerializer

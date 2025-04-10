@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .. import models
+from content import models
 
 
 class GratitudeSerializer(serializers.ModelSerializer):
@@ -46,17 +46,5 @@ class VideoSerializer(serializers.ModelSerializer):
 
 class AddressCollectionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.AddressCollection
-        fields = '__all__'
-
-
-class CollectionPhotoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CollectionPhoto
-        fields = '__all__'
-
-
-class CollectionTextSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CollectionTextBlock
+        model = models.TargetedFundraising
         fields = '__all__'
