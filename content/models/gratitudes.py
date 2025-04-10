@@ -1,5 +1,5 @@
 from django.db import models
-from ..constants import LENGTH_GRATITUDE_TITLE, DEFAULT_GRATITUDE_ORDER
+from content.constants import LENGTH_GRATITUDE_TITLE, DEFAULT_GRATITUDE_ORDER
 
 
 class Gratitude(models.Model):

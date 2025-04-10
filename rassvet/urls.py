@@ -9,6 +9,13 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
+from drf_spectacular.utils import extend_schema
+
+
+@extend_schema(exclude=True)
+class HiddenSchemaView(SpectacularAPIView):
+    pass
+
 
 urlpatterns = [
     path(
@@ -32,10 +39,16 @@ urlpatterns = [
         name='password_reset_complete',
     ),
     path('admin/', admin.site.urls),
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path(
-        'api/docs/swagger/',
-        SpectacularSwaggerView.as_view(url_name='schema'),
+        'api/schema/',
+        HiddenSchemaView.as_view(),
+        name='schema',
+    ),
+    path(
+        'api/docs/swagger-ui/',
+        SpectacularSwaggerView.as_view(
+            url_name='schema',
+        ),
         name='swagger-ui',
     ),
     path(

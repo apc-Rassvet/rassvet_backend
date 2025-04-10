@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import URLValidator
 
-from ..constants import LENGTH_VIDEO_TITLE
+from content.constants import LENGTH_VIDEO_TITLE
 
 
 class Video(models.Model):
@@ -14,11 +14,6 @@ class Video(models.Model):
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
     is_active = models.BooleanField('Активно', default=True)
 
-    def save(self, *args, **kwargs):
-        if self.is_active:
-            Video.objects.filter(is_active=True).update(is_active=False)
-        super().save(*args, **kwargs)
-
     class Meta:
         verbose_name = 'Видео'
         verbose_name_plural = 'Видео'
@@ -26,3 +21,8 @@ class Video(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if self.is_active:
+            Video.objects.filter(is_active=True).update(is_active=False)
+        super().save(*args, **kwargs)

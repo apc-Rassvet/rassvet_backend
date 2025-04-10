@@ -1,8 +1,8 @@
 from rest_framework import viewsets, filters
 from rest_framework.pagination import LimitOffsetPagination
 
-from .. import models
-from .. import pagination
+from content import models
+from content import pagination
 from . import serializers
 
 

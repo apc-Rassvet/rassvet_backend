@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .. import models
+from content import models
 
 
 class GratitudeSerializer(serializers.ModelSerializer):
@@ -20,9 +20,7 @@ class GratitudeSerializer(serializers.ModelSerializer):
         ]
 
     def get_file_url(self, obj) -> str | None:
-        """
-        Формирует абсолютный URL для файла, если он существует.
-        """
+        """Формирует абсолютный URL для файла, если он существует."""
         if obj.file:
             request = self.context.get('request')
             if request is not None:
