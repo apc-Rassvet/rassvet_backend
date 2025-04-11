@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.core.exceptions import ValidationError
-from django.forms.models import BaseInlineFormSet
 
 from content.models import targeted_fundraisings as fundraisings_models
 
@@ -12,6 +11,25 @@ class FundraisingPhotoInline(admin.TabularInline):
     max_num = 3
     validate_min = True
 
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+
+        def custom_clean(self):
+            super(type(self), self).clean()
+            count = 0
+            for form in self.forms:
+                if form.cleaned_data and not form.cleaned_data.get(
+                    'DELETE', False
+                ):
+                    count += 1
+            if count < 1:
+                raise ValidationError(
+                    'Должна быть как минимум одна фотография'
+                )
+
+        formset.clean = custom_clean
+        return formset
+
 
 class FundraisingTextBlockInline(admin.TabularInline):
     model = fundraisings_models.FundraisingTextBlock
@@ -19,6 +37,25 @@ class FundraisingTextBlockInline(admin.TabularInline):
     min_num = 1
     max_num = 3
     validate_min = True
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+
+        def custom_clean(self):
+            super(type(self), self).clean()
+            count = 0
+            for form in self.forms:
+                if form.cleaned_data and not form.cleaned_data.get(
+                    'DELETE', False
+                ):
+                    count += 1
+            if count < 1:
+                raise ValidationError(
+                    'Должен быть как минимум один текстовый блок'
+                )
+
+        formset.clean = custom_clean
+        return formset
 
 
 @admin.register(fundraisings_models.TargetedFundraising)
