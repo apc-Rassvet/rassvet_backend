@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from ..models.gratitudes import Gratitude
+from content.models.gratitudes import Gratitude
 
 
 @admin.register(Gratitude)

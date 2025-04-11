@@ -69,3 +69,45 @@ class VideoSerializer(serializers.ModelSerializer):
             'created_at',
             'is_active',
         ]
+
+
+class FundraisingPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.FundraisingPhoto
+        fields = ('position', 'image')
+
+
+class FundraisingTextBlockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.FundraisingTextBlock
+        fields = ('position', 'title', 'content')
+
+
+class TargetedFundraisingListSerializer(serializers.ModelSerializer):
+    main_photo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.TargetedFundraising
+        fields = ('id', 'title', 'short_description', 'status', 'main_photo')
+
+    def get_main_photo(self, obj):
+        photo = obj.photos.filter(position=1).first()
+        if photo:
+            return FundraisingPhotoSerializer(photo, context=self.context).data
+        return None
+
+
+class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
+    photos = FundraisingPhotoSerializer(many=True, read_only=True)
+    text_blocks = FundraisingTextBlockSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.TargetedFundraising
+        fields = (
+            'id',
+            'title',
+            'short_description',
+            'status',
+            'photos',
+            'text_blocks',
+        )

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from ..models.partners import Partner
+from content.models.partners import Partner
 
 
 @admin.register(Partner)

@@ -37,3 +37,15 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['created_at', 'title']
     ordering = ['-created_at']
+
+
+class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.TargetedFundraising.objects.all()
+    ordering_fields = ['order', 'created_at']
+    ordering = ['order', '-created_at']
+    filterset_fields = ['status']
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return serializers.TargetedFundraisingDetailSerializer
+        return serializers.TargetedFundraisingListSerializer
