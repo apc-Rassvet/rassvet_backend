@@ -135,15 +135,24 @@ class EmployeeSerializer(serializers.ModelSerializer):
 class EmployeeDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации члене команды."""
     
-    documents_type = serializers.SerializerMethodField()
     documents = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Employee
-        fields = ('id', 'name', 'position', 'image', 'documents', 'documents_type')
+        fields = ('id', 'name', 'position', 'image', 'documents')
     
     def get_documents(self, obj):
-        return obj.documents.filter(team_member=self.instance, on_main_page=True).values_list('file', flat=True)
+        if obj.category_on_main:
+            main_documents = obj.documents.filter(
+                team_member=self.instance, 
+                on_main_page=True
+            ).values_list('file', flat=True)
+            category_documents = obj.documents.filter(
+                team_member=self.instance
+            ).values_list('type__type', flat=True).distinct()
+            return main_documents, category_documents
+        else:
+            return obj.documents.filter(
+                team_member=self.instance
+            ).values_list('file', flat=True)
 
-    def get_documents_type(self, obj):
-        return obj.documents.filter(team_member=self.instance).values_list('type__type', flat=True).distinct()

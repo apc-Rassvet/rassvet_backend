@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Document, Team, TypeDocument
+from content.models import Document, Employee, TypeDocument
 
 class TypeDocumentAdmin(admin.ModelAdmin):
     list_display = ('type',)
@@ -13,4 +13,4 @@ class TeamAdmin(admin.ModelAdmin):
 
 admin.site.register(TypeDocument)
 admin.site.register(Document)
-admin.site.register(Team)
+admin.site.register(Employee)

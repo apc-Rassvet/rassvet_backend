@@ -56,8 +56,8 @@ class TeamListView(viewsets.ReadOnlyModelViewSet):
     queryset = models.Employee.objects.all().order_by('ordaring')
     serializer_class = serializers.EmployeeSerializer
 
-class TeamDetailView(viewsets.ReadOnlyModelViewSet):
-    """Вьюсет для вывода информации о команде."""
+class EmployeeView(viewsets.ReadOnlyModelViewSet):
+    """Вьюсет для вывода информации о сотруднике."""
     
     queryset = models.Employee.objects.all()
     serializer_class = serializers.EmployeeDetailSerializer
