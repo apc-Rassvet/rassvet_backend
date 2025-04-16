@@ -20,13 +20,14 @@ class Employee(models.Model):
         verbose_name='Сокращенная должность сотрудника'
     )
     ordaring = models.SmallIntegerField(verbose_name='Позиция на странице')
-    education = models.TextField(verbose_name='Образование')
+    education = models.TextField(verbose_name='Образование', blank=True)
     additional_education = models.TextField(
-        verbose_name='Дополнительное образование'
+        verbose_name='Дополнительное образование', 
+        blank=True
     )
-    trainings = models.TextField(verbose_name='Тренинги')
-    interviews = models.URLField(verbose_name='Интервью')
-    categiry_on_main = models.BooleanField(
+    trainings = models.TextField(verbose_name='Тренинги', blank=True)
+    interviews = models.URLField(verbose_name='Интервью', blank=True)
+    category_on_main = models.BooleanField(
         default=False,
         verbose_name='Отображать категории документов на главной странице'
     )
@@ -58,7 +59,7 @@ class Document(models.Model):
     name = models.CharField(max_length=255, verbose_name='Название документа')
     file = models.FileField(
         upload_to=upload_file,
-        verbose_name='Файл документа'
+        verbose_name='Файл документа',
     )
     type = models.ForeignKey(
         TypeDocument, on_delete=models.CASCADE,

@@ -112,6 +112,7 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'text_blocks',
         )
 
+
 class DocumentSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации о документах."""
 
@@ -130,29 +131,48 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Employee
-        fields = ('id', 'name', 'position', 'image')
+        fields = ('id', 'name', 'image', 'position_short')
+
+    def queryset(self):
+        return models.Employee.objects.all().order_by('ordaring', 'name')
+
 
 class EmployeeDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации члене команды."""
-    
+
     documents = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Employee
-        fields = ('id', 'name', 'position', 'image', 'documents')
-    
+        fields = (
+            'id',
+            'name',
+            'position_full',
+            'education',
+            'additional_education',
+            'trainings',
+            'interviews',
+            'image',
+            'documents'
+        )
+
     def get_documents(self, obj):
         if obj.category_on_main:
             main_documents = obj.documents.filter(
-                team_member=self.instance, 
+                team_member=self.instance,
                 on_main_page=True
             ).values_list('file', flat=True)
             category_documents = obj.documents.filter(
                 team_member=self.instance
             ).values_list('type__type', flat=True).distinct()
-            return main_documents, category_documents
+            return {
+                'category_documents': category_documents,
+                'main_documents': main_documents
+            }
         else:
-            return obj.documents.filter(
+            all_documents = obj.documents.filter(
                 team_member=self.instance
             ).values_list('file', flat=True)
-
+            return {
+                'main_documents': all_documents
+            }

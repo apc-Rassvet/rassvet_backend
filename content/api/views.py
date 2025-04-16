@@ -53,7 +53,7 @@ class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
 class TeamListView(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для вывода информации о команде."""
     
-    queryset = models.Employee.objects.all().order_by('ordaring')
+    queryset = models.Employee.objects.all()
     serializer_class = serializers.EmployeeSerializer
 
 class EmployeeView(viewsets.ReadOnlyModelViewSet):
