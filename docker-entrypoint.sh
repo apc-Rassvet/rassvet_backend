@@ -7,6 +7,9 @@ until PGPASSWORD=$POSTGRES_PASSWORD psql -h "$DB_HOST" -U "$POSTGRES_USER" -d "$
 done
 echo "PostgreSQL запущен"
 
+echo "Создание миграций..."
+python manage.py makemigrations
+
 echo "Применение миграций..."
 python manage.py migrate
 
