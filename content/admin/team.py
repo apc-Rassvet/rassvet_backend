@@ -1,18 +1,48 @@
 from django.contrib import admin
 
-from content.models import Document, Employee, TypeDocument
+from content.models import team as team_models
 
 
-@admin.register(TypeDocument)
-class TypeDocumentAdmin(admin.ModelAdmin):
-    list_display = ('type',)
+class SpecialityInline(admin.TabularInline):
+    model = team_models.Speciality
+    extra = 3
+    min_num = 1
+    validate_min = True
 
 
-@admin.register(Document)
-class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'team_member')
+class EducationInline(admin.TabularInline):
+    model = team_models.Education
+    extra = 1
+    validate_min = False
 
 
-@admin.register(Employee)
-class TeamAdmin(admin.ModelAdmin):
-    list_display = ('name', 'position', 'telephone', 'image')
+class AdditionalEducationInline(admin.TabularInline):
+    model = team_models.AdditionalEducation
+    extra = 1
+    validate_min = False
+
+
+class TrainingsInline(admin.TabularInline):
+    model = team_models.Trainings
+    extra = 1
+    validate_min = False
+
+
+class DocumentInline(admin.TabularInline):
+    model = team_models.Document
+    extra = 1
+    validate_min = False
+
+
+@admin.register(team_models.Employee)
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'ordaring', 'category_on_main')
+    search_fields = ['name',]
+    list_filter = ('ordaring',)
+    inlines = [
+        SpecialityInline,
+        EducationInline,
+        AdditionalEducationInline,
+        TrainingsInline,
+        DocumentInline
+    ]

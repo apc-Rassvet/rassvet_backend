@@ -113,45 +113,44 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
         )
 
 
-class DocumentSerializer(serializers.ModelSerializer):
-    """Сериализатор для вывода информации о документах."""
-
-    file_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = models.Document
-        fields = ('id', 'name', 'file_url', 'type')
-
-    def get_file_url(self, obj):
-        return obj.file.url
-
-
 class EmployeeSerializer(serializers.ModelSerializer):
     """Сериализаор для вывода информации о команде."""
 
+    specialities = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Employee
-        fields = ('id', 'name', 'image', 'speciality_1')
+        fields = ('id', 'name', 'image', 'specialities')
 
     def queryset(self):
         return models.Employee.objects.all().order_by('ordaring', 'name')
+
+    def get_specialities(self, obj):
+        specialities_list = []
+        specialities = obj.specialities.filter(
+            on_main=True
+        ).values('speciality').order_by('position')
+        for speciality in specialities:
+            specialities_list.append(speciality['speciality'])
+        return specialities_list
 
 
 class EmployeeDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации члене команды."""
 
-    speciality = serializers.SerializerMethodField()
+    specialities = serializers.SerializerMethodField()
+    education = serializers.SerializerMethodField()
     main_documents = serializers.SerializerMethodField()
     category_documents = serializers.SerializerMethodField()
-    education = serializers.SerializerMethodField()
     additional_education = serializers.SerializerMethodField()
+    trainings = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Employee
         fields = (
             'id',
             'name',
-            'position_full',
+            'specialities',
             'education',
             'additional_education',
             'trainings',
@@ -161,28 +160,41 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
             'category_documents'
         )
 
-    def get_speciality(self, obj):
-        return [
-            obj.speciality_1,
-            obj.speciality_2,
-            obj.speciality_3,
-        ]
+    def get_specialities(self, obj):
+        specialities_list = []
+        specialities = obj.specialities.all().values(
+            'speciality'
+        ).order_by('position')
+        for speciality in specialities:
+            specialities_list.append(speciality['speciality'])
+        return specialities_list
 
     def get_education(self, obj):
-        return [
-            obj.education_1,
-            obj.education_2,
-            obj.education_3,
-        ]
+        education_list = []
+        education = obj.education.all().values(
+            'education'
+        ).order_by('position')
+        for i in education:
+            education_list.append(i['education'])
+        return education_list
 
     def get_additional_education(self, obj):
-        return [
-            obj.additional_education_1,
-            obj.additional_education_2,
-            obj.additional_education_3,
-            obj.additional_education_4,
-            obj.additional_education_5,
-        ]
+        additional_education_list = []
+        additional_education = obj.additional_education.all().values(
+            'additional_education'
+        ).order_by('position')
+        for i in additional_education:
+            additional_education_list.append(i['additional_education'])
+        return additional_education_list
+
+    def get_trainings(self, obj):
+        trainings_list = []
+        trainings = obj.trainings.all().values(
+            'trainings'
+        ).order_by('position')
+        for i in trainings:
+            trainings_list.append(i['trainings'])
+        return trainings_list
 
     def get_main_documents(self, obj):
         if obj.category_on_main:
@@ -197,8 +209,16 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
 
     def get_category_documents(self, obj):
         if obj.category_on_main:
-            return obj.documents.filter(
+            categories = obj.documents.filter(
                 team_member=self.instance
-            ).values_list('type__type', flat=True).distinct()
+            ).values_list('type', flat=True).distinct()
+            documents = {}
+            documents['categorys'] = categories
+            for category in categories:
+                documents[category] = obj.documents.filter(
+                    team_member=self.instance,
+                    type=category
+                ).values_list('file', flat=True)
+            return documents
         else:
             return [None]

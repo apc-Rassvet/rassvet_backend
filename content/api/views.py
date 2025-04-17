@@ -49,11 +49,12 @@ class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return serializers.TargetedFundraisingDetailSerializer
         return serializers.TargetedFundraisingListSerializer
-    
+
+
 class TeamListView(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для вывода информации о команде."""
-    
-    queryset = models.Employee.objects.all() 
+
+    queryset = models.Employee.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'retrieve':

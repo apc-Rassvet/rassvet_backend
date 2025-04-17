@@ -11,51 +11,9 @@ class Employee(models.Model):
 
     name = models.CharField(max_length=255, verbose_name='ФИО')
     image = models.ImageField(upload_to='team', verbose_name='Фото')
-    speciality_1 = models.CharField(
-        max_length=255,
-        verbose_name='Специальность 1 (Видна везде)'
-    )
-    speciality_2 = models.CharField(
-        max_length=255,
-        verbose_name='Специальность 2 (Видна только на странице сотрудника)'
-    )
-    speciality_3 = models.CharField(
-        max_length=255,
-        verbose_name='Специальность 3 (Видна только на странице сотрудника)'
-    )
     ordaring = models.SmallIntegerField(
         verbose_name='Позиция на общей странице'
     )
-    education_1 = models.TextField(
-        verbose_name='Образование 1', blank=True
-    )
-    education_2 = models.TextField(
-        verbose_name='Образование 2', blank=True
-    )
-    education_3 = models.TextField(
-        verbose_name='Образование 3', blank=True
-    )
-    additional_education_1 = models.TextField(
-        verbose_name='Дополнительное образование 1',
-        blank=True
-    )
-    additional_education_2 = models.TextField(
-        verbose_name='Дополнительное образование 2',
-        blank=True
-    )
-    additional_education_3 = models.TextField(
-        verbose_name='Дополнительное образование 3',
-        blank=True
-    )
-    additional_education_4 = models.TextField(
-        verbose_name='Дополнительное образование 4',
-        blank=True
-    )
-    additional_education_5 = models.TextField(
-        verbose_name='Дополнительное образование 5',
-        blank=True
-    )
-    trainings = models.TextField(verbose_name='Тренинги', blank=True)
     interviews = models.URLField(verbose_name='Интервью', blank=True)
     category_on_main = models.BooleanField(
         default=False,
@@ -70,31 +28,98 @@ class Employee(models.Model):
         verbose_name_plural = 'Сотрудники'
 
 
-class TypeDocument(models.Model):
-    """Типы документов."""
+class Speciality(models.Model):
+    """Модель специальностей сотрудников."""
 
-    type = models.CharField(max_length=255, verbose_name='Тип документа')
+    speciality = models.CharField(
+        max_length=255,
+        verbose_name='Название специальности',
+        help_text='Укажите должность сотрудника'
+    )
+    team_member = models.ForeignKey(
+        Employee, on_delete=models.CASCADE,
+        related_name='specialities',
+        verbose_name='Член команды'
+    )
+    on_main = models.BooleanField(
+        default=False,
+        verbose_name='Отображать на общей странице'
+    )
+    position = models.SmallIntegerField(
+        default=1,
+        verbose_name='Позиция на странице',
+        help_text=(
+            'Позиция определяет в каком порядке'
+            ' будут располагаться специальности'
+        )
+    )
 
-    def __str__(self):
-        return self.type
 
-    class Meta:
-        verbose_name = 'Тип документа'
-        verbose_name_plural = 'Типы документов'
+class Education(models.Model):
+    """Модель специальностей сотрудников."""
+
+    education = models.TextField(
+        verbose_name='Образование'
+    )
+    team_member = models.ForeignKey(
+        Employee, on_delete=models.CASCADE,
+        related_name='education',
+        verbose_name='Член команды'
+    )
+    position = models.SmallIntegerField(
+        default=1,
+        verbose_name='Позиция на странице',
+    )
+
+
+class AdditionalEducation(models.Model):
+    """Модель специальностей сотрудников."""
+
+    additional_education = models.TextField(
+        verbose_name='Дополнительное образование'
+    )
+    team_member = models.ForeignKey(
+        Employee, on_delete=models.CASCADE,
+        related_name='additional_education',
+        verbose_name='Член команды'
+    )
+    position = models.SmallIntegerField(
+        default=1,
+        verbose_name='Позиция на странице',
+    )
+
+
+class Trainings(models.Model):
+    """Модель специальностей сотрудников."""
+
+    trainings = models.TextField(
+        verbose_name='Тренинги'
+    )
+    team_member = models.ForeignKey(
+        Employee, on_delete=models.CASCADE,
+        related_name='trainings',
+        verbose_name='Член команды'
+    )
+    position = models.SmallIntegerField(
+        default=1,
+        verbose_name='Позиция на странице',
+    )
 
 
 class Document(models.Model):
     """Модель для хранения документов."""
 
-    name = models.CharField(max_length=255, verbose_name='Название документа')
+    name = models.CharField(
+        max_length=255,
+        verbose_name='Название документа'
+    )
     file = models.FileField(
         upload_to=upload_file,
         verbose_name='Файл документа',
     )
-    type = models.ForeignKey(
-        TypeDocument, on_delete=models.CASCADE,
-        related_name='documents',
-        verbose_name='Тип документа'
+    type = models.CharField(
+        max_length=255,
+        verbose_name='Категория (тип) документа'
     )
     team_member = models.ForeignKey(
         Employee, on_delete=models.CASCADE,
