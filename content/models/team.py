@@ -11,18 +11,48 @@ class Employee(models.Model):
 
     name = models.CharField(max_length=255, verbose_name='ФИО')
     image = models.ImageField(upload_to='team', verbose_name='Фото')
-    position_full = models.CharField(
+    speciality_1 = models.CharField(
         max_length=255,
-        verbose_name='Полная должность сотрудника'
+        verbose_name='Специальность 1 (Видна везде)'
     )
-    position_short = models.CharField(
+    speciality_2 = models.CharField(
         max_length=255,
-        verbose_name='Сокращенная должность сотрудника'
+        verbose_name='Специальность 2 (Видна только на странице сотрудника)'
     )
-    ordaring = models.SmallIntegerField(verbose_name='Позиция на странице')
-    education = models.TextField(verbose_name='Образование', blank=True)
-    additional_education = models.TextField(
-        verbose_name='Дополнительное образование', 
+    speciality_3 = models.CharField(
+        max_length=255,
+        verbose_name='Специальность 3 (Видна только на странице сотрудника)'
+    )
+    ordaring = models.SmallIntegerField(
+        verbose_name='Позиция на общей странице'
+    )
+    education_1 = models.TextField(
+        verbose_name='Образование 1', blank=True
+    )
+    education_2 = models.TextField(
+        verbose_name='Образование 2', blank=True
+    )
+    education_3 = models.TextField(
+        verbose_name='Образование 3', blank=True
+    )
+    additional_education_1 = models.TextField(
+        verbose_name='Дополнительное образование 1',
+        blank=True
+    )
+    additional_education_2 = models.TextField(
+        verbose_name='Дополнительное образование 2',
+        blank=True
+    )
+    additional_education_3 = models.TextField(
+        verbose_name='Дополнительное образование 3',
+        blank=True
+    )
+    additional_education_4 = models.TextField(
+        verbose_name='Дополнительное образование 4',
+        blank=True
+    )
+    additional_education_5 = models.TextField(
+        verbose_name='Дополнительное образование 5',
         blank=True
     )
     trainings = models.TextField(verbose_name='Тренинги', blank=True)

@@ -131,7 +131,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Employee
-        fields = ('id', 'name', 'image', 'position_short')
+        fields = ('id', 'name', 'image', 'speciality_1')
 
     def queryset(self):
         return models.Employee.objects.all().order_by('ordaring', 'name')
@@ -140,7 +140,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
 class EmployeeDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации члене команды."""
 
-    documents = serializers.SerializerMethodField()
+    speciality = serializers.SerializerMethodField()
+    main_documents = serializers.SerializerMethodField()
+    category_documents = serializers.SerializerMethodField()
+    education = serializers.SerializerMethodField()
+    additional_education = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Employee
@@ -153,26 +157,48 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
             'trainings',
             'interviews',
             'image',
-            'documents'
+            'main_documents',
+            'category_documents'
         )
 
-    def get_documents(self, obj):
+    def get_speciality(self, obj):
+        return [
+            obj.speciality_1,
+            obj.speciality_2,
+            obj.speciality_3,
+        ]
+
+    def get_education(self, obj):
+        return [
+            obj.education_1,
+            obj.education_2,
+            obj.education_3,
+        ]
+
+    def get_additional_education(self, obj):
+        return [
+            obj.additional_education_1,
+            obj.additional_education_2,
+            obj.additional_education_3,
+            obj.additional_education_4,
+            obj.additional_education_5,
+        ]
+
+    def get_main_documents(self, obj):
         if obj.category_on_main:
-            main_documents = obj.documents.filter(
+            return obj.documents.filter(
                 team_member=self.instance,
                 on_main_page=True
             ).values_list('file', flat=True)
-            category_documents = obj.documents.filter(
-                team_member=self.instance
-            ).values_list('type__type', flat=True).distinct()
-            return {
-                'category_documents': category_documents,
-                'main_documents': main_documents
-            }
         else:
-            all_documents = obj.documents.filter(
+            return obj.documents.filter(
                 team_member=self.instance
             ).values_list('file', flat=True)
-            return {
-                'main_documents': all_documents
-            }
+
+    def get_category_documents(self, obj):
+        if obj.category_on_main:
+            return obj.documents.filter(
+                team_member=self.instance
+            ).values_list('type__type', flat=True).distinct()
+        else:
+            return [None]
