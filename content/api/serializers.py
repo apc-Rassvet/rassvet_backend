@@ -160,65 +160,67 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
             'category_documents'
         )
 
-    def get_specialities(self, obj):
-        specialities_list = []
-        specialities = obj.specialities.all().values(
-            'speciality'
+    def make_list(self, model, field):
+        field_list = []
+        list = model.all().values(
+            field
         ).order_by('position')
-        for speciality in specialities:
-            specialities_list.append(speciality['speciality'])
-        return specialities_list
+        for i in list:
+            field_list.append(i[field])
+        return field_list
+
+    def get_specialities(self, obj):
+        field = 'speciality'
+        return self.make_list(obj.specialities, field)
 
     def get_education(self, obj):
-        education_list = []
-        education = obj.education.all().values(
-            'education'
-        ).order_by('position')
-        for i in education:
-            education_list.append(i['education'])
-        return education_list
+        field = 'education'
+        return self.make_list(obj.education, field)
 
     def get_additional_education(self, obj):
-        additional_education_list = []
-        additional_education = obj.additional_education.all().values(
-            'additional_education'
-        ).order_by('position')
-        for i in additional_education:
-            additional_education_list.append(i['additional_education'])
-        return additional_education_list
+        field = 'additional_education'
+        return self.make_list(obj.additional_education, field)
 
     def get_trainings(self, obj):
-        trainings_list = []
-        trainings = obj.trainings.all().values(
-            'trainings'
-        ).order_by('position')
-        for i in trainings:
-            trainings_list.append(i['trainings'])
-        return trainings_list
+        field = 'trainings'
+        return self.make_list(obj.trainings, field)
+
+    def build_url(self, request, documents):
+        if request is not None:
+            documents_url = []
+            for document in documents:
+                documents_url.append(request.build_absolute_uri(document))
+            return documents_url
+        return documents
 
     def get_main_documents(self, obj):
+        request = self.context.get('request')
         if obj.category_on_main:
-            return obj.documents.filter(
+            documents = obj.documents.filter(
                 team_member=self.instance,
                 on_main_page=True
             ).values_list('file', flat=True)
+            return self.build_url(request, documents)
         else:
-            return obj.documents.filter(
+            documents = obj.documents.filter(
                 team_member=self.instance
             ).values_list('file', flat=True)
+            return self.build_url(request, documents)
 
     def get_category_documents(self, obj):
+        request = self.context.get('request')
         if obj.category_on_main:
-            categories = obj.documents.filter(
+            categories = obj.type_documents.filter(
                 team_member=self.instance
-            ).values_list('type', flat=True).distinct()
+            ).values_list('name', flat=True)
             documents = {}
             documents['categorys'] = categories
             for category in categories:
-                documents[category] = obj.documents.filter(
+                doc = obj.documents.filter(
                     team_member=self.instance,
-                    type=category
+                    type__name=category
                 ).values_list('file', flat=True)
+                documents[category] = self.build_url(request, doc)
             return documents
         else:
             return [None]

@@ -106,6 +106,23 @@ class Trainings(models.Model):
     )
 
 
+class TypeDocument(models.Model):
+    """Модель для хранения типов документов."""
+
+    name = models.CharField(
+        max_length=255,
+        verbose_name='Название типа документа'
+    )
+    team_member = models.ForeignKey(
+        Employee, on_delete=models.CASCADE,
+        related_name='type_documents',
+        verbose_name='Член команды'
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class Document(models.Model):
     """Модель для хранения документов."""
 
@@ -117,9 +134,11 @@ class Document(models.Model):
         upload_to=upload_file,
         verbose_name='Файл документа',
     )
-    type = models.CharField(
-        max_length=255,
-        verbose_name='Категория (тип) документа'
+    type = models.ForeignKey(
+        TypeDocument,
+        on_delete=models.CASCADE,
+        related_name='documents',
+        verbose_name='Тип документа'
     )
     team_member = models.ForeignKey(
         Employee, on_delete=models.CASCADE,
