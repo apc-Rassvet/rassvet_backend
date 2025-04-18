@@ -111,3 +111,116 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'photos',
             'text_blocks',
         )
+
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    """Сериализаор для вывода информации о команде."""
+
+    specialities = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Employee
+        fields = ('id', 'name', 'image', 'specialities')
+
+    def queryset(self):
+        return models.Employee.objects.all().order_by('ordaring', 'name')
+
+    def get_specialities(self, obj):
+        specialities_list = []
+        specialities = obj.specialities.filter(
+            on_main=True
+        ).values('speciality').order_by('position')
+        for speciality in specialities:
+            specialities_list.append(speciality['speciality'])
+        return specialities_list
+
+
+class EmployeeDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для вывода информации члене команды."""
+
+    specialities = serializers.SerializerMethodField()
+    education = serializers.SerializerMethodField()
+    main_documents = serializers.SerializerMethodField()
+    category_documents = serializers.SerializerMethodField()
+    additional_education = serializers.SerializerMethodField()
+    trainings = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Employee
+        fields = (
+            'id',
+            'name',
+            'specialities',
+            'education',
+            'additional_education',
+            'trainings',
+            'interviews',
+            'image',
+            'main_documents',
+            'category_documents'
+        )
+
+    def make_list(self, model, field):
+        field_list = []
+        list = model.all().values(
+            field
+        ).order_by('position')
+        for i in list:
+            field_list.append(i[field])
+        return field_list
+
+    def get_specialities(self, obj):
+        field = 'speciality'
+        return self.make_list(obj.specialities, field)
+
+    def get_education(self, obj):
+        field = 'education'
+        return self.make_list(obj.education, field)
+
+    def get_additional_education(self, obj):
+        field = 'additional_education'
+        return self.make_list(obj.additional_education, field)
+
+    def get_trainings(self, obj):
+        field = 'trainings'
+        return self.make_list(obj.trainings, field)
+
+    def build_url(self, request, documents):
+        if request is not None:
+            documents_url = []
+            for document in documents:
+                documents_url.append(request.build_absolute_uri(document))
+            return documents_url
+        return documents
+
+    def get_main_documents(self, obj):
+        request = self.context.get('request')
+        if obj.category_on_main:
+            documents = obj.documents.filter(
+                team_member=self.instance,
+                on_main_page=True
+            ).values_list('file', flat=True)
+            return self.build_url(request, documents)
+        else:
+            documents = obj.documents.filter(
+                team_member=self.instance
+            ).values_list('file', flat=True)
+            return self.build_url(request, documents)
+
+    def get_category_documents(self, obj):
+        request = self.context.get('request')
+        if obj.category_on_main:
+            categories = obj.type_documents.filter(
+                team_member=self.instance
+            ).values_list('name', flat=True)
+            documents = {}
+            documents['categorys'] = categories
+            for category in categories:
+                doc = obj.documents.filter(
+                    team_member=self.instance,
+                    type__name=category
+                ).values_list('file', flat=True)
+                documents[category] = self.build_url(request, doc)
+            return documents
+        else:
+            return [None]
