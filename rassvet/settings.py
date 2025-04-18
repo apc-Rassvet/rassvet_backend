@@ -57,6 +57,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rassvet.wsgi.application'
 
+# sqlite3 - Для локальной разработки
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
+# postgresql - prod
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

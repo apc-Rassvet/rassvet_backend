@@ -1,5 +1,6 @@
 from rest_framework import viewsets, filters
 from rest_framework.pagination import LimitOffsetPagination
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from content import models
 from content import pagination
@@ -39,6 +40,17 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
 
+@extend_schema(tags=["Test group."])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Получить список.",
+        description="""Описание.""",
+    ),
+    retrieve=extend_schema(
+        summary="Получить по id.",
+        description="""Описание.""",
+    )
+)
 class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.TargetedFundraising.objects.all()
     ordering_fields = ['order', 'created_at']
