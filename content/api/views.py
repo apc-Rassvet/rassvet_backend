@@ -44,14 +44,15 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
 @extend_schema_view(
     list=extend_schema(
         summary="Получить список.",
-        description="""Описание.""",
+        # description="""Описание list.""",
     ),
     retrieve=extend_schema(
         summary="Получить по id.",
-        description="""Описание.""",
+        # description="""Описание retrieve.""",
     )
 )
 class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
+    """Описание для всех list + retrieve +.. ."""
     queryset = models.TargetedFundraising.objects.all()
     ordering_fields = ['order', 'created_at']
     ordering = ['order', '-created_at']
