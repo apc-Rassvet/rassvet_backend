@@ -5,15 +5,18 @@ from content.models.gratitudes import Gratitude
 
 @admin.register(Gratitude)
 class GratitudeAdmin(admin.ModelAdmin):
-    list_display = ('title', 'order', 'created_at', 'is_active')
-    list_filter = ('is_active', 'created_at')
-    search_fields = ('title', 'content')
-    readonly_fields = ('created_at',)
+    list_display = ('title', 'order', 'is_active')
     list_editable = ('order', 'is_active')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('title', 'description')
+    readonly_fields = ('created_at', 'updated_at')
     fieldsets = (
-        ('Основная информация', {'fields': ('title', 'content', 'file')}),
         (
-            'Настройки отображения',
-            {'fields': ('order', 'is_active', 'created_at')},
+            'Основные данные',
+            {'fields': ('title', 'file', 'description', 'order', 'is_active')},
+        ),
+        (
+            'Системная информация',
+            {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
         ),
     )

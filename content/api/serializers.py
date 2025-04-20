@@ -4,29 +4,18 @@ from content import models
 
 
 class GratitudeSerializer(serializers.ModelSerializer):
-    file_url = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Gratitude
         fields = [
             'id',
             'title',
-            'content',
+            'description',
             'file',
-            'file_url',
+            'order',
             'created_at',
             'updated_at',
-            'order',
         ]
-
-    def get_file_url(self, obj) -> str | None:
-        """Формирует абсолютный URL для файла, если он существует."""
-        if obj.file:
-            request = self.context.get('request')
-            if request is not None:
-                return request.build_absolute_uri(obj.file.url)
-            return obj.file.url
-        return None
 
 
 class PartnersSerializer(serializers.ModelSerializer):

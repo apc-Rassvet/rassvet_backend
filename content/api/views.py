@@ -3,17 +3,12 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from content import models
-from content import pagination
 from . import serializers
 
 
 class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Gratitude.objects.filter(is_active=True)
     serializer_class = serializers.GratitudeSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['order', 'created_at']
-    ordering = ['order', '-created_at']
-    pagination_class = pagination.GratitudePagination
 
 
 class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
