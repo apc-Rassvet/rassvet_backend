@@ -26,10 +26,8 @@ class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Review.objects.filter(is_active=True)
+    queryset = models.Review.objects.all()
     serializer_class = serializers.ReviewSerializer
-    pagination_class = pagination.ReviewPagination
-    ordering = ['-created_at']
 
 
 class AboutUsVideoViewSet(viewsets.GenericViewSet):

@@ -51,11 +51,10 @@ class ReviewSerializer(serializers.ModelSerializer):
             'title',
             'content',
             'author_name',
+            'is_active',
             'created_at',
             'updated_at',
-            'is_active'
         ]
-        read_only_fields = ['created_at', 'updated_at']
 
 
 class AboutUsVideoSerializer(serializers.ModelSerializer):
