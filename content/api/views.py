@@ -1,5 +1,6 @@
-from rest_framework import viewsets, filters
+from rest_framework import filters, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
 
 from content import models
 from content import pagination
@@ -31,12 +32,15 @@ class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
 
-class VideoViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Video.objects.filter(is_active=True)
-    serializer_class = serializers.VideoSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['created_at', 'title']
-    ordering = ['-created_at']
+class AboutUsVideoViewSet(viewsets.GenericViewSet):
+    serializer_class = serializers.AboutUsVideoSerializer
+
+    def list(self, request, *args, **kwargs):
+        video = models.AboutUsVideo.get_solo()
+        if not video:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(video)
+        return Response(serializer.data)
 
 
 class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):

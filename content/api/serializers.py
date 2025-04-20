@@ -58,16 +58,13 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
 
-class VideoSerializer(serializers.ModelSerializer):
+class AboutUsVideoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Video
+        model = models.AboutUsVideo
         fields = [
-            'id',
             'title',
             'url',
             'description',
-            'created_at',
-            'is_active',
         ]
 
 
