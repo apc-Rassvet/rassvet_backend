@@ -14,51 +14,43 @@ def validate_forms(forms, error_detail):
         raise ValidationError(error_detail)
 
 
-class FundraisingPhotoInline(admin.TabularInline):
+class BaseValidatedInline(admin.TabularInline):
+    extra = 1
+    min_num = 1
+    max_num = 3
+    validate_min = True
+    validation_error_message = 'Необходим минимум один элемент'
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        error_message = self.validation_error_message
+        original_clean = formset.clean
+
+        def custom_clean(self):
+            original_clean(self)
+            validate_forms(self.forms, error_message)
+
+        formset.clean = custom_clean
+        return formset
+
+
+class FundraisingPhotoInline(BaseValidatedInline):
     model = fundraisings_models.FundraisingPhoto
-    extra = 1
-    min_num = 1
-    max_num = 3
-    validate_min = True
-
-    def get_formset(self, request, obj=None, **kwargs):
-        formset = super().get_formset(request, obj, **kwargs)
-
-        def custom_clean(self):
-            super(type(self), self).clean()
-            validate_forms(
-                self.forms, 'Должна быть как минимум одна фотография'
-            )
-
-        formset.clean = custom_clean
-        return formset
+    validation_error_message = 'Должна быть как минимум одна фотография.'
 
 
-class FundraisingTextBlockInline(admin.TabularInline):
+class FundraisingTextBlockInline(BaseValidatedInline):
     model = fundraisings_models.FundraisingTextBlock
-    extra = 1
-    min_num = 1
-    max_num = 3
-    validate_min = True
-
-    def get_formset(self, request, obj=None, **kwargs):
-        formset = super().get_formset(request, obj, **kwargs)
-
-        def custom_clean(self):
-            super(type(self), self).clean()
-            validate_forms(
-                self.forms, 'Должен быть как минимум один текстовый блок'
-            )
-
-        formset.clean = custom_clean
-        return formset
+    validation_error_message = 'Должен быть как минимум один текстовый блок.'
 
 
 @admin.register(fundraisings_models.TargetedFundraising)
 class TargetedFundraisingAdmin(admin.ModelAdmin):
     list_display = ('title', 'status', 'order', 'created_at')
     list_editable = ('order', 'status')
-    list_filter = ('status',)
+    list_filter = ('status', 'created_at')
+    search_fields = ('title',)
+    readonly_fields = ('created_at', 'updated_at')
     inlines = [FundraisingPhotoInline, FundraisingTextBlockInline]
     actions = ['move_to_active', 'move_to_completed']
 

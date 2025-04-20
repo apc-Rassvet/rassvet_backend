@@ -115,7 +115,6 @@ EMAIL_HOST_PASSWORD = 'mypassword'
 DEFAULT_FROM_EMAIL = 'my_email@example.com'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',

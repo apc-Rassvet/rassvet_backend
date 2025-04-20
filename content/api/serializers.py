@@ -83,8 +83,8 @@ class TargetedFundraisingListSerializer(serializers.ModelSerializer):
 
 
 class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
-    photos = FundraisingPhotoSerializer(many=True, read_only=True)
-    text_blocks = FundraisingTextBlockSerializer(many=True, read_only=True)
+    photos = FundraisingPhotoSerializer(many=True)
+    text_blocks = FundraisingTextBlockSerializer(many=True)
 
     class Meta:
         model = models.TargetedFundraising
@@ -95,4 +95,5 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'status',
             'photos',
             'text_blocks',
+            'order',
         )
