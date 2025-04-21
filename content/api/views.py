@@ -27,15 +27,15 @@ class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
 @extend_schema(tags=['Partners group'])
 @extend_schema_view(
     list=extend_schema(
-        summary='Получить список карточек Сотрудников.',
+        summary='Получить список карточек Партнеров.',
     ),
     retrieve=extend_schema(
-        summary='Получить карточку Сотрудника по ID.',
+        summary='Получить карточку Партнера по ID.',
     )
 )
 class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Получить все карточки Сотрудников списком, или конкретную по ID.
+    Получить все карточки Партнеров списком, или конкретную по ID.
     """
     queryset = models.Partner.objects.all()
     serializer_class = serializers.PartnersSerializer
