@@ -7,13 +7,13 @@ from content import pagination
 from . import serializers
 
 
-@extend_schema(tags=["Gratitudes group"])
+@extend_schema(tags=['Gratitudes group'])
 @extend_schema_view(
     list=extend_schema(
-        summary="Получить список Благодарностей.",
+        summary='Получить список Благодарностей.',
     ),
     retrieve=extend_schema(
-        summary="Получить Благодарность по ID.",
+        summary='Получить Благодарность по ID.',
     )
 )
 class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -28,13 +28,13 @@ class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = pagination.GratitudePagination
 
 
-@extend_schema(tags=["Partners group"])
+@extend_schema(tags=['Partners group'])
 @extend_schema_view(
     list=extend_schema(
-        summary="Получить список карточек Сотрудников.",
+        summary='Получить список карточек Сотрудников.',
     ),
     retrieve=extend_schema(
-        summary="Получить карточку Сотрудника по ID.",
+        summary='Получить карточку Сотрудника по ID.',
     )
 )
 class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
@@ -49,13 +49,13 @@ class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = LimitOffsetPagination
 
 
-@extend_schema(tags=["Reviews group"])
+@extend_schema(tags=['Reviews group'])
 @extend_schema_view(
     list=extend_schema(
-        summary="Получить список Отзывов.",
+        summary='Получить список Отзывов.',
     ),
     retrieve=extend_schema(
-        summary="Получить Отзыв по ID.",
+        summary='Получить Отзыв по ID.',
     )
 )
 class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
@@ -68,13 +68,13 @@ class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
 
-@extend_schema(tags=["Videos group"])
+@extend_schema(tags=['Videos group'])
 @extend_schema_view(
     list=extend_schema(
-        summary="Получить список Видео.",
+        summary='Получить список Видео.',
     ),
     retrieve=extend_schema(
-        summary="Получить Видео по ID.",
+        summary='Получить Видео по ID.',
     )
 )
 class VideoViewSet(viewsets.ReadOnlyModelViewSet):
@@ -88,22 +88,25 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
 
-@extend_schema(tags=["Fundraisings group"])
+@extend_schema(tags=['Fundraisings group'])
 @extend_schema_view(
     list=extend_schema(
-        summary="Получить список Адресных сборов.",
-        description="""
+        summary='Получить список Адресных сборов.',
+        description='''
         Получить список Адресных сборов с достаточной информацией о сборе.
-        """,
+        ''',
     ),
     retrieve=extend_schema(
-        summary="Получить Адресный сбор по ID.",
-        description="""
+        summary='Получить Адресный сбор по ID.',
+        description='''
         Получить Адресный сбор по ID с полной информацией о сборе.
-        """
+        '''
     )
 )
 class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Получить список Адресных сборов, или конкретный по его ID.
+    """
     queryset = models.TargetedFundraising.objects.all()
     ordering_fields = ['order', 'created_at']
     ordering = ['order', '-created_at']
