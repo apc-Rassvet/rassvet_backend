@@ -1,6 +1,10 @@
+from django import forms
+from django.urls import path
 from django.contrib import admin
-
+from django.utils.functional import cached_property
+from django.template.loader import get_template
 from content.models import team as team_models
+from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
 
 class SpecialityInline(admin.TabularInline):
@@ -10,6 +14,7 @@ class SpecialityInline(admin.TabularInline):
     max_num = 3
     validate_min = True
     verbose_name = 'Специальность'
+    verbose_name_plural = 'Специальности'
 
 
 class EducationInline(admin.TabularInline):
@@ -39,10 +44,12 @@ class TrainingsInline(admin.TabularInline):
     verbose_name_plural = 'Тренинги'
 
 
-class TypeDocumentInline(admin.TabularInline):
-    model = team_models.TypeDocument
-    extra = 1
-    validate_min = False
+@admin.register(team_models.TypeDocument)
+class TypeDocument(admin.ModelAdmin):
+    fields = ('name',)
+
+    def get_model_perms(self, request):
+        return {}
 
 
 class DocumentInline(admin.TabularInline):
@@ -63,6 +70,5 @@ class EmployeeAdmin(admin.ModelAdmin):
         EducationInline,
         AdditionalEducationInline,
         TrainingsInline,
-        TypeDocumentInline,
         DocumentInline
     ]

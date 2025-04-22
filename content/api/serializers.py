@@ -135,6 +135,39 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return specialities_list
 
 
+class DocumentSerializer(serializers.ModelSerializer):
+    """Сериализатор для вывода информации о документах."""
+
+    file = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Document
+        fields = ('id', 'name', 'file')
+
+    def get_file(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.file.url)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор для вывода информации о категории."""
+
+    documents = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.TypeDocument
+        fields = ('id', 'name', 'documents')
+
+    def get_documents(self, obj):
+        document_obj = obj.documents.filter(
+            team_member=self.context.get('employee'))
+        return DocumentSerializer(
+            document_obj,
+            many=True,
+            context=self.context
+        ).data
+
+
 class EmployeeDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации члене команды."""
 
@@ -194,33 +227,28 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
         return documents
 
     def get_main_documents(self, obj):
-        request = self.context.get('request')
         if obj.category_on_main:
-            documents = obj.documents.filter(
+            doc = models.Document.objects.filter(
                 team_member=self.instance,
                 on_main_page=True
-            ).values_list('file', flat=True)
-            return self.build_url(request, documents)
+            )
+            return DocumentSerializer(
+                doc, many=True, context=self.context).data
         else:
-            documents = obj.documents.filter(
+            doc = models.Document.objects.filter(
                 team_member=self.instance
-            ).values_list('file', flat=True)
-            return self.build_url(request, documents)
+            )
+            return DocumentSerializer(
+                doc, many=True, context=self.context).data
 
     def get_category_documents(self, obj):
-        request = self.context.get('request')
         if obj.category_on_main:
-            categories = obj.type_documents.filter(
-                team_member=self.instance
-            ).values_list('name', flat=True)
-            documents = {}
-            documents['categorys'] = categories
-            for category in categories:
-                doc = obj.documents.filter(
-                    team_member=self.instance,
-                    type__name=category
-                ).values_list('file', flat=True)
-                documents[category] = self.build_url(request, doc)
+            categories = models.TypeDocument.objects.filter(
+                documents__team_member=obj
+            ).distinct()
+            self.context['employee'] = obj
+            documents = CategorySerializer(
+                categories, many=True, context=self.context).data
             return documents
         else:
             return [None]

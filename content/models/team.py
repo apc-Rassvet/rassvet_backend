@@ -15,6 +15,10 @@ class Employee(models.Model):
         verbose_name='Позиция на общей странице'
     )
     interviews = models.URLField(verbose_name='Интервью', blank=True)
+    specialists_register = models.URLField(
+        verbose_name='Реестр специалистов',
+        blank=True
+    )
     category_on_main = models.BooleanField(
         default=False,
         verbose_name='Отображать категории документов на главной странице'
@@ -42,7 +46,7 @@ class Speciality(models.Model):
         verbose_name='Член команды'
     )
     on_main = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name='Отображать на общей странице'
     )
     position = models.SmallIntegerField(
@@ -112,11 +116,6 @@ class TypeDocument(models.Model):
     name = models.CharField(
         max_length=255,
         verbose_name='Название типа документа'
-    )
-    team_member = models.ForeignKey(
-        Employee, on_delete=models.CASCADE,
-        related_name='type_documents',
-        verbose_name='Член команды'
     )
 
     def __str__(self):
