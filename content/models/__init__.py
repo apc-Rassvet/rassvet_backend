@@ -7,6 +7,7 @@ from .targeted_fundraisings import (
     FundraisingPhoto,
     FundraisingTextBlock,
 )
+from .report import Report, Chapter
 
 __all__ = [
     'AboutUsVideo',
@@ -16,4 +17,6 @@ __all__ = [
     'Partner',
     'Review',
     'TargetedFundraising',
+    'Report',
+    'Chapter',
 ]

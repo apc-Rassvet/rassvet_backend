@@ -97,3 +97,39 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'text_blocks',
             'order',
         )
+
+
+class ReportSerializer(serializers.ModelSerializer):
+    """Сериализатор для отчетов"""
+
+    file = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Report
+        fields = (
+            'id',
+            'title',
+            'file',
+        )
+
+    def get_file(self, obj):
+        if obj.download_icon:
+            request = self.context.get('request')
+            file = obj.file.url
+            return request.build_absolute_uri(file)
+        else:
+            return None
+
+
+class ChapterSerializer(serializers.ModelSerializer):
+    """Сериализатор для глав отчетов"""
+
+    reports = ReportSerializer(many=True)
+
+    class Meta:
+        model = models.Chapter
+        fields = (
+            'id',
+            'title',
+            'reports',
+        )
