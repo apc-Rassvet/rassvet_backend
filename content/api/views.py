@@ -2,6 +2,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import filters, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 
 from content import models
 from . import serializers
@@ -107,3 +108,14 @@ class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return serializers.TargetedFundraisingDetailSerializer
         return serializers.TargetedFundraisingListSerializer
+
+
+class ReportViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Получить список отчетов, или конкретный по его ID.
+    """
+    queryset = models.Chapter.objects.all().order_by('position')
+    serializer_class = serializers.ChapterSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        raise NotFound()
