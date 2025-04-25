@@ -116,37 +116,17 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
 class EmployeeSerializer(serializers.ModelSerializer):
     """Сериализаор для вывода информации о команде."""
 
-    specialities = serializers.SerializerMethodField()
-
     class Meta:
         model = models.Employee
-        fields = ('id', 'name', 'image', 'specialities')
-
-    def queryset(self):
-        return models.Employee.objects.all().order_by('ordaring', 'name')
-
-    def get_specialities(self, obj):
-        specialities_list = []
-        specialities = obj.specialities.filter(
-            on_main=True
-        ).values('speciality').order_by('position')
-        for speciality in specialities:
-            specialities_list.append(speciality['speciality'])
-        return specialities_list
+        fields = ('id', 'name', 'image', 'main_specialities', 'order')
 
 
 class DocumentSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации о документах."""
 
-    file = serializers.SerializerMethodField()
-
     class Meta:
         model = models.Document
         fields = ('id', 'name', 'file')
-
-    def get_file(self, obj):
-        request = self.context.get('request')
-        return request.build_absolute_uri(obj.file.url)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -160,7 +140,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def get_documents(self, obj):
         document_obj = obj.documents.filter(
-            team_member=self.context.get('employee'))
+            employee=self.context.get('employee'))
         return DocumentSerializer(
             document_obj,
             many=True,
@@ -171,12 +151,8 @@ class CategorySerializer(serializers.ModelSerializer):
 class EmployeeDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для вывода информации члене команды."""
 
-    specialities = serializers.SerializerMethodField()
-    education = serializers.SerializerMethodField()
     main_documents = serializers.SerializerMethodField()
     category_documents = serializers.SerializerMethodField()
-    additional_education = serializers.SerializerMethodField()
-    trainings = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Employee
@@ -188,55 +164,23 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
             'additional_education',
             'trainings',
             'interviews',
+            'specialists_register',
             'image',
             'main_documents',
             'category_documents'
         )
 
-    def make_list(self, model, field):
-        field_list = []
-        list = model.all().values(
-            field
-        ).order_by('position')
-        for i in list:
-            field_list.append(i[field])
-        return field_list
-
-    def get_specialities(self, obj):
-        field = 'speciality'
-        return self.make_list(obj.specialities, field)
-
-    def get_education(self, obj):
-        field = 'education'
-        return self.make_list(obj.education, field)
-
-    def get_additional_education(self, obj):
-        field = 'additional_education'
-        return self.make_list(obj.additional_education, field)
-
-    def get_trainings(self, obj):
-        field = 'trainings'
-        return self.make_list(obj.trainings, field)
-
-    def build_url(self, request, documents):
-        if request is not None:
-            documents_url = []
-            for document in documents:
-                documents_url.append(request.build_absolute_uri(document))
-            return documents_url
-        return documents
-
     def get_main_documents(self, obj):
         if obj.category_on_main:
             doc = models.Document.objects.filter(
-                team_member=self.instance,
+                employee=self.instance,
                 on_main_page=True
             )
             return DocumentSerializer(
                 doc, many=True, context=self.context).data
         else:
             doc = models.Document.objects.filter(
-                team_member=self.instance
+                employee=self.instance
             )
             return DocumentSerializer(
                 doc, many=True, context=self.context).data
@@ -244,7 +188,7 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
     def get_category_documents(self, obj):
         if obj.category_on_main:
             categories = models.TypeDocument.objects.filter(
-                documents__team_member=obj
+                documents__employee=obj
             ).distinct()
             self.context['employee'] = obj
             documents = CategorySerializer(

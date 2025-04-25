@@ -15,7 +15,7 @@ v1_router_api.register(
 v1_router_api.register(r'partners', views.PartnersViewSet, basename='partner')
 v1_router_api.register(r'reviews', views.ReviewViewSet, basename='review')
 v1_router_api.register(r'videos', views.VideoViewSet, basename='video')
-v1_router_api.register(r'team', views.TeamListView, basename='team')
+v1_router_api.register(r'employees', views.EmployeeViewSet, basename='employee')
 api_urls.extend(v1_router_api.urls)
 
 urlpatterns = [
