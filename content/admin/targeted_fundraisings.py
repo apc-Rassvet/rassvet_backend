@@ -15,7 +15,7 @@ def validate_forms(forms, error_detail):
 
 
 class BaseValidatedInline(admin.TabularInline):
-    extra = 1
+    extra = 0
     min_num = 1
     max_num = 3
     validate_min = True
@@ -46,13 +46,32 @@ class FundraisingTextBlockInline(BaseValidatedInline):
 
 @admin.register(fundraisings_models.TargetedFundraising)
 class TargetedFundraisingAdmin(admin.ModelAdmin):
-    list_display = ('title', 'status', 'order', 'created_at')
+    list_display = ('title', 'status', 'fundraising_link', 'order')
     list_editable = ('order', 'status')
     list_filter = ('status', 'created_at')
     search_fields = ('title',)
     readonly_fields = ('created_at', 'updated_at')
     inlines = [FundraisingPhotoInline, FundraisingTextBlockInline]
     actions = ['move_to_active', 'move_to_completed']
+
+    fieldsets = (
+        (
+            'Основные данные',
+            {
+                'fields': (
+                    'title',
+                    'short_description',
+                    'fundraising_link',
+                    'status',
+                    'order',
+                )
+            },
+        ),
+        (
+            'Системная информация',
+            {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
+        ),
+    )
 
     @admin.action(description='Переместить в актуальные')
     def move_to_active(self, request, queryset):

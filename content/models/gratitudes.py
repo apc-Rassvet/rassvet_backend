@@ -6,7 +6,6 @@ class Gratitude(models.Model):
     """Модель для 'Благодарности' в разделе 'О нас'."""
 
     title = models.CharField('Заголовок', max_length=LENGTH_GRATITUDE_TITLE)
-    description = models.TextField('Описание', blank=True)
     file = models.FileField('Файл благодарности', upload_to='gratitudes/')
     order = models.PositiveIntegerField(
         'Порядок отображения',

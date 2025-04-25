@@ -1,6 +1,5 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import filters, status, viewsets
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 from content import models
@@ -41,10 +40,6 @@ class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.Partner.objects.all()
     serializer_class = serializers.PartnersSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['name', 'created_at']
-    ordering = ['-created_at']
-    pagination_class = LimitOffsetPagination
 
 
 @extend_schema(tags=['Reviews group'])

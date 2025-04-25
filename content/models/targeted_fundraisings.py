@@ -1,10 +1,13 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
+from django_ckeditor_5.fields import CKEditor5Field
+
 from content.constants import (
     LENGTH_FUNDRAISING_TITLE,
     LENGTH_FUNDRAISING_STATUS,
 )
+from content.validators import validate_not_empty_html
 
 
 class FundraisingStatus(models.TextChoices):
@@ -19,6 +22,7 @@ class TargetedFundraising(models.Model):
         max_length=LENGTH_FUNDRAISING_TITLE, verbose_name='Заголовок'
     )
     short_description = models.TextField(verbose_name='Краткое описание')
+    fundraising_link = models.URLField('Ссылка на сбор')
     status = models.CharField(
         max_length=LENGTH_FUNDRAISING_STATUS,
         choices=FundraisingStatus.choices,
@@ -44,7 +48,9 @@ class TargetedFundraising(models.Model):
 
 class FundraisingPhoto(models.Model):
     """Модель 'Фотография' адресного сбора."""
-
+    title = models.CharField(
+        max_length=LENGTH_FUNDRAISING_TITLE, verbose_name='Заголовок'
+    )
     fundraising = models.ForeignKey(
         TargetedFundraising,
         on_delete=models.CASCADE,
@@ -54,8 +60,6 @@ class FundraisingPhoto(models.Model):
     image = models.ImageField(
         upload_to='fundraisings/',
         verbose_name='Фотография',
-        blank=False,
-        null=False,
     )
     position = models.PositiveIntegerField(
         default=1,
@@ -87,13 +91,11 @@ class FundraisingTextBlock(models.Model):
         related_name='text_blocks',
         verbose_name='Адресный сбор',
     )
-    title = models.CharField(
-        max_length=LENGTH_FUNDRAISING_TITLE,
-        blank=True,
-        verbose_name='Заголовок блока',
-    )
-    content = models.TextField(
-        verbose_name='Текстовый блок', blank=False, null=False
+    content = CKEditor5Field(
+        verbose_name='Текстовый блок',
+        config_name='default',
+        blank=False,
+        validators=[validate_not_empty_html],
     )
     position = models.PositiveIntegerField(
         default=1,

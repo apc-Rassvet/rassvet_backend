@@ -163,9 +163,7 @@ CKEDITOR_5_CONFIGS = {
             'link',
             'blockQuote',
             'insertTable',
-            'mediaEmbed',
-            'codeBlock',
-            '|',  # noqa: E501
+            '|',
             'horizontalLine',
             'pageBreak',
             '|',
@@ -177,11 +175,10 @@ CKEDITOR_5_CONFIGS = {
             'highlight',
             'removeFormat',
             '|',
-            'imageUpload',
             'specialCharacters',
             'subscript',
             'superscript',
-            '|',  # noqa: E501
+            '|',
             'todoList',
         ],
         'image': {
@@ -208,43 +205,43 @@ CKEDITOR_5_CONFIGS = {
                     'model': 'paragraph',
                     'title': 'Paragraph',
                     'class': 'ck-heading_paragraph',
-                },  # noqa: E501
+                },
                 {
                     'model': 'heading1',
                     'view': 'h1',
                     'title': 'Heading 1',
                     'class': 'ck-heading_heading1',
-                },  # noqa: E501
+                },
                 {
                     'model': 'heading2',
                     'view': 'h2',
                     'title': 'Heading 2',
                     'class': 'ck-heading_heading2',
-                },  # noqa: E501
+                },
                 {
                     'model': 'heading3',
                     'view': 'h3',
                     'title': 'Heading 3',
                     'class': 'ck-heading_heading3',
-                },  # noqa: E501
+                },
                 {
                     'model': 'heading4',
                     'view': 'h4',
                     'title': 'Heading 4',
                     'class': 'ck-heading_heading4',
-                },  # noqa: E501
+                },
                 {
                     'model': 'heading5',
                     'view': 'h5',
                     'title': 'Heading 5',
                     'class': 'ck-heading_heading5',
-                },  # noqa: E501
+                },
                 {
                     'model': 'heading6',
                     'view': 'h6',
                     'title': 'Heading 6',
                     'class': 'ck-heading_heading6',
-                },  # noqa: E501
+                },
             ]
         },
         'height': '500px',

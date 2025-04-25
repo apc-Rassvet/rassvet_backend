@@ -28,3 +28,29 @@ class EmployeeAdmin(admin.ModelAdmin):
         'name',
     ]
     inlines = [DocumentInline]
+
+    fieldsets = (
+        (
+            'Основные данные',
+            {
+                'fields': (
+                    'name',
+                    'image',
+                    'main_specialities',
+                    'interviews',
+                    'specialists_register',
+                    'order',
+                    'category_on_main',
+                    'specialities',
+                    'education',
+                    'additional_education',
+                    'trainings',
+                )
+            },
+        ),
+        (
+            'Системная информация',
+            {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
+        ),
+    )
+    readonly_fields = ('created_at', 'updated_at')

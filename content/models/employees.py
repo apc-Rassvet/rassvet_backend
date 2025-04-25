@@ -44,8 +44,7 @@ class Employee(models.Model):
     education = CKEditor5Field(
         verbose_name='Образование',
         config_name='default',
-        blank=False,
-        validators=[validate_not_empty_html],
+        blank=True,
     )
     additional_education = CKEditor5Field(
         verbose_name='Дополнительное образование',
@@ -53,18 +52,20 @@ class Employee(models.Model):
         blank=True,
     )
     trainings = CKEditor5Field(
-        verbose_name='Дополнительное образование',
+        verbose_name='Пройденные тренинги',
         config_name='default',
         blank=True,
     )
-
-    def __str__(self):
-        return self.name
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+    updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
     class Meta:
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
         ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
 
     def _clean_empty_html(self, raw_html):
         text = strip_tags(raw_html or '')

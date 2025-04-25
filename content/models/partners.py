@@ -17,12 +17,18 @@ class Partner(models.Model):
     description = models.TextField(
         verbose_name='Описание*', help_text='Обязательное поле'
     )
+    order = models.PositiveIntegerField(
+        'Порядок отображения',
+        default=0,
+        help_text='Чем меньше значение, тем первее в списке',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Партнер'
         verbose_name_plural = 'Партнеры'
+        ordering = ['order', '-created_at']
 
     def __str__(self):
         return self.name

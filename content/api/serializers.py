@@ -10,7 +10,6 @@ class GratitudeSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
-            'description',
             'file',
             'order',
             'created_at',
@@ -37,9 +36,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = models.Review
         fields = [
             'id',
-            'title',
-            'content',
             'author_name',
+            'content',
+            'order',
             'is_active',
             'created_at',
             'updated_at',
@@ -52,20 +51,19 @@ class AboutUsVideoSerializer(serializers.ModelSerializer):
         fields = [
             'title',
             'url',
-            'description',
         ]
 
 
 class FundraisingPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FundraisingPhoto
-        fields = ('position', 'image')
+        fields = ('title', 'position', 'image')
 
 
 class FundraisingTextBlockSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FundraisingTextBlock
-        fields = ('position', 'title', 'content')
+        fields = ('position', 'content')
 
 
 class TargetedFundraisingListSerializer(serializers.ModelSerializer):
@@ -73,8 +71,17 @@ class TargetedFundraisingListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.TargetedFundraising
-        fields = ('id', 'title', 'short_description', 'status', 'main_photo')
+        fields = (
+            'id',
+            'title',
+            'short_description',
+            'status',
+            'main_photo',
+            'created_at',
+            'updated_at',
+        )
 
+    @extend_schema_field(FundraisingPhotoSerializer(allow_null=True))
     def get_main_photo(self, obj):
         photo = obj.photos.filter(position=1).first()
         if photo:
@@ -92,6 +99,7 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'short_description',
+            'fundraising_link',
             'status',
             'photos',
             'text_blocks',
@@ -104,7 +112,15 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Employee
-        fields = ('id', 'name', 'image', 'main_specialities', 'order')
+        fields = (
+            'id',
+            'name',
+            'image',
+            'main_specialities',
+            'order',
+            'created_at',
+            'updated_at',
+        )
 
 
 class DocumentSerializer(serializers.ModelSerializer):

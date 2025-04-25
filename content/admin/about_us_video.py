@@ -8,10 +8,10 @@ from content.models.about_us_video import AboutUsVideo
 class AboutUsVideoAdmin(admin.ModelAdmin):
     """Отображение единственного экземпляра Video в админке."""
 
-    list_display = ('title', 'url', 'description')
+    list_display = ('title', 'url')
     readonly_fields = ('created_at', 'updated_at')
     fieldsets = (
-        ('Основная информация', {'fields': ('title', 'url', 'description')}),
+        ('Основная информация', {'fields': ('title', 'url')}),
         (
             'Служебная информация',
             {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
