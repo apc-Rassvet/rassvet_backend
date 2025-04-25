@@ -11,13 +11,11 @@ class PartnersAdmin(admin.ModelAdmin):
     search_fields = ('name', 'description')
     readonly_fields = ('created_at', 'updated_at', 'logo_preview')
     fieldsets = (
-        ('Основная информация', {
-            'fields': ('name', 'logo', 'description')
-        }),
-        ('Системная информация', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
+        ('Основная информация', {'fields': ('name', 'logo', 'description')}),
+        (
+            'Системная информация',
+            {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
+        ),
     )
 
     @admin.display(description='Логотип')

@@ -13,7 +13,7 @@ class Review(models.Model):
         max_length=LENGTH_REVIEW_AUTHOR,
         blank=True,
         null=True,
-        default=None
+        default=None,
     )
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)

@@ -57,6 +57,7 @@ urlpatterns = [
         name='redoc',
     ),
     path('api/', include('content.urls')),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(

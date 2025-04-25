@@ -1,10 +1,10 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 
 from content import models
 
 
 class GratitudeSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.Gratitude
         fields = [
@@ -27,7 +27,7 @@ class PartnersSerializer(serializers.ModelSerializer):
             'logo',
             'description',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -97,3 +97,87 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'text_blocks',
             'order',
         )
+
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    """Сериализаор для вывода информации о команде."""
+
+    class Meta:
+        model = models.Employee
+        fields = ('id', 'name', 'image', 'main_specialities', 'order')
+
+
+class DocumentSerializer(serializers.ModelSerializer):
+    """Сериализатор для вывода информации о документах."""
+
+    class Meta:
+        model = models.Document
+        fields = ('id', 'name', 'file')
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор для вывода информации о категории."""
+
+    documents = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.TypeDocument
+        fields = ('id', 'name', 'documents')
+
+    def get_documents(self, obj):
+        document_obj = obj.documents.filter(
+            employee=self.context.get('employee')
+        )
+        return DocumentSerializer(
+            document_obj, many=True, context=self.context
+        ).data
+
+
+class EmployeeDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для вывода информации члене команды."""
+
+    main_documents = serializers.SerializerMethodField()
+    category_documents = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Employee
+        fields = (
+            'id',
+            'name',
+            'specialities',
+            'education',
+            'additional_education',
+            'trainings',
+            'interviews',
+            'specialists_register',
+            'image',
+            'main_documents',
+            'category_documents',
+        )
+
+    @extend_schema_field(list[dict])
+    def get_main_documents(self, obj) -> list[dict]:
+        if obj.category_on_main:
+            doc = models.Document.objects.filter(
+                employee=self.instance, on_main_page=True
+            )
+            return DocumentSerializer(
+                doc, many=True, context=self.context
+            ).data
+        else:
+            doc = models.Document.objects.filter(employee=self.instance)
+            return DocumentSerializer(
+                doc, many=True, context=self.context
+            ).data
+
+    @extend_schema_field(list[dict])
+    def get_category_documents(self, obj) -> list[dict]:
+        if not obj.category_on_main:
+            return []
+        categories = models.TypeDocument.objects.filter(
+            documents__employee=obj
+        ).distinct()
+        self.context['employee'] = obj
+        return CategorySerializer(
+            categories, many=True, context=self.context
+        ).data
