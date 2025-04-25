@@ -48,6 +48,7 @@ class TargetedFundraising(models.Model):
 
 class FundraisingPhoto(models.Model):
     """Модель 'Фотография' адресного сбора."""
+
     title = models.CharField(
         max_length=LENGTH_FUNDRAISING_TITLE, verbose_name='Заголовок'
     )

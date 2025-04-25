@@ -6,7 +6,10 @@ from content.models.reviews import Review
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('author_name', 'order', 'is_active')
-    list_editable = ('order', 'is_active',)
+    list_editable = (
+        'order',
+        'is_active',
+    )
     list_filter = ('is_active', 'created_at')
     search_fields = ('content', 'author_name')
 
