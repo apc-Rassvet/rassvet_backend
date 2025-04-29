@@ -4,7 +4,6 @@ from content import models
 
 
 class GratitudeSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.Gratitude
         fields = [
@@ -27,7 +26,7 @@ class PartnersSerializer(serializers.ModelSerializer):
             'logo',
             'description',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -96,4 +95,36 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'photos',
             'text_blocks',
             'order',
+        )
+
+
+class ProjectPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор ProjectPhoto."""
+
+    class Meta:
+        model = models.ProjectPhoto
+        fields = ('image',)
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    """Сериализатор Project."""
+
+    photo = ProjectPhotoSerializer(many=True)
+
+    class Meta:
+        model = models.Project
+        fields = (
+            'id',
+            'title',
+            'logo',
+            'status',
+            'project_start',
+            'project_end',
+            'source_financing',
+            'project_rassvet',
+            'program',
+            'photo',
+            'project_goal',
+            'project_tasks',
+            'project_description',
         )
