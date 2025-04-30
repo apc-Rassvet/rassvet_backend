@@ -1,347 +1,416 @@
 import os
 import csv
-import requests
+import pandas as pd
 
-from django.core.files.base import ContentFile
+from django.core.files import File
 from django.core.management.base import BaseCommand
 
 from content.models import (
     AboutUsVideo,
     Gratitude,
+    Employee,
     Review,
     Partner,
     TargetedFundraising,
     FundraisingPhoto,
     FundraisingTextBlock,
+    TypeDocument,
+    Document,
 )
 from content.models.targeted_fundraisings import FundraisingStatus
 
 
+MEDIA_PATH = 'media_data'
+
+
 class Command(BaseCommand):
-    help = "Импорт данных из TXT-файлов в базу данных"
+    help = 'Импорт данных из TXT-файлов в базу данных'
 
     def handle(self, *args, **kwargs):
-        base_url = "https://rassvet-apc.ru/"
-        base_path = "data/"
-
+        base_path = 'data/'
+        gratitude_count = Gratitude.objects.all().count()
+        Gratitude.objects.all().delete()
+        self.stdout.write(f'Удалено {gratitude_count} старых благодарностей')
+        review_count = Review.objects.all().count()
+        Review.objects.all().delete()
+        self.stdout.write(f'Удалено {review_count} старых отзывов')
+        partner_count = Partner.objects.all().count()
+        Partner.objects.all().delete()
+        self.stdout.write(f'Удалено {partner_count} старых партнёров')
+        fundraising_count = TargetedFundraising.objects.all().count()
+        TargetedFundraising.objects.all().delete()
+        self.stdout.write(f'Удалено {fundraising_count} старых сборов')
+        employee_count = Employee.objects.all().count()
+        Employee.objects.all().delete()
+        self.stdout.write(f'Удалено {employee_count} старых сотрудников')
         with open(
-            os.path.join(base_path, "video.txt"), "r", encoding="utf-8"
+            os.path.join(base_path, 'video.txt'), 'r', encoding='utf-8'
         ) as f:
-            reader = csv.DictReader(f, delimiter="\t")
+            reader = csv.DictReader(f, delimiter='\t')
             for row in reader:
                 AboutUsVideo.objects.update_or_create(
-                    title=row["title"],
-                    url=row["url"],
+                    title=row['title'],
+                    url=row['url'],
                 )
 
         with open(
-            os.path.join(base_path, "gratitudes.txt"), "r", encoding="utf-8"
+            os.path.join(base_path, 'gratitudes.txt'), 'r', encoding='utf-8'
         ) as f:
-            reader = csv.DictReader(f, delimiter="\t")
+            reader = csv.DictReader(f, delimiter='\t')
+            gratitude_count = 0
             for row_num, row in enumerate(reader, 1):
-                if not row.get("file"):
-                    continue
-                relative_path = row["file"].lstrip("\\/")
-                file_url = f"{base_url}{relative_path}"
-                file_name = os.path.basename(relative_path)
-                try:
-                    title = row.get("title") or f"Благодарность #{row_num}"
-                    file_basename = os.path.splitext(
-                        os.path.basename(relative_path)
-                    )[0]
-                    existing_gratitudes = Gratitude.objects.filter(
-                        file__contains=file_basename
-                    )
-                    existing_gratitude = None
-                    for gratitude in existing_gratitudes:
-                        if row["order"] == gratitude.order:
-                            existing_gratitude = gratitude
-                            break
-                    if not existing_gratitude and row.get("order"):
-                        existing_by_order = Gratitude.objects.filter(
-                            order=row["order"]
-                        ).first()
-                        if existing_by_order:
-                            existing_gratitude = existing_by_order
-                    if existing_gratitude:
-                        existing_gratitude.title = title
-                        existing_gratitude.order = row["order"]
-                        existing_gratitude.is_active = True
-                        existing_gratitude.save()
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                "Обновлена существующая благодарность: "
-                                f"{file_url}"
-                            )
-                        )
-                    else:
-                        response = requests.get(file_url, timeout=10)
-                        response.raise_for_status()
-                        gratitude = Gratitude(
-                            file=relative_path,
-                            title=title,
-                            order=row["order"],
-                            is_active=True,
-                        )
-                        gratitude.save()
-                        gratitude.file.save(
-                            file_name, ContentFile(response.content), save=True
-                        )
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                "Успешно загружена новая благодарность: "
-                                f"{file_url}"
-                            )
-                        )
-                except requests.exceptions.RequestException as e:
+                if not row.get('file'):
                     self.stdout.write(
-                        self.style.ERROR(
-                            f"Ошибка загрузки {file_url}: {str(e)}"
+                        self.style.WARNING(
+                            f'Пропущена строка {row_num}: отсутствует файл'
                         )
                     )
-                except Exception as e:
-                    self.stdout.write(self.style.ERROR(f"Ошибка: {str(e)}"))
-
-        with open(
-            os.path.join(base_path, "reviews.txt"), "r", encoding="utf-8"
-        ) as f:
-            reader = csv.DictReader(f, delimiter="\t")
-            for row in reader:
-                Review.objects.update_or_create(
-                    author_name=row["author_name"],
-                    defaults={
-                        "content": row["content"],
-                        "order": row["order"],
-                        "is_active": row["is_active"] == "да",
-                    },
-                )
-
-        with open(
-            os.path.join(base_path, "partners.txt"), "r", encoding="utf-8"
-        ) as f:
-            reader = csv.DictReader(f, delimiter="\t")
-            for row_num, row in enumerate(reader, 1):
-                if not row.get("logo"):
                     continue
-                relative_path = row["logo"].lstrip("\\/")
-                logo_url = f"{base_url}{relative_path}"
-                logo_filename = os.path.basename(relative_path)
-                try:
-                    name = row["name"]
-                    logo_basename = os.path.splitext(
-                        os.path.basename(relative_path)
-                    )[0]
-                    existing_partners = Partner.objects.filter(
-                        logo__contains=logo_basename
-                    )
-                    existing_partner = None
-                    for partner in existing_partners:
-                        if partner.name == name:
-                            existing_partner = partner
-                            break
-                    if not existing_partner:
-                        existing_partner = Partner.objects.filter(
-                            name=name
-                        ).first()
-                    if existing_partner:
-                        existing_partner.description = row["description"]
-                        existing_partner.order = row.get("order", 0)
-                        existing_partner.save()
+                file_path = row['file'].lstrip('\\')
+                absolute_path = MEDIA_PATH + file_path
 
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                f"Обновлен существующий партнер (ID: "
-                                f"{existing_partner.id}): {name}"
-                            )
-                        )
-                    else:
-                        response = requests.get(logo_url, timeout=10)
-                        response.raise_for_status()
-                        partner = Partner(
-                            name=name,
-                            description=row["description"],
-                            order=row.get("order", 0),
-                        )
-                        partner.save()
-                        partner.logo.save(
-                            logo_filename,
-                            ContentFile(response.content),
+                try:
+                    title = row.get('title') or f'Благодарность #{row_num}'
+                    gratitude = Gratitude(
+                        title=title,
+                        order=row.get('order', 0),
+                        is_active=True,
+                    )
+
+                    with open(absolute_path, 'rb') as file_obj:
+                        gratitude.file.save(
+                            os.path.basename(file_path),
+                            File(file_obj),
                             save=True,
                         )
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                f"Создан новый партнер (ID: {partner.id}): "
-                                f"{name} с логотипом: {logo_url}"
-                            )
-                        )
-                except requests.exceptions.RequestException as e:
+                    gratitude_count += 1
+                    self.stdout.write(f"Благодарность '{title}' создана")
+                except FileNotFoundError:
                     self.stdout.write(
-                        self.style.ERROR(
-                            f"Ошибка загрузки логотипа {logo_url}: {str(e)} "
-                            f"для {row['name']}"
-                        )
+                        self.style.ERROR(f'Файл не найден: {absolute_path}')
                     )
                 except Exception as e:
-                    self.stdout.write(self.style.ERROR(f"Ошибка: {str(e)}"))
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f'Ошибка при импорте {file_path}: {str(e)}'
+                        )
+                    )
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f'Импортировано {gratitude_count} благодарностей'
+                )
+            )
 
         with open(
-            os.path.join(base_path, "fundraisings.txt"), "r", encoding="utf-8"
+            os.path.join(base_path, 'reviews.txt'), 'r', encoding='utf-8'
         ) as f:
-            reader = csv.DictReader(f, delimiter="\t")
+            reader = csv.DictReader(f, delimiter='\t')
+            review_count = 0
+            for row in reader:
+                review, created = Review.objects.update_or_create(
+                    author_name=row['author_name'],
+                    defaults={
+                        'content': row['content'],
+                        'order': row['order'],
+                        'is_active': row['is_active'] == 'да',
+                    },
+                )
+                review_count += 1
+                status = 'создан' if created else 'обновлен'
+                self.stdout.write(f"Отзыв от '{row['author_name']}' {status}")
+            self.stdout.write(
+                self.style.SUCCESS(f'Импортировано {review_count} отзывов')
+            )
+
+        with open(
+            os.path.join(base_path, 'partners.txt'), 'r', encoding='utf-8'
+        ) as f:
+            reader = csv.DictReader(f, delimiter='\t')
+            partner_count = 0
             for row_num, row in enumerate(reader, 1):
+                if not row.get('logo'):
+                    continue
+                file_path = row['logo'].lstrip('\\')
+                absolute_path = MEDIA_PATH + file_path
                 try:
-                    status = (
-                        FundraisingStatus.ACTIVE
-                        if row["status"] == "Актуальный"
-                        else FundraisingStatus.COMPLETED
+                    name = row.get('name') or f'Партнёр #{row_num}'
+                    partner = Partner(
+                        name=name,
+                        description=row.get('description'),
+                        order=row.get('order', 0),
                     )
-                    existing_fundraising = TargetedFundraising.objects.filter(
-                        title=row["title"]
-                    ).first()
-                    if not existing_fundraising and row.get("order"):
-                        existing_by_order = TargetedFundraising.objects.filter(
-                            order=row["order"]
-                        ).first()
-                        if existing_by_order:
-                            existing_fundraising = existing_by_order
-                    if existing_fundraising:
-                        existing_fundraising.short_description = row[
-                            "short_description"
-                        ]
-                        existing_fundraising.fundraising_link = row[
-                            "fundraising_link"
-                        ]
-                        existing_fundraising.status = status
-                        existing_fundraising.order = row["order"]
-                        existing_fundraising.save()
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                f"Обновлен существующий адресный сбор (ID: "
-                                f"{existing_fundraising.id}): {row['title']}"
-                            )
+
+                    with open(absolute_path, 'rb') as file_obj:
+                        partner.logo.save(
+                            os.path.basename(file_path),
+                            File(file_obj),
+                            save=True,
                         )
-                        fundraising = existing_fundraising
-                    else:
-                        fundraising = TargetedFundraising.objects.create(
-                            title=row["title"],
-                            short_description=row["short_description"],
-                            fundraising_link=row["fundraising_link"],
-                            status=status,
-                            order=row["order"],
+                    partner_count += 1
+                    self.stdout.write(f"Партнёр '{name}' создан")
+                except FileNotFoundError:
+                    self.stdout.write(
+                        self.style.ERROR(f'Файл не найден: {absolute_path}')
+                    )
+                except Exception as e:
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f'Ошибка при импорте {file_path}: {str(e)}'
                         )
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                f"Создан новый адресный сбор (ID: "
-                                f"{fundraising.id}): {row['title']}"
-                            )
-                        )
-                    for i in range(1, 4):
-                        photo_field = f"photo{i}"
-                        if not row.get(photo_field):
-                            continue
-                        relative_path = row[photo_field].lstrip("\\/")
-                        photo_url = f"{base_url}{relative_path}"
-                        photo_filename = os.path.basename(relative_path)
-                        photo_basename = os.path.splitext(
-                            os.path.basename(relative_path)
-                        )[0]
-                        existing_photos = FundraisingPhoto.objects.filter(
-                            fundraising=fundraising, position=i
-                        )
-                        existing_photo = None
-                        for photo in existing_photos:
-                            if photo.image and photo_basename in str(
-                                photo.image
-                            ):
-                                existing_photo = photo
-                                break
+                    )
+            self.stdout.write(
+                self.style.SUCCESS(f'Импортировано {partner_count} партнёров')
+            )
+
+        with open(
+            os.path.join(base_path, 'fundraisings.txt'), 'r', encoding='utf-8'
+        ) as f:
+            reader = csv.DictReader(f, delimiter='\t')
+            fundraising_count = 0
+            for row in reader:
+                status = (
+                    FundraisingStatus.ACTIVE
+                    if row['status'].lower() == 'актуальный'
+                    else FundraisingStatus.COMPLETED
+                )
+                fundraising = TargetedFundraising.objects.create(
+                    title=row['title'],
+                    short_description=row['short_description'],
+                    fundraising_link=row.get('fundraising_link', ''),
+                    status=status,
+                    order=int(row.get('order', 0)),
+                )
+                fundraising_count += 1
+                self.stdout.write(
+                    f"Создан сбор '{fundraising.title}' со статусом '{status}'"
+                )
+                for i in range(1, 4):
+                    photo_field = f'photo{i}'
+                    if photo_field in row and row[photo_field]:
+                        photo_path = row[photo_field].lstrip('/')
+                        absolute_path = os.path.join(MEDIA_PATH, photo_path)
                         try:
-                            if existing_photo:
-                                existing_photo.title = (
-                                    f"{photo_field}_{photo_basename}"
-                                )
-                                existing_photo.save()
-                                self.stdout.write(
-                                    self.style.SUCCESS(
-                                        f"Обновлена существующая фотография "
-                                        f"(ID: {existing_photo.id}) "
-                                        f"для сбора (ID: {fundraising.id})"
-                                    )
-                                )
-                            else:
-                                response = requests.get(photo_url, timeout=10)
-                                response.raise_for_status()
-
-                                photo = FundraisingPhoto(
-                                    title=f"{photo_field}_{photo_basename}",
-                                    fundraising=fundraising,
-                                    position=i,
-                                )
-                                photo.save()
-
+                            photo = FundraisingPhoto(
+                                title=f'Фото {i} для {fundraising.title}',
+                                fundraising=fundraising,
+                                position=i,
+                            )
+                            with open(absolute_path, 'rb') as file_obj:
                                 photo.image.save(
-                                    photo_filename,
-                                    ContentFile(response.content),
+                                    os.path.basename(photo_path),
+                                    File(file_obj),
                                     save=True,
                                 )
-
                                 self.stdout.write(
-                                    self.style.SUCCESS(
-                                        f"Загружена новая фотография (ID: "
-                                        f"{photo.id}) для сбора (ID: "
-                                        f"{fundraising.id}): {photo_url}"
-                                    )
+                                    f"Загружено фото {i} для сбора '"
+                                    f"{fundraising.title}'"
                                 )
-                        except requests.exceptions.RequestException as e:
+                        except FileNotFoundError:
                             self.stdout.write(
                                 self.style.ERROR(
-                                    f"Ошибка загрузки фотографии "
-                                    f"{photo_url} для "
-                                    f"{row['title']}: {str(e)}"
+                                    f'Файл не найден: {absolute_path}'
                                 )
                             )
                         except Exception as e:
                             self.stdout.write(
                                 self.style.ERROR(
-                                    f"Ошибка при обработке фотографии: "
-                                    f"{str(e)}"
+                                    f'Ошибка при импорте фото {photo_path}: '
+                                    f'{str(e)}'
                                 )
                             )
-                    for i in range(1, 4):
-                        text_field = f"text{i}"
-                        if not row.get(text_field):
-                            continue
-                        existing_text = FundraisingTextBlock.objects.filter(
-                            fundraising=fundraising, position=i
-                        ).first()
-                        if existing_text:
-                            existing_text.content = row[text_field]
-                            existing_text.save()
-                            self.stdout.write(
-                                self.style.SUCCESS(
-                                    f"Обновлен текстовый блок (ID: "
-                                    f"{existing_text.id}) "
-                                    f"для сбора (ID: {fundraising.id})"
-                                )
-                            )
-                        else:
-                            text_block = FundraisingTextBlock.objects.create(
+                for i in range(1, 4):
+                    text_field = f'text{i}'
+                    if text_field in row and row[text_field]:
+                        try:
+                            FundraisingTextBlock.objects.create(
                                 fundraising=fundraising,
-                                position=i,
                                 content=row[text_field],
+                                position=i,
                             )
                             self.stdout.write(
-                                self.style.SUCCESS(
-                                    f"Создан новый текстовый блок (ID: "
-                                    f"{text_block.id}) "
-                                    f"для сбора (ID: {fundraising.id})"
+                                f'Создан текстовый блок {i} для сбора '
+                                f"'{fundraising.title}'"
+                            )
+                        except Exception as e:
+                            self.stdout.write(
+                                self.style.ERROR(
+                                    f'Ошибка при создании текстового блока '
+                                    f"{i} для сбора '{fundraising.title}': "
+                                    f'{str(e)}'
                                 )
                             )
-                except Exception as e:
-                    self.stdout.write(
-                        self.style.ERROR(
-                            f"Ошибка при обработке строки {row_num}: {str(e)}"
-                        )
-                    )
+            self.stdout.write(
+                self.style.SUCCESS(f'Импортировано {fundraising_count} сборов')
+            )
 
-        self.stdout.write(self.style.SUCCESS("Данные успешно загружены!"))
+        excel_file = 'data/employees.xlsx'
+
+        try:
+            if not os.path.exists(excel_file):
+                self.stdout.write(
+                    self.style.ERROR(f'Файл не найден: {excel_file}')
+                )
+                return
+            df = pd.read_excel(excel_file, dtype=str)
+            df = df.fillna('')
+            employee_count = 0
+            document_count = 0
+            current_employee = None
+            for index, row in df.iterrows():
+                name = row.get('Имя', '')
+                if name:
+                    employee, created = Employee.objects.update_or_create(
+                        name=name,
+                        defaults={
+                            'main_specialities': row.get(
+                                'Специальности на странице Команда', ''
+                            ),
+                            'specialities': row.get(
+                                'Специальности подробная', ''
+                            ),
+                            'order': (
+                                int(row.get('Порядок', 999))
+                                if row.get('Порядок')
+                                and str(row.get('Порядок')).isdigit()
+                                else 999
+                            ),
+                            'education': row.get('Образование', ''),
+                            'additional_education': row.get(
+                                'Доп. Образование', ''
+                            ),
+                            'trainings': row.get('Тренинги', ''),
+                            'interviews': row.get('Интервью', ''),
+                            'specialists_register': row.get(
+                                'Реестр специалистов', ''
+                            ),
+                        },
+                    )
+                    if created:
+                        self.stdout.write(
+                            self.style.SUCCESS(f'Создан сотрудник: {name}')
+                        )
+                    else:
+                        self.stdout.write(
+                            self.style.SUCCESS(f'Обновлен сотрудник: {name}')
+                        )
+                    current_employee = employee
+                    employee_count += 1
+                    photo_url = (
+                        MEDIA_PATH + row.get('Фотография', '')
+                    ).strip()
+                    if (
+                        photo_url
+                        and isinstance(photo_url, str)
+                        and not photo_url.isspace()
+                    ):
+                        photo_filename = os.path.basename(photo_url)
+                        try:
+                            if os.path.exists(photo_url):
+                                with open(photo_url, 'rb') as f:
+                                    employee.image.save(
+                                        photo_filename,
+                                        File(f),
+                                        save=True,
+                                    )
+                                    self.stdout.write(
+                                        self.style.SUCCESS(
+                                            f'Загружено фото: {photo_filename}'
+                                        )
+                                    )
+                            else:
+                                self.stdout.write(
+                                    self.style.WARNING(
+                                        f'Файл не найден: {photo_url}'
+                                    )
+                                )
+                        except Exception as e:
+                            self.stdout.write(
+                                self.style.ERROR(
+                                    f'Ошибка при обработке изображения: {e}'
+                                )
+                            )
+                file_path = (
+                    MEDIA_PATH + row.get('Файл сертификата', '').strip()
+                )
+                cert_name = row.get('Название сертификата', '')
+                cert_type = row.get('Тип сертификата', '')
+                if file_path and cert_type and current_employee:
+                    if not cert_name:
+                        cert_name = os.path.basename(file_path).split('.')[0]
+                    if cert_type == 'лента':
+                        document, created = Document.objects.update_or_create(
+                            name=cert_name,
+                            employee=current_employee,
+                            on_main_page=True,
+                        )
+                    else:
+                        doc_type, created = TypeDocument.objects.get_or_create(
+                            name=cert_type
+                        )
+                        if created:
+                            self.stdout.write(
+                                self.style.SUCCESS(
+                                    f'Создан тип документа: {cert_type}'
+                                )
+                            )
+                        document, created = Document.objects.update_or_create(
+                            name=cert_name,
+                            employee=current_employee,
+                            type=doc_type,
+                            defaults={'on_main_page': False},
+                        )
+                    if created:
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                f'Создан документ: {cert_name} для '
+                                f'{current_employee.name}'
+                            )
+                        )
+                    else:
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                f'Обновлен документ: {cert_name} для '
+                                f'{current_employee.name}'
+                            )
+                        )
+                    document_count += 1
+                    if created or not document.file:
+                        try:
+                            if os.path.exists(file_path):
+                                with open(file_path, 'rb') as f:
+                                    document.file.save(
+                                        os.path.basename(file_path),
+                                        File(f),
+                                        save=True,
+                                    )
+                                    self.stdout.write(
+                                        self.style.SUCCESS(
+                                            f'Загружен файл документа: '
+                                            f'{os.path.basename(file_path)}'
+                                        )
+                                    )
+                            else:
+                                self.stdout.write(
+                                    self.style.WARNING(
+                                        f'Файл документа не найден: '
+                                        f'{file_path}'
+                                    )
+                                )
+                        except Exception as e:
+                            self.stdout.write(
+                                self.style.ERROR(
+                                    f'Ошибка при обработке файла '
+                                    f'документа: {e}'
+                                )
+                            )
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f'Импорт данных успешно завершен. Обработано сотрудников: '
+                    f'{employee_count}, документов: {document_count}'
+                )
+            )
+        except Exception as e:
+            self.stdout.write(
+                self.style.ERROR(f'Ошибка при импорте данных: {e}')
+            )
+        self.stdout.write(self.style.SUCCESS('Данные загружены!'))
