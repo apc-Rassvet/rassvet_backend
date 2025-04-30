@@ -1,3 +1,2 @@
-Заголовок Alt	URL (ссылка)
-
+title	url
 Видео о жизни “Рассвета”	https://rutube.ru/video/b1f49b5807273b32e5f16cfa159e2813/?r=plemwd
