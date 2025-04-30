@@ -32,7 +32,7 @@ class Employee(models.Model):
         verbose_name='Реестр специалистов', blank=True
     )
     category_on_main = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name='Отображать категории документов на главной странице',
     )
     specialities = CKEditor5Field(
@@ -100,7 +100,9 @@ class Document(models.Model):
     )
     type = models.ForeignKey(
         TypeDocument,
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
         related_name='documents',
         verbose_name='Тип документа',
     )
