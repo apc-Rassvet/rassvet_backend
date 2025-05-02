@@ -8,6 +8,8 @@ def upload_file(instance, filename):
 
 
 class Chapter(models.Model):
+    """Модель для хранения информации о разделах отчетов"""
+
     title = models.TextField(
         verbose_name='Название раздела')
     position = models.PositiveSmallIntegerField(
@@ -17,12 +19,15 @@ class Chapter(models.Model):
     class Meta:
         verbose_name = 'Раздел отчетов'
         verbose_name_plural = 'Разделы отчетов'
+        ordering = ['position']
 
     def __str__(self):
         return self.title
 
 
 class Report(models.Model):
+    """Модель для хранения информации о отчетах"""
+    
     title = models.TextField(
         verbose_name='Название отчета'
     )
@@ -49,6 +54,7 @@ class Report(models.Model):
     class Meta:
         verbose_name = 'Отчет'
         verbose_name_plural = 'Отчеты'
+        ordering = ['-pub_date']
 
     def __str__(self):
         return self.title

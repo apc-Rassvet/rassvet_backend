@@ -102,23 +102,15 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
 class ReportSerializer(serializers.ModelSerializer):
     """Сериализатор для отчетов"""
 
-    file = serializers.SerializerMethodField()
-
     class Meta:
         model = models.Report
         fields = (
             'id',
             'title',
+            'download_icon',
             'file',
+            'pub_date'
         )
-
-    def get_file(self, obj):
-        if obj.download_icon:
-            request = self.context.get('request')
-            file = obj.file.url
-            return request.build_absolute_uri(file)
-        else:
-            return None
 
 
 class ChapterSerializer(serializers.ModelSerializer):
@@ -132,4 +124,5 @@ class ChapterSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'reports',
+            'position'
         )

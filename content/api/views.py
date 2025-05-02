@@ -109,13 +109,24 @@ class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
             return serializers.TargetedFundraisingDetailSerializer
         return serializers.TargetedFundraisingListSerializer
 
-
+@extend_schema(tags=['Reports'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список отчетов.',
+        description='''
+        Получить список отчетов с сортировкой по разделам.
+        ''',
+    ),
+    retrieve=extend_schema(
+        summary='Получить список отчетов раздела.',
+        description='''
+        Получить список отчетов одного раздела.
+        '''
+    )
+)
 class ReportViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Получить список отчетов, или конкретный по его ID.
     """
-    queryset = models.Chapter.objects.all().order_by('position')
+    queryset = models.Chapter.objects.all()
     serializer_class = serializers.ChapterSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        raise NotFound()
