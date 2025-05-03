@@ -1,16 +1,18 @@
+"""Модуль конфигурации административного интерфейса для приложения users.
+
+Этот модуль регистрирует модели приложения пользователей в административном
+интерфейсе Django и настраивает отображение, фильтрацию и редактирование
+пользовательских данных.
+"""
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import ProxyUser
+
+from .models import RassvetUser
 
 
-@admin.register(ProxyUser)
-class ProxyUserAdmin(UserAdmin):
-    add_fieldsets = (
-        (
-            None,
-            {
-                'classes': ('wide',),
-                'fields': ('username', 'email', 'password1', 'password2'),
-            },
-        ),
-    )
+@admin.register(RassvetUser)
+class RassvetUserAdmin(UserAdmin):
+    """Административный интерфейс для модели пользователя RassvetUser."""
+
+    pass

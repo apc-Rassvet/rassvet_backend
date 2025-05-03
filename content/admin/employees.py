@@ -1,26 +1,44 @@
+"""Административная конфигурация для моделей Document и Employee.
+
+Этот модуль содержит:
+- TypeDocumentInline: настройка отображения типов документов в админке.
+- DocumentInline: inline-класс для связанных документов.
+- EmployeeAdmin: конфигурация админки для модели Employee.
+"""
+
 from django.contrib import admin
 
-from content.models import employees as team_models
+from content.models import Document, Employee, TypeDocument
 
 
-@admin.register(team_models.TypeDocument)
-class TypeDocument(admin.ModelAdmin):
+@admin.register(TypeDocument)
+class TypeDocumentInline(admin.ModelAdmin):
+    """Настройка отображения модели TypeDocument в админке."""
+
     fields = ('name',)
 
     def get_model_perms(self, request):
+        """Отключает отображение модели в основном меню админки."""
         return {}
 
 
 class DocumentInline(admin.TabularInline):
-    model = team_models.Document
+    """Inline-класс для связанных с Employee документов."""
+
+    model = Document
     extra = 1
     validate_min = False
     verbose_name = 'Документ'
     verbose_name_plural = 'Документы'
 
 
-@admin.register(team_models.Employee)
+@admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
+    """Конфигурация админки для модели Employee.
+
+    Определяет отображаемые поля, фильтрацию, поиск, inline-классы и fieldsets.
+    """
+
     list_display = ('name', 'order', 'category_on_main')
     list_editable = ('order', 'category_on_main')
     list_filter = ('order',)

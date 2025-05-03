@@ -1,29 +1,31 @@
+"""Модуль содержит модель для работы с отзывами.
+
+Модели:
+    - Review: Модель для хранения информации об отзывах
+"""
+
 from django.db import models
 
-from content.constants import LENGTH_REVIEW_AUTHOR
+from content.mixins import OrderMixin, TimestampMixin
 
 
-class Review(models.Model):
-    """Модель Отзывы (страница 'О нас')."""
+class Review(OrderMixin, TimestampMixin, models.Model):
+    """Модель для хранения информации об отзывах."""
 
     author_name = models.CharField(
         'Автор',
-        max_length=LENGTH_REVIEW_AUTHOR,
+        max_length=100,
     )
     content = models.TextField('Текст отзыва')
-    order = models.PositiveIntegerField(
-        'Порядок отображения',
-        default=0,
-        help_text='Чем меньше значение, тем первее в списке',
-    )
     is_active = models.BooleanField('Активный', default=True)
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-    updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
     class Meta:
+        """Класс Meta для модели Review, содержащий мета-данные."""
+
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         ordering = ['order', '-created_at']
 
     def __str__(self):
+        """Возвращает строковое представление отзыва."""
         return self.author_name

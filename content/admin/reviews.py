@@ -1,10 +1,21 @@
+"""Конфигурация админки для модели Review.
+
+Этот модуль содержит класс ReviewAdmin,
+настраивающий отображение и поведение записей партнеров в админке.
+"""
+
 from django.contrib import admin
 
-from content.models.reviews import Review
+from content.models import Review
 
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
+    """Настройка отображения списка Review и форм редактирования.
+
+    Определяет отображаемые и редактируемые поля, фильтры, поиск и секции.
+    """
+
     list_display = ('author_name', 'order', 'is_active')
     list_editable = (
         'order',

@@ -1,25 +1,27 @@
+"""Модуль содержит модель для работы с благодарностями.
+
+Модели:
+    - Gratitude: Модель для хранения информации о благодарностях
+"""
+
 from django.db import models
-from content.constants import LENGTH_GRATITUDE_TITLE
+
+from content.mixins import OrderMixin, TimestampMixin, TitleMixin
 
 
-class Gratitude(models.Model):
-    """Модель для 'Благодарности' в разделе 'О нас'."""
+class Gratitude(TitleMixin, OrderMixin, TimestampMixin, models.Model):
+    """Модель для хранения информации о благодарностях."""
 
-    title = models.CharField('Заголовок', max_length=LENGTH_GRATITUDE_TITLE)
     file = models.FileField('Файл благодарности', upload_to='gratitudes/')
-    order = models.PositiveIntegerField(
-        'Порядок отображения',
-        default=0,
-        help_text='Чем меньше значение, тем первее в списке',
-    )
     is_active = models.BooleanField('Видимость в ленте', default=True)
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-    updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
     class Meta:
+        """Класс Meta для модели Gratitude, содержащий мета-данные."""
+
         verbose_name = 'Благодарность'
         verbose_name_plural = 'Благодарности'
         ordering = ['order', '-created_at']
 
     def __str__(self):
+        """Возвращает строковое представление благодарности."""
         return self.title

@@ -1,34 +1,36 @@
+"""Модуль содержит модель для работы с партнёрами.
+
+Модели:
+    - Partner: Модель для хранения информации о партнёрах
+"""
+
 from django.db import models
 
+from content.mixins import OrderMixin, TimestampMixin
 
-class Partner(models.Model):
-    """Модель Партнеры (страница Партнеры)."""
+
+class Partner(OrderMixin, TimestampMixin, models.Model):
+    """Модель для хранения информации о партнёрах."""
 
     name = models.CharField(
         max_length=255,
-        verbose_name='Название партнера*',
-        help_text='Обязательное поле',
+        verbose_name='Название партнера',
     )
     logo = models.ImageField(
         upload_to='partners/logos/',
-        verbose_name='Логотип партнера*',
-        help_text='Обязательное поле',
+        verbose_name='Логотип партнера',
     )
     description = models.TextField(
-        verbose_name='Описание*', help_text='Обязательное поле'
+        verbose_name='Описание',
     )
-    order = models.PositiveIntegerField(
-        'Порядок отображения',
-        default=0,
-        help_text='Чем меньше значение, тем первее в списке',
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        """Класс Meta для модели Partner, содержащий мета-данные."""
+
         verbose_name = 'Партнер'
         verbose_name_plural = 'Партнеры'
         ordering = ['order', '-created_at']
 
     def __str__(self):
+        """Возвращает строковое представление партнёра."""
         return self.name

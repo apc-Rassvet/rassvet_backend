@@ -1,3 +1,15 @@
+"""Модуль конфигурации проекта 'АПЦ Рассвет'.
+
+Этот модуль содержит все настройки проекта, включая:
+- Базовые параметры проекта (SECRET_KEY, DEBUG и т.д.)
+- Настройки приложений (INSTALLED_APPS)
+- Конфигурацию базы данных (PostgreSQL)
+- Настройки статических файлов и медиа
+- Настройки аутентификации и авторизации
+- Конфигурацию REST Framework и DRF Spectacular для API
+- Настройки редактора CKEditor 5
+"""
+
 import os
 from pathlib import Path
 
@@ -68,14 +80,6 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
-
-# sqlite3 - Для локальной разработки
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {

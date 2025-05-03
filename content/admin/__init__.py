@@ -1,3 +1,5 @@
+"""Пакет админских классов для приложения content."""
+
 from .about_us_video import AboutUsVideoAdmin
 from .employees import EmployeeAdmin
 from .gratitudes import GratitudeAdmin

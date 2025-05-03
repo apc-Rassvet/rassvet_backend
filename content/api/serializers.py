@@ -1,12 +1,47 @@
-from rest_framework import serializers
-from drf_spectacular.utils import extend_schema_field
+"""Сериализаторы для моделей приложения.
 
-from content import models
+Этот модуль содержит сериализаторы, используемые для преобразования
+данных моделей в JSON-формат для API, а также обработки входящих данных.
+
+Включенные сериализаторы:
+- GratitudeSerializer: для благодарностей.
+- PartnersSerializer: для партнёров.
+- ReviewSerializer: для отзывов.
+- AboutUsVideoSerializer: для видео о нас.
+- FundraisingPhotoSerializer: для фотографий сборов.
+- FundraisingTextBlockSerializer: для текстовых блоков сборов.
+- TargetedFundraisingListSerializer: краткий формат сбора средств.
+- TargetedFundraisingDetailSerializer: детальный формат сбора средств.
+- EmployeeSerializer: краткая информация о сотруднике.
+- DocumentSerializer: документы сотрудников.
+- CategorySerializer: категория документов сотрудника.
+- EmployeeDetailSerializer: подробная информация о сотруднике с документами.
+"""
+
+from drf_spectacular.utils import extend_schema_field
+from rest_framework import serializers
+
+from content.models import (
+    AboutUsVideo,
+    Document,
+    Employee,
+    FundraisingPhoto,
+    FundraisingTextBlock,
+    Gratitude,
+    Partner,
+    Review,
+    TargetedFundraising,
+    TypeDocument,
+)
 
 
 class GratitudeSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Gratitude."""
+
     class Meta:
-        model = models.Gratitude
+        """Meta класс с настройками сериализатора Gratitude."""
+
+        model = Gratitude
         fields = [
             'id',
             'title',
@@ -18,8 +53,12 @@ class GratitudeSerializer(serializers.ModelSerializer):
 
 
 class PartnersSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Partner."""
+
     class Meta:
-        model = models.Partner
+        """Meta класс с настройками сериализатора Partner."""
+
+        model = Partner
         fields = [
             'id',
             'name',
@@ -32,8 +71,12 @@ class PartnersSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Review."""
+
     class Meta:
-        model = models.Review
+        """Meta класс с настройками сериализатора Review."""
+
+        model = Review
         fields = [
             'id',
             'author_name',
@@ -46,8 +89,12 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class AboutUsVideoSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели AboutUsVideo."""
+
     class Meta:
-        model = models.AboutUsVideo
+        """Meta класс с настройками сериализатора AboutUsVideo."""
+
+        model = AboutUsVideo
         fields = [
             'title',
             'url',
@@ -55,22 +102,34 @@ class AboutUsVideoSerializer(serializers.ModelSerializer):
 
 
 class FundraisingPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор для фотографий, связанных с TargetedFundraising."""
+
     class Meta:
-        model = models.FundraisingPhoto
+        """Meta класс с настройками сериализатора FundraisingPhoto."""
+
+        model = FundraisingPhoto
         fields = ('title', 'position', 'image')
 
 
 class FundraisingTextBlockSerializer(serializers.ModelSerializer):
+    """Сериализатор для текстовых блоков, связанных с TargetedFundraising."""
+
     class Meta:
-        model = models.FundraisingTextBlock
+        """Meta класс с настройками сериализатора FundraisingTextBlock."""
+
+        model = FundraisingTextBlock
         fields = ('position', 'content')
 
 
 class TargetedFundraisingListSerializer(serializers.ModelSerializer):
+    """Сериализатор списка адресных сборов (TargetedFundraising)."""
+
     main_photo = serializers.SerializerMethodField()
 
     class Meta:
-        model = models.TargetedFundraising
+        """Meta класс с настройками сериализатора TargetedFundraising."""
+
+        model = TargetedFundraising
         fields = (
             'id',
             'title',
@@ -83,6 +142,7 @@ class TargetedFundraisingListSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(FundraisingPhotoSerializer(allow_null=True))
     def get_main_photo(self, obj):
+        """Возвращает главное фото для сбора (position=1)."""
         photo = obj.photos.filter(position=1).first()
         if photo:
             return FundraisingPhotoSerializer(photo, context=self.context).data
@@ -90,11 +150,18 @@ class TargetedFundraisingListSerializer(serializers.ModelSerializer):
 
 
 class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
+    """Детализированный сериализатор для TargetedFundraising.
+
+    Включает в себя все фото, текстовые блоки и другие подробности сбора.
+    """
+
     photos = FundraisingPhotoSerializer(many=True)
     text_blocks = FundraisingTextBlockSerializer(many=True)
 
     class Meta:
-        model = models.TargetedFundraising
+        """Meta класс с настройками сериализатора TargetedFundraising."""
+
+        model = TargetedFundraising
         fields = (
             'id',
             'title',
@@ -108,10 +175,12 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    """Сериализаор для вывода информации о команде."""
+    """Сериализатор для краткого отображения информации о сотруднике."""
 
     class Meta:
-        model = models.Employee
+        """Meta класс с настройками сериализатора Employee."""
+
+        model = Employee
         fields = (
             'id',
             'name',
@@ -124,23 +193,31 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
 
 class DocumentSerializer(serializers.ModelSerializer):
-    """Сериализатор для вывода информации о документах."""
+    """Сериализатор для модели Document."""
 
     class Meta:
-        model = models.Document
+        """Meta класс с настройками сериализатора Document."""
+
+        model = Document
         fields = ('id', 'name', 'file')
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    """Сериализатор для вывода информации о категории."""
+    """Сериализатор для категорий документов (TypeDocument).
+
+    Добавляет поле documents, отфильтрованное по текущему сотруднику.
+    """
 
     documents = serializers.SerializerMethodField()
 
     class Meta:
-        model = models.TypeDocument
+        """Meta класс с настройками сериализатора TypeDocument."""
+
+        model = TypeDocument
         fields = ('id', 'name', 'documents')
 
     def get_documents(self, obj):
+        """Возвращает документы для конкретного сотрудника и категории."""
         document_obj = obj.documents.filter(
             employee=self.context.get('employee')
         )
@@ -150,13 +227,18 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class EmployeeDetailSerializer(serializers.ModelSerializer):
-    """Сериализатор для вывода информации члене команды."""
+    """Детализированный сериализатор для модели Employee.
+
+    Включает основной список документов и документы по категориям.
+    """
 
     main_documents = serializers.SerializerMethodField()
     category_documents = serializers.SerializerMethodField()
 
     class Meta:
-        model = models.Employee
+        """Meta класс с настройками сериализатора Employee."""
+
+        model = Employee
         fields = (
             'id',
             'name',
@@ -173,24 +255,25 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(list[dict])
     def get_main_documents(self, obj) -> list[dict]:
+        """Возвращает список документов сотрудника отображаемых в ленте."""
         if obj.category_on_main:
-            doc = models.Document.objects.filter(
+            document = Document.objects.filter(
                 employee=self.instance, on_main_page=True
             )
             return DocumentSerializer(
-                doc, many=True, context=self.context
+                document, many=True, context=self.context
             ).data
-        else:
-            doc = models.Document.objects.filter(employee=self.instance)
-            return DocumentSerializer(
-                doc, many=True, context=self.context
-            ).data
+        document = Document.objects.filter(employee=self.instance)
+        return DocumentSerializer(
+            document, many=True, context=self.context
+        ).data
 
     @extend_schema_field(list[dict])
     def get_category_documents(self, obj) -> list[dict]:
+        """Возвращает документы, сгруппированные по категориям."""
         if not obj.category_on_main:
             return []
-        categories = models.TypeDocument.objects.filter(
+        categories = TypeDocument.objects.filter(
             documents__employee=obj
         ).distinct()
         self.context['employee'] = obj

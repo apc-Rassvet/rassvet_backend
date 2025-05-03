@@ -1,8 +1,20 @@
+"""Маршруты API для приложения content.
+
+Этот модуль определяет маршруты для версии API v1, включая:
+- TargetedFundraisingViewSet: целевые сборы.
+- GratitudeViewSet: благодарности.
+- PartnersViewSet: партнёры.
+- ReviewViewSet: отзывы.
+- AboutUsVideoViewSet: видео «О нас».
+- EmployeeViewSet: сотрудники.
+
+Используется DefaultRouter из DRF для автоматической генерации URL-адресов.
+"""
+
 from django.urls import include, path
 from rest_framework import routers
 
 from . import views
-
 
 api_urls: list = []
 v1_router_api = routers.DefaultRouter()

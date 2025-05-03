@@ -1,32 +1,63 @@
-import os
-import csv
-import pandas as pd
+"""Команда импорта контентных данных из локальных файлов в базу данных.
 
+Импортирует данные для моделей:
+- AboutUsVideo
+- Gratitude
+- Review
+- Partner
+- TargetedFundraising (включая фотографии и текстовые блоки)
+- Employee (включая фото и документы)
+
+Файлы должны находиться в папке data/, изображения и документы — в media_data/.
+"""
+
+import csv
+import os
+
+import pandas as pd
 from django.core.files import File
 from django.core.management.base import BaseCommand
 
 from content.models import (
     AboutUsVideo,
-    Gratitude,
+    Document,
     Employee,
-    Review,
-    Partner,
-    TargetedFundraising,
     FundraisingPhoto,
     FundraisingTextBlock,
+    Gratitude,
+    Partner,
+    Review,
+    TargetedFundraising,
     TypeDocument,
-    Document,
 )
 from content.models.targeted_fundraisings import FundraisingStatus
-
 
 MEDIA_PATH = 'media_data'
 
 
 class Command(BaseCommand):
+    """Импортирует данные из текстовых и Excel файлов в соответствующие модели.
+
+    Доступна через команду:
+        python manage.py import_data
+
+    Эта команда очищает старые записи и перезаписывает их новыми данными.
+    Зависит от наличия файлов в каталогах `data/` и `media_data/`.
+    """
+
     help = 'Импорт данных из TXT-файлов в базу данных'
 
     def handle(self, *args, **kwargs):
+        """Основной метод обработки команды импорта данных.
+
+        Осуществляет пошаговый импорт следующих сущностей:
+        - Видео "О нас"
+        - Благодарности (Gratitude)
+        - Отзывы (Review)
+        - Партнеры (Partner)
+        - Адресные сборы (TargetedFundraising), с вложенными фото и текстами
+        - Сотрудники (Employee), с фото и связанными документами
+        """
         base_path = 'data/'
         gratitude_count = Gratitude.objects.all().count()
         Gratitude.objects.all().delete()
@@ -43,6 +74,8 @@ class Command(BaseCommand):
         employee_count = Employee.objects.all().count()
         Employee.objects.all().delete()
         self.stdout.write(f'Удалено {employee_count} старых сотрудников')
+
+        # --- Импорт видео "О нас" ---
         with open(
             os.path.join(base_path, 'video.txt'), 'r', encoding='utf-8'
         ) as f:
@@ -53,6 +86,7 @@ class Command(BaseCommand):
                     url=row['url'],
                 )
 
+        # --- Импорт Благодарностей ---
         with open(
             os.path.join(base_path, 'gratitudes.txt'), 'r', encoding='utf-8'
         ) as f:
@@ -101,6 +135,7 @@ class Command(BaseCommand):
                 )
             )
 
+        # --- Импорт Отзывов ---
         with open(
             os.path.join(base_path, 'reviews.txt'), 'r', encoding='utf-8'
         ) as f:
@@ -122,6 +157,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS(f'Импортировано {review_count} отзывов')
             )
 
+        # --- Импорт Партнёров ---
         with open(
             os.path.join(base_path, 'partners.txt'), 'r', encoding='utf-8'
         ) as f:
@@ -162,6 +198,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS(f'Импортировано {partner_count} партнёров')
             )
 
+        # --- Импорт Адресных сборов ---
         with open(
             os.path.join(base_path, 'fundraisings.txt'), 'r', encoding='utf-8'
         ) as f:
@@ -243,6 +280,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS(f'Импортировано {fundraising_count} сборов')
             )
 
+        # --- Импорт Сотрудников ---
         excel_file = 'data/employees.xlsx'
 
         try:

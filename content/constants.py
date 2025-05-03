@@ -1,6 +1,7 @@
-LENGTH_GRATITUDE_TITLE = 200
-LENGTH_ABOUT_VIDEO_TITLE = 200
-LENGTH_FUNDRAISING_TITLE = 200
-LENGTH_REVIEW_TITLE = 200
-LENGTH_REVIEW_AUTHOR = 100
-LENGTH_FUNDRAISING_STATUS = 10
+"""Константы приложения content."""
+
+TITLE_LENGTH = 255
+"""Максимальная длина заголовка."""
+
+ORDER_DEFAULT = 0
+"""Значение по умолчанию для порядка отображения элементов."""

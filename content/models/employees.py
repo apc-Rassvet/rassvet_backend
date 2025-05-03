@@ -1,22 +1,30 @@
+"""Модуль содержит модели сотрудников, документов и их типов.
+
+Модели:
+    - Employee: Содержит информацию о сотрудниках компании
+    - TypeDocument: Хранит типы документов
+    - Document: Хранит документы, прикрепленные к сотрудникам
+"""
+
 import html
 
 from django.db import models
 from django.utils.html import strip_tags
-
 from django_ckeditor_5.fields import CKEditor5Field
 
+from content.mixins import TimestampMixin
 from content.validators import validate_not_empty_html
 
 
 def upload_file(instance, filename):
-    """Метод для генерации пути к файлу."""
+    """Генерирует путь к файлу для загрузки."""
     return f'team/{instance.employee.id}/{filename}'
 
 
-class Employee(models.Model):
+class Employee(TimestampMixin, models.Model):
     """Модель для хранения информации о членах команды."""
 
-    name = models.CharField(max_length=255, verbose_name='ФИО')
+    name = models.CharField(max_length=100, verbose_name='ФИО')
     image = models.ImageField(upload_to='team', verbose_name='Фото')
     main_specialities = CKEditor5Field(
         verbose_name='Специальности на общей странице',
@@ -24,7 +32,7 @@ class Employee(models.Model):
         blank=False,
         validators=[validate_not_empty_html],
     )
-    order = models.PositiveIntegerField(
+    order = models.PositiveSmallIntegerField(
         verbose_name='Позиция на общей странице', default=1
     )
     interviews = models.URLField(verbose_name='Интервью', blank=True)
@@ -56,37 +64,55 @@ class Employee(models.Model):
         config_name='default',
         blank=True,
     )
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-    updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
     class Meta:
+        """Класс Meta для модели Employee, содержащий мета-данные."""
+
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
         ordering = ['order', 'name']
 
     def __str__(self):
+        """Возвращает строковое представление объекта сотрудника."""
         return self.name
 
+    def save(self, *args, **kwargs):
+        """Переопределяет метод сохранения для очистки HTML-контента в полях.
+
+        Этот метод проверяет поля additional_education и trainings на наличие
+        пустого HTML-контента и очищает их перед сохранением объекта.
+        """
+        for field in ('additional_education', 'trainings'):
+            original_field = getattr(self, field)
+            setattr(self, field, self._clean_empty_html(original_field))
+        super().save(*args, **kwargs)
+
     def _clean_empty_html(self, raw_html):
+        """Очищает HTML-контент, если он пустой.
+
+        Функция удаляет HTML-теги, возвращая пустую строку,
+        если текст после очистки не содержит видимого содержания.
+        """
         text = strip_tags(raw_html or '')
         text = html.unescape(text)
         return '' if not text.strip() else raw_html
-
-    def save(self, *args, **kwargs):
-        for fld in ('additional_education', 'trainings'):
-            orig = getattr(self, fld)
-            setattr(self, fld, self._clean_empty_html(orig))
-        super().save(*args, **kwargs)
 
 
 class TypeDocument(models.Model):
     """Модель для хранения типов документов."""
 
     name = models.CharField(
-        max_length=255, verbose_name='Название типа документа'
+        max_length=100, verbose_name='Название типа документа'
     )
 
+    class Meta:
+        """Класс Meta для модели TypeDocument, содержащий мета-данные."""
+
+        verbose_name = 'Тип документа'
+        verbose_name_plural = 'Типы документов'
+
     def __str__(self):
+        """Возвращает строковое представление типа документа."""
         return self.name
 
 
@@ -113,12 +139,15 @@ class Document(models.Model):
         verbose_name='Сотрудник',
     )
     on_main_page = models.BooleanField(
-        default=False, verbose_name='Отображать на главной странице'
+        default=False, verbose_name='Отображать в ленте'
     )
 
-    def __str__(self):
-        return self.name
-
     class Meta:
+        """Класс Meta для модели Document, содержащий мета-данные."""
+
         verbose_name = 'Документ'
         verbose_name_plural = 'Документы'
+
+    def __str__(self):
+        """Возвращает строковое представление документа."""
+        return self.name

@@ -1,8 +1,29 @@
+"""Представления для API приложения content.
+
+Содержит представления для следующих моделей:
+- Gratitude (благодарности)
+- Partner (партнеры)
+- Review (отзывы)
+- AboutUsVideo (видео о нас)
+- TargetedFundraising (адресные сборы)
+- Employee (сотрудники)
+
+Используются только для чтения (GET-запросов).
+"""
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from content import models
+from content.models import (
+    AboutUsVideo,
+    Employee,
+    Gratitude,
+    Partner,
+    Review,
+    TargetedFundraising,
+)
+
 from . import serializers
 
 
@@ -16,11 +37,13 @@ from . import serializers
     ),
 )
 class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Получить все Благодарности списком, или конкретную по ID.
+    """Получение благодарностей.
+
+    Используйте этот эндпоинт, чтобы отобразить благодарности.
+    Можно получить как весь список, так и одну благодарность по ID.
     """
 
-    queryset = models.Gratitude.objects.filter(is_active=True)
+    queryset = Gratitude.objects.filter(is_active=True)
     serializer_class = serializers.GratitudeSerializer
 
 
@@ -34,11 +57,13 @@ class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
     ),
 )
 class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Получить все карточки Партнеров списком, или конкретную по ID.
+    """Информация о партнёрах.
+
+    Используйте этот эндпоинт, чтобы отобразить информацию о партнёрах.
+    Можно получить как весь список, так и одного партнёра по ID.
     """
 
-    queryset = models.Partner.objects.all()
+    queryset = Partner.objects.all()
     serializer_class = serializers.PartnersSerializer
 
 
@@ -52,11 +77,13 @@ class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
     ),
 )
 class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Получить все Отзывы списком, или конкретный по его ID.
+    """Информация об отзывах.
+
+    Используйте этот эндпоинт, чтобы отобразить информацию об отзывах.
+    Можно получить как весь список, так и один отзыв по ID.
     """
 
-    queryset = models.Review.objects.filter(is_active=True)
+    queryset = Review.objects.filter(is_active=True)
     serializer_class = serializers.ReviewSerializer
 
 
@@ -67,14 +94,20 @@ class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
     )
 )
 class AboutUsVideoViewSet(viewsets.GenericViewSet):
-    """
-    Получить Видео для раздела 'О нас'.
+    """Информация о видео об организации.
+
+    Возвращает одно видео с названием и ссылкой на источник.
+    Используется для блока "О нас".
     """
 
     serializer_class = serializers.AboutUsVideoSerializer
 
     def list(self, request, *args, **kwargs):
-        video = models.AboutUsVideo.get_solo()
+        """Возвращает единственное видео для блока 'О нас'.
+
+        Если видео не найдено, возвращает 404.
+        """
+        video = AboutUsVideo.get_solo()
         if not video:
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(video)
@@ -97,13 +130,20 @@ class AboutUsVideoViewSet(viewsets.GenericViewSet):
     ),
 )
 class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Получить список Адресных сборов, или конкретный по его ID.
+    """Информация об адресных сборах.
+
+    Используйте этот эндпоинт, чтобы отобразить информацию об адресных сборах.
+    Можно получить как весь список, так и один адресный сбор по ID.
     """
 
-    queryset = models.TargetedFundraising.objects.all()
+    queryset = TargetedFundraising.objects.all()
 
     def get_serializer_class(self):
+        """Выбирает сериализатор в зависимости от действия.
+
+        Возвращает краткий сериализатор для списка (list)
+        и детальный для отдельного сбора (retrieve).
+        """
         if self.action == 'retrieve':
             return serializers.TargetedFundraisingDetailSerializer
         return serializers.TargetedFundraisingListSerializer
@@ -119,13 +159,20 @@ class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
     ),
 )
 class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Получить список Сотрудников, или конкретный по его ID.
+    """Информация о сотрудниках.
+
+    Используйте этот эндпоинт, чтобы отобразить информацию о сотрудниках.
+    Можно получить как весь список, так и одного сотрудника по ID.
     """
 
-    queryset = models.Employee.objects.all()
+    queryset = Employee.objects.all()
 
     def get_serializer_class(self):
+        """Выбирает сериализатор в зависимости от действия.
+
+        Возвращает краткий сериализатор для списка (list)
+        и детальный для отдельного сотрудника (retrieve).
+        """
         if self.action == 'retrieve':
             return serializers.EmployeeDetailSerializer
         return serializers.EmployeeSerializer

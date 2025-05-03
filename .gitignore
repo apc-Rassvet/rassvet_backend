@@ -138,7 +138,7 @@ dmypy.json
 # .idea
 .idea
 .vscode
-.isort.cfg
+# .isort.cfg
 
 static/
 media/
