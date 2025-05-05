@@ -1,15 +1,15 @@
 from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.conf.urls.static import static
 from django.urls import include, path
 
+from drf_spectacular.utils import extend_schema
 from drf_spectacular.views import (
     SpectacularAPIView,
-    SpectacularSwaggerView,
     SpectacularRedocView,
+    SpectacularSwaggerView,
 )
-from drf_spectacular.utils import extend_schema
 
 
 @extend_schema(exclude=True)
@@ -59,6 +59,4 @@ urlpatterns = [
     path('api/', include('content.urls')),
 ]
 if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-    )
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
