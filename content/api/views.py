@@ -133,4 +133,3 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['project_start']
     ordering = ['-project_start']
-    pagination_class = LimitOffsetPagination
