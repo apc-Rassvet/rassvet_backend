@@ -14,12 +14,13 @@ from . import serializers
     ),
     retrieve=extend_schema(
         summary='Получить Благодарность по ID.',
-    )
+    ),
 )
 class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Получить все Благодарности списком, или конкретную по ID.
     """
+
     queryset = models.Gratitude.objects.filter(is_active=True)
     serializer_class = serializers.GratitudeSerializer
 
@@ -31,12 +32,13 @@ class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
     ),
     retrieve=extend_schema(
         summary='Получить карточку Партнера по ID.',
-    )
+    ),
 )
 class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Получить все карточки Партнеров списком, или конкретную по ID.
     """
+
     queryset = models.Partner.objects.all()
     serializer_class = serializers.PartnersSerializer
     filter_backends = [filters.OrderingFilter]
@@ -52,12 +54,13 @@ class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
     ),
     retrieve=extend_schema(
         summary='Получить Отзыв по ID.',
-    )
+    ),
 )
 class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Получить все Отзывы списком, или конкретный по его ID.
     """
+
     queryset = models.Review.objects.filter(is_active=True)
     serializer_class = serializers.ReviewSerializer
 
@@ -72,6 +75,7 @@ class AboutUsVideoViewSet(viewsets.GenericViewSet):
     """
     Получить Видео для раздела 'О нас'.
     """
+
     serializer_class = serializers.AboutUsVideoSerializer
 
     def list(self, request, *args, **kwargs):
@@ -94,16 +98,29 @@ class AboutUsVideoViewSet(viewsets.GenericViewSet):
         summary='Получить Адресный сбор по ID.',
         description='''
         Получить Адресный сбор по ID с полной информацией о сборе.
-        '''
-    )
+        ''',
+    ),
 )
 class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Получить список Адресных сборов, или конкретный по его ID.
     """
+
     queryset = models.TargetedFundraising.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return serializers.TargetedFundraisingDetailSerializer
         return serializers.TargetedFundraisingListSerializer
+
+
+class HelpKidsViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Вьюсет группы страниц Помощь детям
+    """
+
+    serializer_class = serializers.HelpKidsSerializer
+
+    def get_queryset(self):
+        name = self.basename
+        return models.Page.objects.filter(name=name)

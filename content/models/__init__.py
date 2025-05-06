@@ -2,10 +2,11 @@ from .about_us_video import AboutUsVideo
 from .gratitudes import Gratitude
 from .partners import Partner
 from .reviews import Review
+from .supervisors import Supervisor, Page
 from .targeted_fundraisings import (
-    TargetedFundraising,
     FundraisingPhoto,
     FundraisingTextBlock,
+    TargetedFundraising,
 )
 
 __all__ = [
@@ -16,4 +17,6 @@ __all__ = [
     'Partner',
     'Review',
     'TargetedFundraising',
+    'Supervisor',
+    'Page',
 ]

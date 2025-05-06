@@ -3,6 +3,7 @@ from .gratitudes import GratitudeAdmin
 from .partners import PartnersAdmin
 from .reviews import ReviewAdmin
 from .targeted_fundraisings import TargetedFundraisingAdmin
+from .supervisors import PageAdmin
 
 __all__ = [
     'AboutUsVideoAdmin',
@@ -10,4 +11,5 @@ __all__ = [
     'PartnersAdmin',
     'ReviewAdmin',
     'TargetedFundraisingAdmin',
+    'PageAdmin',
 ]

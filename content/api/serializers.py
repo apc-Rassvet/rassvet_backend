@@ -97,3 +97,25 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'text_blocks',
             'order',
         )
+
+
+class SupervisorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Supervisor
+        fields = (
+            'id',
+            'name',
+            'position',
+            'image',
+            'ordering'
+        )
+
+
+class HelpKidsSerializer(serializers.ModelSerializer):
+    supervisor = SupervisorSerializer(many=True)
+
+    class Meta:
+        model = models.Page
+        fields = (
+            'name', 'supervisor',
+        )
