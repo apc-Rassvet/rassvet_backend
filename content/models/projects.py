@@ -20,6 +20,7 @@ class ProjectsStatus(models.TextChoices):
     """Статусы проекта."""
 
     ACTIVE = 'active', 'Действующий'
+    ALWAYS_ACTIVE = 'always_active', 'Постоянно действующий'
     COMPLETED = 'completed', 'Завершенный'
 
 
@@ -54,9 +55,13 @@ class Project(OrderMixin, TitleMixin, models.Model):
     )
     project_start = models.DateField(
         'Дата старта',
+        null=True,
+        default=None,
     )
     project_end = models.DateField(
         'Дата окончания',
+        null=True,
+        default=None,
     )
     source_financing = models.TextField(
         verbose_name='Источник софинансирования'
