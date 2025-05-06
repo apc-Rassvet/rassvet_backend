@@ -52,11 +52,11 @@ class Project(OrderMixin, TitleMixin, models.Model):
         default=ProjectsStatus.ACTIVE,
         verbose_name='Статус сбора',
     )
-    project_start = models.DateTimeField('Дата старта', auto_now_add=True)
-    project_end = models.DateTimeField(
+    project_start = models.DateField(
+        'Дата старта',
+    )
+    project_end = models.DateField(
         'Дата окончания',
-        blank=True,
-        null=True,
     )
     source_financing = models.TextField(
         verbose_name='Источник софинансирования'
