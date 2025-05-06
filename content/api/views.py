@@ -1,9 +1,11 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import filters, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from content import models
+
 from . import serializers
 
 
@@ -114,13 +116,26 @@ class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
         return serializers.TargetedFundraisingListSerializer
 
 
-class HelpKidsViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Вьюсет группы страниц Помощь детям
-    """
+@extend_schema(tags=['Supervisors group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить супервизоров.',
+        description='''
+        Получить список супервизоров центра.
+        Фильтрация доступна через ?page='slug-страницы'
+        Slug страниц:
+        aba-therapy 'ABA-терапия'
+        adaptive-physical-culture 'Адаптивная физкультура'
+        creative-workshops 'Творческие мастерские'
+        resource-classes 'Ресурсные классы'
+        children-leisure 'Досуг для детей'
+        ''',
+    ),
+)
+class SupervisorViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Супервизоров."""
 
-    serializer_class = serializers.HelpKidsSerializer
-
-    def get_queryset(self):
-        name = self.basename
-        return models.Page.objects.filter(name=name)
+    queryset = models.Supervisor.objects.all()
+    serializer_class = serializers.SupervisorSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('page',)

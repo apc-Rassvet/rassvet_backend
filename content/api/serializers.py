@@ -27,7 +27,7 @@ class PartnersSerializer(serializers.ModelSerializer):
             'logo',
             'description',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -100,22 +100,8 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
 
 
 class SupervisorSerializer(serializers.ModelSerializer):
+    """Сериализатор для супервизоров"""
+
     class Meta:
         model = models.Supervisor
-        fields = (
-            'id',
-            'name',
-            'position',
-            'image',
-            'ordering'
-        )
-
-
-class HelpKidsSerializer(serializers.ModelSerializer):
-    supervisor = SupervisorSerializer(many=True)
-
-    class Meta:
-        model = models.Page
-        fields = (
-            'name', 'supervisor',
-        )
+        fields = ('id', 'name', 'position', 'image', 'ordering')
