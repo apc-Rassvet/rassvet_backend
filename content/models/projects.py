@@ -12,11 +12,7 @@
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 
-from content.constants import (
-    LENGTH_PROJS_TITLE,
-    LENGTH_PROGS_PROJS_TITLE,
-    LENGTH_PROJS_STATUS,
-)
+from content.mixins import OrderMixin, TitleMixin
 from content.validators import validate_not_empty_html
 
 
@@ -27,12 +23,8 @@ class ProjectsStatus(models.TextChoices):
     COMPLETED = 'completed', 'Завершенный'
 
 
-class ProgramsProjects(models.Model):
+class ProgramsProjects(TitleMixin, models.Model):
     """Модель программ проектов."""
-
-    title = models.CharField(
-        max_length=LENGTH_PROGS_PROJS_TITLE, verbose_name='Заголовок'
-    )
 
     class Meta:
         """Класс Meta для ProgramsProjects, содержащий мета-данные."""
@@ -45,12 +37,9 @@ class ProgramsProjects(models.Model):
         return self.title
 
 
-class Project(models.Model):
+class Project(OrderMixin, TitleMixin, models.Model):
     """Модель Проекта."""
 
-    title = models.CharField(
-        max_length=LENGTH_PROJS_TITLE, verbose_name='Заголовок'
-    )
     logo = models.ImageField(
         upload_to='projects/',
         verbose_name='Логотип',
@@ -58,7 +47,7 @@ class Project(models.Model):
         null=False,
     )
     status = models.CharField(
-        max_length=LENGTH_PROJS_STATUS,
+        max_length=max(len(value) for value, _ in ProjectsStatus.choices),
         choices=ProjectsStatus.choices,
         default=ProjectsStatus.ACTIVE,
         verbose_name='Статус сбора',
@@ -76,6 +65,7 @@ class Project(models.Model):
     program = models.ForeignKey(
         ProgramsProjects,
         on_delete=models.SET_NULL,
+        null=True,
         related_name='project',
         verbose_name='Проект',
     )
@@ -103,7 +93,7 @@ class Project(models.Model):
 
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
-        ordering = ['project_start']
+        ordering = ['order', '-project_start']
 
     def __str__(self):
         """Возвращает строковое представление проекта."""
