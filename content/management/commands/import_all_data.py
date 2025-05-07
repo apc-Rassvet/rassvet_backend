@@ -1,5 +1,4 @@
-"""
-Django management command для автоматизированного запуска всех команд импорта.
+"""Django command для автоматизированного запуска всех команд импорта.
 
 Эта команда последовательно запускает заданный список команд импорта,
 обрабатывает исключения и выводит информацию о результатах выполнения каждой.
@@ -30,7 +29,8 @@ class Command(BaseCommand):
     help = 'Запускает все команды импорта данных'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("Начинаем выполнение всех команд импорта...")
+        """Запускает команду."""
+        self.stdout.write('Начинаем выполнение всех команд импорта...')
         commands = [
             'import_employees',
             'import_fundraisings',
@@ -40,16 +40,16 @@ class Command(BaseCommand):
             'import_reviews',
         ]
         for command in commands:
-            self.stdout.write(f"Запуск команды: {command}")
+            self.stdout.write(f'Запуск команды: {command}')
             try:
                 call_command(command)
                 self.stdout.write(
-                    self.style.SUCCESS(f"Команда {command} выполнена успешно.")
+                    self.style.SUCCESS(f'Команда {command} выполнена успешно.')
                 )
             except Exception as e:
                 self.stdout.write(
                     self.style.ERROR(
-                        f"Ошибка при выполнении команды {command}: {str(e)}"
+                        f'Ошибка при выполнении команды {command}: {str(e)}'
                     )
                 )
-        self.stdout.write(self.style.SUCCESS("Все команды импорта выполнены."))
+        self.stdout.write(self.style.SUCCESS('Все команды импорта выполнены.'))

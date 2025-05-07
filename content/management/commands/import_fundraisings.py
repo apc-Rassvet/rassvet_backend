@@ -5,9 +5,9 @@ from typing import Any
 from content.management.config import MODEL_CONFIG
 from content.management.utils import ImporterBase
 from content.models import (
-    TargetedFundraising,
     FundraisingPhoto,
     FundraisingTextBlock,
+    TargetedFundraising,
 )
 
 

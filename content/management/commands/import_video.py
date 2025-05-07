@@ -2,6 +2,7 @@
 
 import csv
 import os
+
 from django.core.management.base import BaseCommand
 
 from content.models import AboutUsVideo
@@ -16,7 +17,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         """Запускает процесс импорта данных."""
-
         self.stdout.write("Начинаем импорт видео 'О нас'...")
         with open(
             os.path.join(DATA_PATH, 'video.txt'), 'r', encoding='utf-8'

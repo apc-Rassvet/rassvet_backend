@@ -27,7 +27,6 @@ from content.models.targeted_fundraisings import (
     TargetedFundraising,
 )
 
-
 MODEL_CONFIG = {
     Gratitude: {
         'fields': {

@@ -2,9 +2,10 @@
 
 import csv
 from typing import Any
-from content.models import Employee, Document, TypeDocument
+
 from content.management.config import MODEL_CONFIG
 from content.management.utils import ImporterBase
+from content.models import Document, Employee, TypeDocument
 
 
 class Command(ImporterBase):
