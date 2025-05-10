@@ -10,17 +10,15 @@
 """
 
 from django.db import models
-from django_ckeditor_5.fields import CKEditor5Field
 
+from .partners import Partner
 from content.mixins import OrderMixin, TitleMixin
-from content.validators import validate_not_empty_html
 
 
 class ProjectsStatus(models.TextChoices):
     """Статусы проекта."""
 
     ACTIVE = 'active', 'Действующий'
-    ALWAYS_ACTIVE = 'always_active', 'Постоянно действующий'
     COMPLETED = 'completed', 'Завершенный'
 
 
@@ -41,12 +39,6 @@ class ProgramsProjects(TitleMixin, models.Model):
 class Project(OrderMixin, TitleMixin, models.Model):
     """Модель Проекта."""
 
-    logo = models.ImageField(
-        upload_to='projects/',
-        verbose_name='Логотип',
-        blank=False,
-        null=False,
-    )
     status = models.CharField(
         max_length=max(len(value) for value, _ in ProjectsStatus.choices),
         choices=ProjectsStatus.choices,
@@ -55,16 +47,22 @@ class Project(OrderMixin, TitleMixin, models.Model):
     )
     project_start = models.DateField(
         'Дата старта',
+        blank=True,
         null=True,
         default=None,
     )
     project_end = models.DateField(
         'Дата окончания',
+        blank=True,
         null=True,
         default=None,
     )
-    source_financing = models.TextField(
-        verbose_name='Источник софинансирования'
+    source_financing = models.ForeignKey(
+        Partner,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='project',
+        verbose_name='Источник софинансирования - Партнёр',
     )
     project_rassvet = models.BooleanField('Проект НКО Рассвет', default=True)
     program = models.ForeignKey(
@@ -74,23 +72,14 @@ class Project(OrderMixin, TitleMixin, models.Model):
         related_name='project',
         verbose_name='Проект',
     )
-    project_goal = CKEditor5Field(
-        verbose_name='Цель проекта',
-        config_name='default',
-        blank=False,
-        validators=[validate_not_empty_html],
+    project_goal = models.TextField(
+        verbose_name='Цель проекта', help_text='Введи Цель проекта'
     )
-    project_tasks = CKEditor5Field(
-        verbose_name='Задачи проекта',
-        config_name='default',
-        blank=False,
-        validators=[validate_not_empty_html],
+    project_tasks = models.TextField(
+        verbose_name='Задачи проекта', help_text='Введи Задачи проекта'
     )
-    project_description = CKEditor5Field(
-        verbose_name='Описание проекта',
-        config_name='default',
-        blank=False,
-        validators=[validate_not_empty_html],
+    project_description = models.TextField(
+        verbose_name='Описание проекта', help_text='Введи Описание проекта'
     )
 
     class Meta:

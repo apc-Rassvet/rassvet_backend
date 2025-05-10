@@ -24,6 +24,7 @@ class ProjectAdmin(admin.ModelAdmin):
     """Админ зона Проектов."""
 
     list_display = (
+        'order',
         'title',
         'status',
         'project_start',
@@ -40,10 +41,12 @@ class ProjectAdmin(admin.ModelAdmin):
         'project_end',
     )
     list_filter = (
+        'order',
         'title',
         'status',
     )
     search_fields = (
+        'order',
         'title',
         'status',
     )

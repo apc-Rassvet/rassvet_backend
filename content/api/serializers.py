@@ -106,17 +106,27 @@ class ProjectPhotoSerializer(serializers.ModelSerializer):
         fields = ('image',)
 
 
+class ProgramsProjectsSerializer(serializers.ModelSerializer):
+    """Сериализатор ProgramsProjects."""
+
+    class Meta:
+        model = models.ProgramsProjects
+        fields = ('title',)
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     """Сериализатор Project."""
 
     photo = ProjectPhotoSerializer(many=True)
+    program = ProgramsProjectsSerializer()
+    source_financing = PartnersSerializer()
 
     class Meta:
         model = models.Project
         fields = (
             'id',
+            'order',
             'title',
-            'logo',
             'status',
             'project_start',
             'project_end',
