@@ -81,6 +81,10 @@ class Project(OrderMixin, TitleMixin, models.Model):
     project_description = models.TextField(
         verbose_name='Описание проекта', help_text='Введи Описание проекта'
     )
+    achieved_results = models.TextField(
+        verbose_name='Достигнутые результаты',
+        help_text='Введи Достигнутые результаты',
+    )
 
     class Meta:
         """Класс Meta для Project, содержащий мета-данные."""

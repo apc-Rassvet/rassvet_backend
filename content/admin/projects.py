@@ -43,6 +43,7 @@ class ProjectAdmin(admin.ModelAdmin):
         'project_goal',
         'project_tasks',
         'project_description',
+        'achieved_results',
     )
     list_editable = (
         'status',

@@ -330,4 +330,5 @@ class ProjectSerializer(serializers.ModelSerializer):
             'project_goal',
             'project_tasks',
             'project_description',
+            'achieved_results',
         )
