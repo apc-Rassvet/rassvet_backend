@@ -119,6 +119,3 @@ class ProjectPhoto(models.Model):
     def __str__(self):
         """Возвращает строковое представление проекта фотографии."""
         return f'Фотография для проекта {self.project.title}'
-
-
-# ver1
