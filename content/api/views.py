@@ -19,6 +19,7 @@ from content.models import (
     AboutUsVideo,
     Employee,
     Gratitude,
+    Mission,
     Partner,
     Project,
     Review,
@@ -193,3 +194,19 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Project.objects.all()
     serializer_class = serializers.ProjectSerializer
+
+
+@extend_schema(tags=['Missions group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Миссий.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Миссию по ID.',
+    ),
+)
+class MissionViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Миссий, или конкретную по ID."""
+
+    queryset = Mission.objects.all()
+    serializer_class = serializers.MissionSerializer

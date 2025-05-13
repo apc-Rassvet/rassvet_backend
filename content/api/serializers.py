@@ -28,6 +28,7 @@ from content.models import (
     FundraisingPhoto,
     FundraisingTextBlock,
     Gratitude,
+    Mission,
     Partner,
     ProgramsProjects,
     Project,
@@ -331,4 +332,21 @@ class ProjectSerializer(serializers.ModelSerializer):
             'project_tasks',
             'project_description',
             'achieved_results',
+        )
+
+
+class MissionSerializer(serializers.ModelSerializer):
+    """Сериализатор Mission."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора MissionSerializer."""
+
+        model = Mission
+        fields = (
+            'id',
+            'order',
+            'organization_mission',
+            'ambitions',
+            'goal_for_five_years',
+            'tasks',
         )

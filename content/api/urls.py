@@ -24,6 +24,7 @@ v1_router_api.register(
 v1_router_api.register(
     r'gratitudes', views.GratitudeViewSet, basename='gratitude'
 )
+v1_router_api.register(r'missions', views.MissionViewSet, basename='mission')
 v1_router_api.register(r'partners', views.PartnersViewSet, basename='partner')
 v1_router_api.register(r'projects', views.ProjectViewSet, basename='project')
 v1_router_api.register(r'reviews', views.ReviewViewSet, basename='review')

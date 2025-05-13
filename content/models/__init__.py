@@ -14,6 +14,7 @@
 from .about_us_video import AboutUsVideo
 from .employees import Document, Employee, TypeDocument
 from .gratitudes import Gratitude
+from .mission import Mission
 from .partners import Partner
 from .projects import ProgramsProjects, Project, ProjectPhoto
 from .reviews import Review
@@ -30,6 +31,7 @@ __all__ = [
     'FundraisingPhoto',
     'FundraisingTextBlock',
     'Gratitude',
+    'Mission',
     'Partner',
     'ProgramsProjects',
     'Project',
