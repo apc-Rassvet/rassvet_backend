@@ -29,6 +29,9 @@ from content.models import (
     FundraisingTextBlock,
     Gratitude,
     Partner,
+    ProgramsProjects,
+    Project,
+    ProjectPhoto,
     Review,
     TargetedFundraising,
     TypeDocument,
@@ -280,3 +283,51 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
         return CategorySerializer(
             categories, many=True, context=self.context
         ).data
+
+
+class ProjectPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор ProjectPhoto."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора ProjectPhotoSerializer."""
+
+        model = ProjectPhoto
+        fields = ('image',)
+
+
+class ProgramsProjectsSerializer(serializers.ModelSerializer):
+    """Сериализатор ProgramsProjects."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора ProgramProjectsSerializer."""
+
+        model = ProgramsProjects
+        fields = ('title',)
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    """Сериализатор Project."""
+
+    photo = ProjectPhotoSerializer(many=True)
+    program = ProgramsProjectsSerializer()
+    source_financing = PartnersSerializer()
+
+    class Meta:
+        """Meta класс с настройками сериализатора ProjectSerializer."""
+
+        model = Project
+        fields = (
+            'id',
+            'order',
+            'title',
+            'status',
+            'project_start',
+            'project_end',
+            'source_financing',
+            'project_rassvet',
+            'program',
+            'photo',
+            'project_goal',
+            'project_tasks',
+            'project_description',
+        )

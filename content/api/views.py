@@ -20,6 +20,7 @@ from content.models import (
     Employee,
     Gratitude,
     Partner,
+    Project,
     Review,
     TargetedFundraising,
 )
@@ -176,3 +177,19 @@ class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return serializers.EmployeeDetailSerializer
         return serializers.EmployeeSerializer
+
+
+@extend_schema(tags=['Projects group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Проектов.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Проект по ID.',
+    ),
+)
+class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Проектов, или конкретный по его ID."""
+
+    queryset = Project.objects.all()
+    serializer_class = serializers.ProjectSerializer
