@@ -11,6 +11,7 @@
 from django.db import models
 
 from content.mixins import OrderMixin, TitleMixin
+from content.utils import ckeditor_function
 
 from .partners import Partner
 
@@ -72,19 +73,10 @@ class Project(OrderMixin, TitleMixin, models.Model):
         related_name='project',
         verbose_name='Проект',
     )
-    project_goal = models.TextField(
-        verbose_name='Цель проекта', help_text='Введи Цель проекта'
-    )
-    project_tasks = models.TextField(
-        verbose_name='Задачи проекта', help_text='Введи Задачи проекта'
-    )
-    project_description = models.TextField(
-        verbose_name='Описание проекта', help_text='Введи Описание проекта'
-    )
-    achieved_results = models.TextField(
-        verbose_name='Достигнутые результаты',
-        help_text='Введи Достигнутые результаты',
-    )
+    project_goal = ckeditor_function('Цель проекта')
+    project_tasks = ckeditor_function('Задачи проекта')
+    project_description = ckeditor_function('Описание проекта')
+    achieved_results = ckeditor_function('Достигнутые результаты')
 
     class Meta:
         """Класс Meta для Project, содержащий мета-данные."""

@@ -7,27 +7,16 @@
 from django.db import models
 
 from content.mixins import OrderMixin
+from content.utils import ckeditor_function
 
 
 class Mission(OrderMixin, models.Model):
     """Модель Миссии."""
 
-    organization_mission = models.TextField(
-        verbose_name='Миссия организации',
-        help_text='Добавте Миссию организации',
-    )
-    ambitions = models.TextField(
-        verbose_name='Амбиции',
-        help_text='Добавте Амбиции',
-    )
-    goal_for_five_years = models.TextField(
-        verbose_name='Цель на 5 пять лет',
-        help_text='Добавте Цель на 5 пять лет',
-    )
-    tasks = models.TextField(
-        verbose_name='Задачи',
-        help_text='Добавте Задачу',
-    )
+    organization_mission = ckeditor_function('Миссия организации')
+    ambitions = ckeditor_function('Амбиции')
+    goal_for_five_years = ckeditor_function('Цель на 5 пять лет')
+    tasks = ckeditor_function('Задачи')
 
     class Meta:
         """Класс Meta для Mission, содержащий мета-данные."""

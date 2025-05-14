@@ -16,6 +16,10 @@
 - DocumentSerializer: документы сотрудников.
 - CategorySerializer: категория документов сотрудника.
 - EmployeeDetailSerializer: подробная информация о сотруднике с документами.
+- ProjectPhotoSerializer: для фотографий проектов.
+- ProgramsProjectsSerializer: для программ.
+- ProjectSerializer: для проектов.
+- MissionSerializer: для миссий.
 """
 
 from drf_spectacular.utils import extend_schema_field

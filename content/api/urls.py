@@ -3,7 +3,9 @@
 Этот модуль определяет маршруты для версии API v1, включая:
 - TargetedFundraisingViewSet: целевые сборы.
 - GratitudeViewSet: благодарности.
+- MissionViewSet: миссии.
 - PartnersViewSet: партнёры.
+- ProjectViewSet: проекты.
 - ReviewViewSet: отзывы.
 - AboutUsVideoViewSet: видео «О нас».
 - EmployeeViewSet: сотрудники.

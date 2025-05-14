@@ -2,7 +2,9 @@
 
 Содержит представления для следующих моделей:
 - Gratitude (благодарности)
+- Mission (миссии)
 - Partner (партнеры)
+- Project (проекты)
 - Review (отзывы)
 - AboutUsVideo (видео о нас)
 - TargetedFundraising (адресные сборы)
