@@ -17,7 +17,6 @@
 - CategorySerializer: категория документов сотрудника.
 - EmployeeDetailSerializer: подробная информация о сотруднике с документами.
 - ProjectPhotoSerializer: для фотографий проектов.
-- ProgramsProjectsSerializer: для программ.
 - ProjectSerializer: для проектов.
 - MissionSerializer: для миссий.
 """
@@ -34,7 +33,6 @@ from content.models import (
     Gratitude,
     Mission,
     Partner,
-    ProgramsProjects,
     Project,
     ProjectPhoto,
     Review,
@@ -300,22 +298,13 @@ class ProjectPhotoSerializer(serializers.ModelSerializer):
         fields = ('image',)
 
 
-class ProgramsProjectsSerializer(serializers.ModelSerializer):
-    """Сериализатор ProgramsProjects."""
-
-    class Meta:
-        """Meta класс с настройками сериализатора ProgramProjectsSerializer."""
-
-        model = ProgramsProjects
-        fields = ('title',)
-
-
 class ProjectSerializer(serializers.ModelSerializer):
     """Сериализатор Project."""
 
     photo = ProjectPhotoSerializer(many=True)
-    program = ProgramsProjectsSerializer()
-    source_financing = PartnersSerializer()
+    program = serializers.CharField(source='program.title')
+    logotip = serializers.ImageField(source='source_financing.logo')
+    source_financing = serializers.CharField(source='source_financing.name')
 
     class Meta:
         """Meta класс с настройками сериализатора ProjectSerializer."""
@@ -325,6 +314,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'id',
             'order',
             'title',
+            'logotip',
             'status',
             'project_start',
             'project_end',

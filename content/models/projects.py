@@ -9,6 +9,7 @@
 """
 
 from django.db import models
+from django.db.models import CheckConstraint, F, Q
 
 from content.mixins import OrderMixin, TitleMixin
 from content.utils import ckeditor_function
@@ -71,7 +72,7 @@ class Project(OrderMixin, TitleMixin, models.Model):
         on_delete=models.SET_NULL,
         null=True,
         related_name='project',
-        verbose_name='Проект',
+        verbose_name='Программа',
     )
     project_goal = ckeditor_function('Цель проекта')
     project_tasks = ckeditor_function('Задачи проекта')
@@ -84,6 +85,12 @@ class Project(OrderMixin, TitleMixin, models.Model):
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
         ordering = ['order', '-project_start']
+        constraints = [
+            CheckConstraint(
+                check=Q(project_end__gt=F('project_start')),
+                name='Дата старта не может быть позже даты окончания проекта',
+            ),
+        ]
 
     def __str__(self):
         """Возвращает строковое представление проекта."""

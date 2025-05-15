@@ -28,3 +28,12 @@ class Mission(OrderMixin, models.Model):
     def __str__(self):
         """Возвращает строковое представление Миссии организации."""
         return self.organization_mission
+
+    @classmethod
+    def get_solo(cls):
+        """Получает единственную Миссию'.
+
+        Если Миссия не существует, будет создана одна Миссия.
+        """
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj

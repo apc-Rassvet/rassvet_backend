@@ -14,7 +14,7 @@
 """
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
 from content.models import (
@@ -201,14 +201,25 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
 @extend_schema(tags=['Missions group'])
 @extend_schema_view(
     list=extend_schema(
-        summary='Получить список Миссий.',
-    ),
-    retrieve=extend_schema(
-        summary='Получить Миссию по ID.',
+        summary='Получить Миссию.',
     ),
 )
-class MissionViewSet(viewsets.ReadOnlyModelViewSet):
-    """Получить список Миссий, или конкретную по ID."""
+class MissionViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Получить Миссию."""
 
-    queryset = Mission.objects.all()
+    # queryset = Mission.objects.all()
     serializer_class = serializers.MissionSerializer
+
+    def list(self, request, *args, **kwargs):
+        """Возвращает единственную Миссию'.
+
+        Если Миссия не найдена, возвращает 404.
+        """
+        mission = Mission.get_solo()
+        if not mission:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(mission)
+        return Response(serializer.data)
