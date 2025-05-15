@@ -280,3 +280,11 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
         return CategorySerializer(
             categories, many=True, context=self.context
         ).data
+
+
+class FitbakFormSerializer(serializers.Serializer):
+    """Сериализатор для формы обратной связи."""
+
+    name = serializers.CharField(max_length=255)
+    phone_number = serializers.CharField(max_length=25)
+    message = serializers.CharField()
