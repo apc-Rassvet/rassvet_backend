@@ -14,6 +14,7 @@
 from .about_us_video import AboutUsVideo
 from .employees import Document, Employee, TypeDocument
 from .gratitudes import Gratitude
+from .news import Direction, GalleryImage, News
 from .partners import Partner
 from .reviews import Review
 from .targeted_fundraisings import (
@@ -24,11 +25,14 @@ from .targeted_fundraisings import (
 
 __all__ = [
     'AboutUsVideo',
+    'Direction',
     'Document',
     'Employee',
     'FundraisingPhoto',
     'FundraisingTextBlock',
+    'GalleryImage',
     'Gratitude',
+    'News',
     'Partner',
     'Review',
     'TargetedFundraising',
