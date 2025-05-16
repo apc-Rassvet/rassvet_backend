@@ -97,6 +97,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rassvet.wsgi.application'
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
