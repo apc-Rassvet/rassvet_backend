@@ -4,14 +4,23 @@ from django.contrib import admin
 from content.models import News, Direction, GalleryImage
 
 
+class GalleryImageInline(admin.TabularInline):
+    """Инлайн для изображений галереи новости (до 15 штук)."""
+
+    model = GalleryImage
+    extra = 1
+    max_num = 15
+
+
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
     """Настройка административного интерфейса для модели News."""
 
+    inlines = [GalleryImageInline]
     list_display = ('id', 'title', 'date', 'show_on_main')
     list_filter = ('date', 'show_on_main', 'detail_page_type')
     search_fields = ('title', 'summary', 'full_text')
-    filter_horizontal = ('directions', 'additional_images')
+    filter_horizontal = ('directions',)
     fieldsets = (
         (
             None,
@@ -23,7 +32,6 @@ class NewsAdmin(admin.ModelAdmin):
                     'course_start',
                     'summary',
                     'directions',
-                    'project',
                 )
             },
         ),
@@ -42,14 +50,11 @@ class NewsAdmin(admin.ModelAdmin):
             {
                 'fields': (
                     'full_text',
-                    'gallery',
-                    'additional_images',
                     'video_url',
-                    'video_format',
                 )
             },
         ),
-        ('Сортировка', {'fields': ('order',)}),
+        ('Сортировка', {'fields': ('date',)}),
     )
 
 
@@ -59,10 +64,3 @@ class DirectionAdmin(admin.ModelAdmin):
 
     list_display = ('id', 'name')
     search_fields = ('name',)
-
-
-@admin.register(GalleryImage)
-class GalleryImageAdmin(admin.ModelAdmin):
-    """Настройка административного интерфейса для модели GalleryImage."""
-
-    list_display = ('id', 'image')

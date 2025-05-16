@@ -10,30 +10,31 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-from content.mixins import TimestampMixin
+from content.mixins import OrderMixin, TimestampMixin, TitleMixin
+
+
+def upload_file(instance, filename):
+    """Генерирует путь к файлу для загрузки."""
+    return f'news_gallery_images/{instance.gallery_images.id}/{filename}'
 
 
 class Direction(TimestampMixin, models.Model):
     """Модель направления деятельности, к которому может относиться новость."""
 
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField('Название', max_length=100, unique=True)
+
+    class Meta:
+        """Мета-настройки модели Direction."""
+
+        verbose_name = 'Направление'
+        verbose_name_plural = 'Направления'
 
     def __str__(self):
         """Строковое представление направления."""
         return self.name
 
 
-class GalleryImage(models.Model):
-    """Модель изображений для галереи в карточке новости."""
-
-    image = models.ImageField(upload_to='news_gallery_images/')
-
-    def __str__(self):
-        """Строковое представление направления."""
-        return f'Галерея: {self.image.name}'
-
-
-class News(models.Model):
+class News(TimestampMixin, TitleMixin, models.Model):
     """Модель новости, содержащая информацию и детализированные поля."""
 
     class DetailPageChoices(models.TextChoices):
@@ -43,43 +44,42 @@ class News(models.Model):
         LINK = 'link', 'Прикрепить ссылку'
         NONE = 'none', 'Не создавать страницу'
 
-    class DisplayChoices(models.TextChoices):
-        """Выбор отображения новости на главной странице."""
-
-        YES = 'True', 'Да'
-        NO = 'False', 'Нет'
-
-    title = models.CharField(max_length=255)
-    photo = models.ImageField(upload_to='news_photos/')
-    date = models.DateField(default=timezone.now)
-    course_start = models.DateField(null=True, blank=True)
-    summary = models.TextField()
-    directions = models.ManyToManyField(Direction)
+    photo = models.ImageField('Фото', upload_to='news_photos/')
+    date = models.DateField('Дата новости', default=timezone.now)
+    course_start = models.DateField('Старт курса', null=True, blank=True)
+    summary = models.TextField('Краткий текст', max_length=255)
+    directions = models.ManyToManyField('Направление деятельности', Direction)
     # project = models.ForeignKey(
     #     Project, on_delete=models.SET_NULL, null=True, blank=True
     # )
     detail_page_type = models.CharField(
+        'Подробная страница',
         max_length=10,
         choices=DetailPageChoices.choices,
         default=DetailPageChoices.NONE,
     )
-    detail_page_link = models.URLField(blank=True, null=True)
-    show_on_main = models.BooleanField(default=True)
-    order = models.PositiveIntegerField(
-        default=0, help_text='Используется для сортировки карточек'
+    detail_page_link = models.URLField(
+        'Ссылка на подробную страницу', blank=True, null=True
     )
-    full_text = models.TextField(blank=True, null=True)
-    gallery = models.ForeignKey(GalleryImage, blank=True)
-    video_url = models.URLField(blank=True, null=True)
+    show_on_main = models.BooleanField('Отображение на странице', default=True)
+    full_text = models.TextField('Основной текст', blank=True, null=True)
+    video_url = models.URLField('Ссылка на видео', blank=True, null=True)
 
     class Meta:
         """Мета-настройки модели News."""
 
-        ordering = ['-order', '-date']
+        ordering = ['-date']
+        verbose_name = 'Новость'
+        verbose_name_plural = 'Новости'
 
     def __str__(self):
         """Строковое представление направления."""
         return f'{self.title} ({self.date})'
+
+    def save(self, *args, **kwargs):
+        """Сохранение объекта с предварительной валидацией."""
+        self.clean()
+        super().save(*args, **kwargs)
 
     def clean(self):
         """Валидация полей в зависимости от типа подробной страницы."""
@@ -91,7 +91,26 @@ class News(models.Model):
         if self.detail_page_type == 'link' and not self.detail_page_link:
             raise ValidationError('Укажите ссылку на внешнюю страницу.')
 
-    def save(self, *args, **kwargs):
-        """Сохранение объекта с предварительной валидацией."""
-        self.clean()
-        super().save(*args, **kwargs)
+
+class GalleryImage(OrderMixin, models.Model):
+    """Модель изображений для галереи в карточке новости."""
+
+    news = models.ForeignKey(
+        'Новость',
+        News,
+        on_delete=models.CASCADE,
+        related_name='gallery_images',
+        verbose_name='Новость',
+    )
+    image = models.ImageField('Фото', upload_to=upload_file)
+
+    class Meta:
+        """Мета-настройки модели GalleryImage."""
+
+        ordering = ['order', 'id']
+        verbose_name = 'Фотография'
+        verbose_name_plural = 'Фотографии'
+
+    def __str__(self):
+        """Строковое представление галереи."""
+        return f'Галерея: {self.image.name}'
