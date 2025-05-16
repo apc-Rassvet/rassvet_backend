@@ -34,6 +34,7 @@ class ProjectAdmin(admin.ModelAdmin):
     list_display = (
         'order',
         'title',
+        'logo',
         'status',
         'project_start',
         'project_end',

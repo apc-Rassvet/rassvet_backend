@@ -41,6 +41,12 @@ class ProgramsProjects(TitleMixin, models.Model):
 class Project(OrderMixin, TitleMixin, models.Model):
     """Модель Проекта."""
 
+    logo = models.ImageField(
+        upload_to='projects/',
+        verbose_name='Логотип',
+        blank=False,
+        null=False,
+    )
     status = models.CharField(
         max_length=max(len(value) for value, _ in ProjectsStatus.choices),
         choices=ProjectsStatus.choices,

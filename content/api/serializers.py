@@ -303,7 +303,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     photo = ProjectPhotoSerializer(many=True)
     program = serializers.CharField(source='program.title')
-    logotip = serializers.ImageField(source='source_financing.logo')
     source_financing = serializers.CharField(source='source_financing.name')
 
     class Meta:
@@ -314,7 +313,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'id',
             'order',
             'title',
-            'logotip',
+            'logo',
             'status',
             'project_start',
             'project_end',

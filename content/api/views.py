@@ -210,7 +210,6 @@ class MissionViewSet(
 ):
     """Получить Миссию."""
 
-    # queryset = Mission.objects.all()
     serializer_class = serializers.MissionSerializer
 
     def list(self, request, *args, **kwargs):
