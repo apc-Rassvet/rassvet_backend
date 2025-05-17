@@ -2,7 +2,9 @@
 
 Содержит представления для следующих моделей:
 - Gratitude (благодарности)
+- Mission (миссии)
 - Partner (партнеры)
+- Project (проекты)
 - Review (отзывы)
 - AboutUsVideo (видео о нас)
 - TargetedFundraising (адресные сборы)
@@ -12,14 +14,16 @@
 """
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
 from content.models import (
     AboutUsVideo,
     Employee,
     Gratitude,
+    Mission,
     Partner,
+    Project,
     Review,
     TargetedFundraising,
 )
@@ -176,3 +180,45 @@ class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return serializers.EmployeeDetailSerializer
         return serializers.EmployeeSerializer
+
+
+@extend_schema(tags=['Projects group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Проектов.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Проект по ID.',
+    ),
+)
+class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Проектов, или конкретный по его ID."""
+
+    queryset = Project.objects.all()
+    serializer_class = serializers.ProjectSerializer
+
+
+@extend_schema(tags=['Missions group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить Миссию.',
+    ),
+)
+class MissionViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Получить Миссию."""
+
+    serializer_class = serializers.MissionSerializer
+
+    def list(self, request, *args, **kwargs):
+        """Возвращает единственную Миссию'.
+
+        Если Миссия не найдена, возвращает 404.
+        """
+        mission = Mission.get_solo()
+        if not mission:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(mission)
+        return Response(serializer.data)

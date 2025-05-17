@@ -16,6 +16,9 @@
 - DocumentSerializer: документы сотрудников.
 - CategorySerializer: категория документов сотрудника.
 - EmployeeDetailSerializer: подробная информация о сотруднике с документами.
+- ProjectPhotoSerializer: для фотографий проектов.
+- ProjectSerializer: для проектов.
+- MissionSerializer: для миссий.
 """
 
 from drf_spectacular.utils import extend_schema_field
@@ -28,7 +31,10 @@ from content.models import (
     FundraisingPhoto,
     FundraisingTextBlock,
     Gratitude,
+    Mission,
     Partner,
+    Project,
+    ProjectPhoto,
     Review,
     TargetedFundraising,
     TypeDocument,
@@ -280,3 +286,60 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
         return CategorySerializer(
             categories, many=True, context=self.context
         ).data
+
+
+class ProjectPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор ProjectPhoto."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора ProjectPhotoSerializer."""
+
+        model = ProjectPhoto
+        fields = ('image',)
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    """Сериализатор Project."""
+
+    photo = ProjectPhotoSerializer(many=True)
+    program = serializers.CharField(source='program.title')
+    source_financing = serializers.CharField(source='source_financing.name')
+
+    class Meta:
+        """Meta класс с настройками сериализатора ProjectSerializer."""
+
+        model = Project
+        fields = (
+            'id',
+            'order',
+            'title',
+            'logo',
+            'status',
+            'project_start',
+            'project_end',
+            'source_financing',
+            'project_rassvet',
+            'program',
+            'photo',
+            'project_goal',
+            'project_tasks',
+            'project_description',
+            'achieved_results',
+        )
+
+
+class MissionSerializer(serializers.ModelSerializer):
+    """Сериализатор Mission."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора MissionSerializer."""
+
+        model = Mission
+        fields = (
+            'id',
+            'order',
+            'organization_mission',
+            'ambitions',
+            'goal_for_five_years',
+            'tasks',
+        )

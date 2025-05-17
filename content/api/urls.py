@@ -3,7 +3,9 @@
 Этот модуль определяет маршруты для версии API v1, включая:
 - TargetedFundraisingViewSet: целевые сборы.
 - GratitudeViewSet: благодарности.
+- MissionViewSet: миссии.
 - PartnersViewSet: партнёры.
+- ProjectViewSet: проекты.
 - ReviewViewSet: отзывы.
 - AboutUsVideoViewSet: видео «О нас».
 - EmployeeViewSet: сотрудники.
@@ -24,7 +26,9 @@ v1_router_api.register(
 v1_router_api.register(
     r'gratitudes', views.GratitudeViewSet, basename='gratitude'
 )
+v1_router_api.register(r'mission', views.MissionViewSet, basename='mission')
 v1_router_api.register(r'partners', views.PartnersViewSet, basename='partner')
+v1_router_api.register(r'projects', views.ProjectViewSet, basename='project')
 v1_router_api.register(r'reviews', views.ReviewViewSet, basename='review')
 v1_router_api.register(
     r'about-video', views.AboutUsVideoViewSet, basename='about-video'
