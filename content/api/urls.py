@@ -36,6 +36,10 @@ v1_router_api.register(
 v1_router_api.register(
     r'employees', views.EmployeeViewSet, basename='employee'
 )
+v1_router_api.register(r'news', views.NewsViewSet, basename='news')
+v1_router_api.register(
+    r'directions', views.DirectionViewSet, basename='direction'
+)
 api_urls.extend(v1_router_api.urls)
 
 urlpatterns = [

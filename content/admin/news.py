@@ -17,8 +17,9 @@ class NewsAdmin(admin.ModelAdmin):
     """Настройка административного интерфейса для модели News."""
 
     inlines = [GalleryImageInline]
-    list_display = ('id', 'title', 'date', 'show_on_main')
-    list_filter = ('date', 'show_on_main', 'detail_page_type')
+    list_display = ('title', 'date', 'show_on_main', 'project')
+    list_editable = ('date', 'show_on_main')
+    list_filter = ('date', 'show_on_main', 'project', 'detail_page_type')
     search_fields = ('title', 'summary', 'full_text')
     filter_horizontal = ('directions',)
     fieldsets = (
@@ -28,10 +29,10 @@ class NewsAdmin(admin.ModelAdmin):
                 'fields': (
                     'title',
                     'photo',
-                    'date',
                     'course_start',
                     'summary',
                     'directions',
+                    'project',
                 )
             },
         ),

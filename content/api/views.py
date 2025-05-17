@@ -17,11 +17,15 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from content.models import (
     AboutUsVideo,
+    Direction,
     Employee,
     Gratitude,
     Mission,
+    News,
     Partner,
     Project,
     Review,
@@ -222,3 +226,37 @@ class MissionViewSet(
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(mission)
         return Response(serializer.data)
+
+
+@extend_schema(tags=['News group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Новостей.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Новость по ID.',
+    ),
+)
+class NewsViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Новостей, или конкретную по её ID."""
+
+    queryset = News.objects.all()
+    serializer_class = serializers.NewsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['directions']
+
+
+@extend_schema(tags=['Directions group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Направлений.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Направление по ID.',
+    ),
+)
+class DirectionViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Направлений, или конкретное по его ID."""
+
+    queryset = Direction.objects.all()
+    serializer_class = serializers.DirectionSerializer

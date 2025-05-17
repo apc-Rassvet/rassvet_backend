@@ -11,11 +11,13 @@ from django.db import models
 from django.utils import timezone
 
 from content.mixins import OrderMixin, TimestampMixin, TitleMixin
+from content.utils import ckeditor_function
+from .projects import Project
 
 
 def upload_file(instance, filename):
     """Генерирует путь к файлу для загрузки."""
-    return f'news_gallery_images/{instance.gallery_images.id}/{filename}'
+    return f'news_gallery_images/{instance.news.id}/{filename}'
 
 
 class Direction(TimestampMixin, models.Model):
@@ -47,11 +49,17 @@ class News(TimestampMixin, TitleMixin, models.Model):
     photo = models.ImageField('Фото', upload_to='news_photos/')
     date = models.DateField('Дата новости', default=timezone.now)
     course_start = models.DateField('Старт курса', null=True, blank=True)
-    summary = models.TextField('Краткий текст', max_length=255)
-    directions = models.ManyToManyField('Направление деятельности', Direction)
-    # project = models.ForeignKey(
-    #     Project, on_delete=models.SET_NULL, null=True, blank=True
-    # )
+    summary = ckeditor_function('Краткий текст')
+    directions = models.ManyToManyField(
+        Direction, verbose_name='Направление деятельности'
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Проект',
+    )
     detail_page_type = models.CharField(
         'Подробная страница',
         max_length=10,
@@ -62,7 +70,7 @@ class News(TimestampMixin, TitleMixin, models.Model):
         'Ссылка на подробную страницу', blank=True, null=True
     )
     show_on_main = models.BooleanField('Отображение на странице', default=True)
-    full_text = models.TextField('Основной текст', blank=True, null=True)
+    full_text = ckeditor_function('Основной текст', blank=True, validators=[])
     video_url = models.URLField('Ссылка на видео', blank=True, null=True)
 
     class Meta:
@@ -92,25 +100,25 @@ class News(TimestampMixin, TitleMixin, models.Model):
             raise ValidationError('Укажите ссылку на внешнюю страницу.')
 
 
-class GalleryImage(OrderMixin, models.Model):
-    """Модель изображений для галереи в карточке новости."""
+class GalleryImage(OrderMixin, TimestampMixin, models.Model):
+    """Модель изображения в галерее новости."""
 
     news = models.ForeignKey(
-        'Новость',
         News,
         on_delete=models.CASCADE,
         related_name='gallery_images',
         verbose_name='Новость',
     )
     image = models.ImageField('Фото', upload_to=upload_file)
+    name = models.CharField('Название', max_length=100, default=image.name)
 
     class Meta:
         """Мета-настройки модели GalleryImage."""
 
-        ordering = ['order', 'id']
+        ordering = ['order', '-created_at']
         verbose_name = 'Фотография'
         verbose_name_plural = 'Фотографии'
 
     def __str__(self):
-        """Строковое представление галереи."""
-        return f'Галерея: {self.image.name}'
+        """Строковое представление для изображения."""
+        return self.name
