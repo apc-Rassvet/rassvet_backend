@@ -240,7 +240,9 @@ class MissionViewSet(
 class NewsViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список Новостей, или конкретную по её ID."""
 
-    queryset = News.objects.all()
+    queryset = News.objects.select_related('project').prefetch_related(
+        'directions', 'gallery_images'
+    )
     serializer_class = serializers.NewsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['directions']
