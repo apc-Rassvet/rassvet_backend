@@ -32,23 +32,18 @@ class ProjectAdmin(admin.ModelAdmin):
     """Админ зона Проектов."""
 
     list_display = (
-        'order',
         'title',
-        'logo',
         'status',
         'project_start',
         'project_end',
-        'source_financing',
         'project_rassvet',
         'program',
-        'project_goal',
-        'project_tasks',
-        'project_description',
-        'achieved_results',
+        'order',
     )
     list_editable = (
         'status',
         'project_end',
+        'project_rassvet',
     )
     list_filter = (
         'order',
