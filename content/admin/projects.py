@@ -7,6 +7,8 @@
 """
 
 from django.contrib import admin
+from django.utils.html import format_html
+from ordered_model.admin import OrderedModelAdmin
 
 from content.models.projects import ProgramsProjects, Project, ProjectPhoto
 
@@ -28,13 +30,14 @@ class ProjectPhotoAdmin(admin.StackedInline):
 
 
 @admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
+class ProjectAdmin(OrderedModelAdmin):
     """Админ зона Проектов."""
 
     list_display = (
+        'move_up_down_links',
         'order',
         'title',
-        'logo',
+        'logo_preview',
         'status',
         'project_start',
         'project_end',
@@ -46,10 +49,7 @@ class ProjectAdmin(admin.ModelAdmin):
         'project_description',
         'achieved_results',
     )
-    list_editable = (
-        'status',
-        'project_end',
-    )
+    list_editable = ('status',)
     list_filter = (
         'order',
         'title',
@@ -62,3 +62,10 @@ class ProjectAdmin(admin.ModelAdmin):
     )
     inlines = (ProjectPhotoAdmin,)
     empty_value_display = '-пусто-'
+
+    @admin.display(description='Логотип')
+    def logo_preview(self, obj):
+        """Отображает превью логотипа."""
+        if obj.logo:
+            return format_html('<img src="{}" width="50" />', obj.logo.url)
+        return '—'
