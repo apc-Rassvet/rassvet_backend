@@ -145,3 +145,25 @@ media/
 media_data/
 data/
 help_file.py
+
+# === Бэкапы PostgreSQL ===
+backup/pg_dumps/
+*.sql
+*.sql.gz
+*.dump
+*.backup
+
+# === Скрипты бэкапа (если локальные и не для репозитория) ===
+backup/backup_pg.sh
+
+# === Docker ===
+*.pid
+*.log
+*.sock
+
+# === Общие системные исключения ===
+__pycache__/
+*.py[cod]
+*.swp
+.DS_Store
+Thumbs.db
