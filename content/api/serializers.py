@@ -369,14 +369,51 @@ class GalleryImageSerializer(serializers.ModelSerializer):
 
 
 class NewsSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели новости с вложенными полями и галереей."""
+    """Сериализатор для модели новости на общей странице."""
+
+    directions = DirectionSerializer(many=True, read_only=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора NewsSerializer."""
+
+        model = News
+        fields = (
+            'id',
+            'title',
+            'summary',
+            'date',
+            'photo',
+            'show_on_main',
+            'directions',
+        )
+
+
+class NewsDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели новости на подробной странице."""
 
     directions = DirectionSerializer(many=True, read_only=True)
     project = ProjectSerializer(read_only=True)
     gallery_images = GalleryImageSerializer(many=True, read_only=True)
 
     class Meta:
-        """Meta класс с настройками сериализатора NewsSerializer."""
+        """Meta класс с настройками сериализатора NewsDetailSerializer."""
 
         model = News
-        fields = '__all__'
+        fields = (
+            'id',
+            'title',
+            'photo',
+            'date',
+            'course_start',
+            'summary',
+            'detail_page_type',
+            'detail_page_link',
+            'show_on_main',
+            'full_text',
+            'video_url',
+            'directions',
+            'project',
+            'gallery_images',
+            'created_at',
+            'updated_at',
+        )

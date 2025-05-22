@@ -19,6 +19,7 @@ from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
+from content import filters
 from content.models import (
     AboutUsVideo,
     Direction,
@@ -243,9 +244,18 @@ class NewsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = News.objects.select_related('project').prefetch_related(
         'directions', 'gallery_images'
     )
-    serializer_class = serializers.NewsSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['directions']
+    filterset_class = filters.NewsFilter
+
+    def get_serializer_class(self):
+        """Выбирает сериализатор в зависимости от действия.
+
+        Возвращает краткий сериализатор для списка (list)
+        и детальный для отдельного сотрудника (retrieve).
+        """
+        if self.action == 'retrieve':
+            return serializers.NewsDetailSerializer
+        return serializers.NewsSerializer
 
 
 @extend_schema(tags=['Directions group'])

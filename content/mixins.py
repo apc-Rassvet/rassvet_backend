@@ -41,3 +41,29 @@ class OrderMixin(models.Model):
         """Мета-класс для указания того, что модель является абстрактной."""
 
         abstract = True
+
+
+class CleanEmptyHTMLMixin:
+    """Миксин для автоматической очистки HTML-полей от "пустых" значений."""
+
+    clean_html_fields: tuple[str, ...] = ()
+
+    def save(self, *args, **kwargs):
+        """Переопределяет сохранение объекта: очищает указанные HTML-поля."""
+        for field in self.clean_html_fields:
+            original_field = getattr(self, field, None)
+            setattr(self, field, self._clean_empty_html(original_field))
+        super().save(*args, **kwargs)
+
+    def _clean_empty_html(self, raw_html):
+        """Проверяет значение HTML-поля.
+
+        Если значение поля ровно <p>&nbsp;</p> (или <p> </p>), возвращает None.
+        В остальных случаях возвращает оригинальное значение.
+        """
+        if raw_html is None:
+            return None
+        cleared = raw_html.strip().replace('\xa0', '&nbsp;')
+        if cleared == '<p>&nbsp;</p>':
+            return None
+        return raw_html

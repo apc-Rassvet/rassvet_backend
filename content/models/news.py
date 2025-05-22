@@ -10,7 +10,12 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-from content.mixins import OrderMixin, TimestampMixin, TitleMixin
+from content.mixins import (
+    CleanEmptyHTMLMixin,
+    OrderMixin,
+    TimestampMixin,
+    TitleMixin,
+)
 from content.utils import ckeditor_function
 from .projects import Project
 
@@ -28,15 +33,16 @@ class Direction(TimestampMixin, models.Model):
     class Meta:
         """Мета-настройки модели Direction."""
 
-        verbose_name = 'Направление'
-        verbose_name_plural = 'Направления'
+        ordering = ['name']
+        verbose_name = 'Направление деятельности'
+        verbose_name_plural = 'Направления деятельности'
 
     def __str__(self):
         """Строковое представление направления."""
         return self.name
 
 
-class News(TimestampMixin, TitleMixin, models.Model):
+class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
     """Модель новости, содержащая информацию и детализированные поля."""
 
     class DetailPageChoices(models.TextChoices):
@@ -69,9 +75,12 @@ class News(TimestampMixin, TitleMixin, models.Model):
     detail_page_link = models.URLField(
         'Ссылка на подробную страницу', blank=True, null=True
     )
-    show_on_main = models.BooleanField('Отображение на странице', default=True)
+    show_on_main = models.BooleanField(
+        'Отображение на главной странице', default=True
+    )
     full_text = ckeditor_function('Основной текст', blank=True, validators=[])
     video_url = models.URLField('Ссылка на видео', blank=True, null=True)
+    clean_html_fields = ('full_text', 'summary')
 
     class Meta:
         """Мета-настройки модели News."""
