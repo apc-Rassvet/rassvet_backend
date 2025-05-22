@@ -26,12 +26,15 @@ from rest_framework import serializers
 
 from content.models import (
     AboutUsVideo,
+    Direction,
     Document,
     Employee,
     FundraisingPhoto,
     FundraisingTextBlock,
+    GalleryImage,
     Gratitude,
     Mission,
+    News,
     Partner,
     Project,
     ProjectPhoto,
@@ -342,4 +345,75 @@ class MissionSerializer(serializers.ModelSerializer):
             'ambitions',
             'goal_for_five_years',
             'tasks',
+        )
+
+
+class DirectionSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели направления деятельности."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора DirectionSerializer."""
+
+        model = Direction
+        fields = ('id', 'name')
+
+
+class GalleryImageSerializer(serializers.ModelSerializer):
+    """Сериализатор для изображений галереи."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора GalleryImageSerializer."""
+
+        model = GalleryImage
+        fields = ('id', 'name', 'image', 'order')
+
+
+class NewsSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели новости на общей странице."""
+
+    directions = DirectionSerializer(many=True, read_only=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора NewsSerializer."""
+
+        model = News
+        fields = (
+            'id',
+            'title',
+            'summary',
+            'date',
+            'photo',
+            'show_on_main',
+            'directions',
+        )
+
+
+class NewsDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели новости на подробной странице."""
+
+    directions = DirectionSerializer(many=True, read_only=True)
+    project = ProjectSerializer(read_only=True)
+    gallery_images = GalleryImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора NewsDetailSerializer."""
+
+        model = News
+        fields = (
+            'id',
+            'title',
+            'photo',
+            'date',
+            'course_start',
+            'summary',
+            'detail_page_type',
+            'detail_page_link',
+            'show_on_main',
+            'full_text',
+            'video_url',
+            'directions',
+            'project',
+            'gallery_images',
+            'created_at',
+            'updated_at',
         )
