@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'django_ckeditor_5',
     'content',
     'users',
+    'debug_toolbar',
+    'ordered_model',
 ]
 
 MIDDLEWARE = [
@@ -47,7 +49,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+INTERNAL_IPS = ALLOWED_HOSTS
 
 CORS_ALLOW_ALL_ORIGINS = (
     os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'True') == 'True'
