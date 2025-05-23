@@ -29,7 +29,7 @@ class Partner(OrderMixin, TimestampMixin, models.Model):
 
         verbose_name = 'Партнер'
         verbose_name_plural = 'Партнеры'
-        ordering = ['order', '-created_at']
+        ordering = ['name']
 
     def __str__(self):
         """Возвращает строковое представление партнёра."""

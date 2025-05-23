@@ -199,7 +199,11 @@ class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):
 class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список Проектов, или конкретный по его ID."""
 
-    queryset = Project.objects.all()
+    queryset = (
+        Project.objects.select_related('source_financing', 'program')
+        .prefetch_related('photo')
+        .all()
+    )
     serializer_class = serializers.ProjectSerializer
 
 

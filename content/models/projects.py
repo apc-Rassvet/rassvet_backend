@@ -10,6 +10,7 @@
 
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
+from ordered_model.models import OrderedModel
 
 from content.mixins import OrderMixin, TitleMixin
 from content.utils import ckeditor_function
@@ -38,7 +39,7 @@ class ProgramsProjects(TitleMixin, models.Model):
         return self.title
 
 
-class Project(OrderMixin, TitleMixin, models.Model):
+class Project(OrderMixin, TitleMixin, OrderedModel):
     """Модель Проекта."""
 
     logo = models.ImageField(
@@ -68,11 +69,12 @@ class Project(OrderMixin, TitleMixin, models.Model):
     source_financing = models.ForeignKey(
         Partner,
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
         related_name='project',
         verbose_name='Источник софинансирования - Партнёр',
     )
-    project_rassvet = models.BooleanField('Проект НКО Рассвет', default=True)
+    project_rassvet = models.BooleanField('Проект НКО Рассвет', default=False)
     program = models.ForeignKey(
         ProgramsProjects,
         on_delete=models.SET_NULL,
@@ -80,17 +82,23 @@ class Project(OrderMixin, TitleMixin, models.Model):
         related_name='project',
         verbose_name='Программа',
     )
-    project_goal = ckeditor_function('Цель проекта')
-    project_tasks = ckeditor_function('Задачи проекта')
-    project_description = ckeditor_function('Описание проекта')
-    achieved_results = ckeditor_function('Достигнутые результаты')
+    project_goal = ckeditor_function(verbose_name='Цель проекта')
+    project_tasks = ckeditor_function(verbose_name='Задачи проекта')
+    project_description = ckeditor_function(verbose_name='Описание проекта')
+    achieved_results = ckeditor_function(
+        verbose_name='Достигнутые результаты',
+        blank=True,
+        null=True,
+        validators=[],
+    )
+    order_field_name = 'order'
 
     class Meta:
         """Класс Meta для Project, содержащий мета-данные."""
 
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
-        ordering = ['order', '-project_start']
+        ordering = ['order']
         constraints = [
             CheckConstraint(
                 check=Q(project_end__gt=F('project_start')),
@@ -101,6 +109,16 @@ class Project(OrderMixin, TitleMixin, models.Model):
     def __str__(self):
         """Возвращает строковое представление проекта."""
         return self.title
+
+    def save(self, *args, **kwargs):
+        """Переопределяет метод сохранения для очистки HTML-контента в полях.
+
+        Этот метод проверяет поле achieved_results на наличие
+        пустого HTML-контента и присваивает None.
+        """
+        if self.achieved_results == '<p>&nbsp;</p>':
+            self.achieved_results = None
+        super().save(*args, **kwargs)
 
 
 class ProjectPhoto(models.Model):
