@@ -14,7 +14,7 @@ def ckeditor_function(
     config_name='default',
     blank=False,
     null=False,
-    validators=[validate_not_empty_html],
+    validators=None,
 ):
     """Функция создающая text поля для моделей проекта."""
     return CKEditor5Field(
@@ -22,5 +22,7 @@ def ckeditor_function(
         config_name=config_name,
         blank=blank,
         null=null,
-        validators=validators,
+        validators=validators
+        if validators is not None
+        else [validate_not_empty_html],
     )

@@ -40,6 +40,7 @@ class ProjectAdmin(OrderedModelAdmin):
         'status',
         'logo_preview',
     )
+    list_editable = ('status',)
     list_filter = (
         'order',
         'title',
@@ -50,7 +51,6 @@ class ProjectAdmin(OrderedModelAdmin):
         'title',
         'status',
     )
-    readonly_fields = ('order',)
     inlines = (ProjectPhotoAdmin,)
     empty_value_display = '-пусто-'
 

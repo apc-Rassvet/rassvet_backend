@@ -172,6 +172,10 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
 }
 
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
+}
+
 CKEDITOR_5_CONFIGS = {
     'default': {
         'toolbar': [
