@@ -19,7 +19,7 @@ from .gratitudes import Gratitude
 from .mission import Mission
 from .news import Direction, GalleryImage, News
 from .partners import Partner
-from .projects import ProgramsProjects, Project, ProjectPhoto
+from .projects import ProgramsProjects, Project, ProjectPhoto, ProjectsStatus
 from .reviews import Review
 from .targeted_fundraisings import (
     FundraisingPhoto,
@@ -42,6 +42,7 @@ __all__ = [
     'ProgramsProjects',
     'Project',
     'ProjectPhoto',
+    'ProjectsStatus',
     'Review',
     'TargetedFundraising',
     'TypeDocument',

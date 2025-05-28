@@ -21,7 +21,15 @@
 обработки и валидации данных перед их сохранением в базу данных.
 """
 
-from content.models import Employee, Gratitude, Partner, Review
+from content.models import (
+    Employee,
+    Gratitude,
+    Partner,
+    Project,
+    ProjectsStatus,
+    ProgramsProjects,
+    Review,
+)
 from content.models.targeted_fundraisings import (
     FundraisingStatus,
     TargetedFundraising,
@@ -133,5 +141,25 @@ MODEL_CONFIG = {
             'trainings': {'source': 'trainings', 'default': ''},
         },
         'required_fields': ['name'],
+    },
+    Project: {
+        'fields': {
+            'title': {'source': 'title'},
+            'status': {'default': ProjectsStatus.ACTIVE},
+            'project_rassvet': {'default': True},
+            'program': {
+                'default': lambda val,
+                r,
+                r_num: ProgramsProjects.objects.get_or_create(
+                    title='Основная программа'
+                )[0],
+            },
+            'logo': {'default': 'projects/default.png'},
+            'project_goal': {'default': ''},
+            'project_tasks': {'default': ''},
+            'project_description': {'default': ''},
+            'achieved_results': {'default': ''},
+        },
+        'required_fields': ['title'],
     },
 }
