@@ -5,11 +5,11 @@
 """
 
 from django.db import models
+from ordered_model.models import OrderedModel
+from content.mixins import TimestampMixin
 
-from content.mixins import OrderMixin, TimestampMixin
 
-
-class Partner(OrderMixin, TimestampMixin, models.Model):
+class Partner(OrderedModel, TimestampMixin, models.Model):
     """Модель для хранения информации о партнёрах."""
 
     name = models.CharField(
@@ -24,13 +24,13 @@ class Partner(OrderMixin, TimestampMixin, models.Model):
         verbose_name='Описание',
     )
 
-    class Meta:
-        """Класс Meta для модели Partner, содержащий мета-данные."""
+    class Meta(OrderedModel.Meta):
+        """Мета-настройки модели Partners."""
 
         verbose_name = 'Партнер'
         verbose_name_plural = 'Партнеры'
-        ordering = ['name']
+        ordering = ['order']
 
     def __str__(self):
-        """Возвращает строковое представление партнёра."""
+        """Строковое представление партнёра."""
         return self.name

@@ -6,27 +6,23 @@
 
 from django.contrib import admin
 from django.utils.html import format_html
+from ordered_model.admin import OrderedModelAdmin
 
 from content.models import Partner
 
 
 @admin.register(Partner)
-class PartnersAdmin(admin.ModelAdmin):
-    """Настройка отображения списка Partner с предпросмотром логотипа.
+class PartnersAdmin(OrderedModelAdmin):
+    """Настройка отображения списка Partner с предпросмотром логотипа."""
 
-    Определяет поля для списка, фильтры, поиск, readonly-поля
-    и секции полей для редактирования.
-    """
-
-    list_display = ('name', 'logo_preview', 'order')
-    list_editable = ('order',)
+    list_display = ('name', 'logo_preview', 'move_up_down_links')
     list_filter = ('created_at', 'updated_at')
     search_fields = ('name', 'description')
     readonly_fields = ('created_at', 'updated_at', 'logo_preview')
     fieldsets = (
         (
             'Основная информация',
-            {'fields': ('name', 'logo', 'description', 'order')},
+            {'fields': ('name', 'logo', 'description')},
         ),
         (
             'Системная информация',
