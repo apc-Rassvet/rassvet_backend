@@ -30,6 +30,19 @@ class PartnersAdmin(OrderedModelAdmin):
         ),
     )
 
+    def save_model(self, request, obj, form, change):
+        """Сохраняет объект модели в админке.
+
+        При создании нового объекта автоматически перемещает его
+        на верхнюю позицию (в начало списка), чтобы новые элементы
+        отображались первыми. Для уже существующих объектов сохраняет
+        стандартное поведение.
+        """
+        super().save_model(request, obj, form, change)
+        if not change:
+            obj.top()
+            obj.save()
+
     @admin.display(description='Логотип')
     def logo_preview(self, obj):
         """Отображает превью логотипа."""

@@ -9,7 +9,7 @@ from ordered_model.models import OrderedModel
 from content.mixins import TimestampMixin
 
 
-class Partner(OrderedModel, TimestampMixin, models.Model):
+class Partner(TimestampMixin, OrderedModel):
     """Модель для хранения информации о партнёрах."""
 
     name = models.CharField(
