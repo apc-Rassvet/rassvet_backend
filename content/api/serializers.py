@@ -73,6 +73,7 @@ class PartnersSerializer(serializers.ModelSerializer):
             'name',
             'logo',
             'description',
+            'order',
             'created_at',
             'updated_at',
         ]
