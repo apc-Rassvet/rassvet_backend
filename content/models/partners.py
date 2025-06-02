@@ -32,5 +32,5 @@ class Partner(TimestampMixin, OrderedModel):
         ordering = ['order']
 
     def __str__(self):
-        """Строковое представление партнёра."""
+        """Возвращает строковое представление партнёра."""
         return self.name
