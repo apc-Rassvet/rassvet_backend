@@ -26,6 +26,7 @@ from rest_framework import serializers
 
 from content.models import (
     AboutUsVideo,
+    Chapter,
     Direction,
     Document,
     Employee,
@@ -38,6 +39,7 @@ from content.models import (
     Partner,
     Project,
     ProjectPhoto,
+    Report,
     Review,
     TargetedFundraising,
     TypeDocument,
@@ -422,3 +424,25 @@ class NewsDetailSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         )
+
+
+class ReportSerializer(serializers.ModelSerializer):
+    """Сериализатор для отчетов."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора ReportSerializer."""
+
+        model = Report
+        fields = ('id', 'title', 'file', 'pub_date')
+
+
+class ChapterSerializer(serializers.ModelSerializer):
+    """Сериализатор для глав отчетов."""
+
+    reports = ReportSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора ChapterSerializer."""
+
+        model = Chapter
+        fields = ('id', 'title', 'reports', 'position')

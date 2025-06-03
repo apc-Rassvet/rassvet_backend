@@ -40,6 +40,8 @@ v1_router_api.register(r'news', views.NewsViewSet, basename='news')
 v1_router_api.register(
     r'directions', views.DirectionViewSet, basename='direction'
 )
+v1_router_api.register(r'report', views.ReportViewSet, basename='report')
+
 api_urls.extend(v1_router_api.urls)
 
 urlpatterns = [

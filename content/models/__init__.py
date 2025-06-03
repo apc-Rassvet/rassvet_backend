@@ -26,9 +26,11 @@ from .targeted_fundraisings import (
     FundraisingTextBlock,
     TargetedFundraising,
 )
+from .report import Report, Chapter
 
 __all__ = [
     'AboutUsVideo',
+    'Chapter',
     'Direction',
     'Document',
     'Employee',
@@ -42,6 +44,7 @@ __all__ = [
     'ProgramsProjects',
     'Project',
     'ProjectPhoto',
+    'Report',
     'Review',
     'TargetedFundraising',
     'TypeDocument',
