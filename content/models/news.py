@@ -1,0 +1,133 @@
+"""Модуль содержит модели направлений деятельности, новостей и галереи.
+
+Модели:
+    - Direction: Хранит направления деятельности
+    - News: Содержит информацию о новостях
+    - GalleryImage: Хранит изображения для подробных страниц новостей
+"""
+
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils import timezone
+
+from content.mixins import (
+    CleanEmptyHTMLMixin,
+    OrderMixin,
+    TimestampMixin,
+    TitleMixin,
+)
+from content.utils import ckeditor_function
+from .projects import Project
+
+
+def upload_file(instance, filename):
+    """Генерирует путь к файлу для загрузки."""
+    return f'news_gallery_images/{instance.news.id}/{filename}'
+
+
+class Direction(TimestampMixin, models.Model):
+    """Модель направления деятельности, к которому может относиться новость."""
+
+    name = models.CharField('Название', max_length=100, unique=True)
+
+    class Meta:
+        """Мета-настройки модели Direction."""
+
+        ordering = ['name']
+        verbose_name = 'Направление деятельности'
+        verbose_name_plural = 'Направления деятельности'
+
+    def __str__(self):
+        """Строковое представление направления."""
+        return self.name
+
+
+class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
+    """Модель новости, содержащая информацию и детализированные поля."""
+
+    class DetailPageChoices(models.TextChoices):
+        """Выбор способа отображения подробной страницы новости."""
+
+        CREATE = 'create', 'Создать подробную страницу'
+        LINK = 'link', 'Прикрепить ссылку'
+        NONE = 'none', 'Не создавать страницу'
+
+    photo = models.ImageField('Фото', upload_to='news_photos/')
+    date = models.DateField('Дата новости', default=timezone.now)
+    course_start = models.DateField('Старт курса', null=True, blank=True)
+    summary = ckeditor_function('Краткий текст')
+    directions = models.ManyToManyField(
+        Direction, verbose_name='Направление деятельности'
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Проект',
+    )
+    detail_page_type = models.CharField(
+        'Подробная страница',
+        max_length=10,
+        choices=DetailPageChoices.choices,
+        default=DetailPageChoices.NONE,
+    )
+    detail_page_link = models.URLField(
+        'Ссылка на подробную страницу', blank=True, null=True
+    )
+    show_on_main = models.BooleanField(
+        'Отображение на главной странице', default=True
+    )
+    full_text = ckeditor_function('Основной текст', blank=True, validators=[])
+    video_url = models.URLField('Ссылка на видео', blank=True, null=True)
+    clean_html_fields = ('full_text', 'summary')
+
+    class Meta:
+        """Мета-настройки модели News."""
+
+        ordering = ['-date']
+        verbose_name = 'Новость'
+        verbose_name_plural = 'Новости'
+
+    def __str__(self):
+        """Строковое представление направления."""
+        return f'{self.title} ({self.date})'
+
+    def save(self, *args, **kwargs):
+        """Сохранение объекта с предварительной валидацией."""
+        self.clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        """Валидация полей в зависимости от типа подробной страницы."""
+        if self.detail_page_type == 'create' and not self.full_text:
+            raise ValidationError(
+                'Для создания подробной страницы '
+                'необходимо заполнить основное описание.'
+            )
+        if self.detail_page_type == 'link' and not self.detail_page_link:
+            raise ValidationError('Укажите ссылку на внешнюю страницу.')
+
+
+class GalleryImage(OrderMixin, TimestampMixin, models.Model):
+    """Модель изображения в галерее новости."""
+
+    news = models.ForeignKey(
+        News,
+        on_delete=models.CASCADE,
+        related_name='gallery_images',
+        verbose_name='Новость',
+    )
+    image = models.ImageField('Фото', upload_to=upload_file)
+    name = models.CharField('Название', max_length=100, default=image.name)
+
+    class Meta:
+        """Мета-настройки модели GalleryImage."""
+
+        ordering = ['order', '-created_at']
+        verbose_name = 'Фотография'
+        verbose_name_plural = 'Фотографии'
+
+    def __str__(self):
+        """Строковое представление для изображения."""
+        return self.name

@@ -1,21 +1,16 @@
+"""Конфигурация URL для проекта 'АПЦ Рассвет'.
+
+Этот модуль определяет все URL-маршруты проекта, включая:
+- Маршруты административной панели Django и восстановления пароля
+- Маршруты для API приложений
+- Маршруты для редактора CKEditor 5
+"""
+
 from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.conf.urls.static import static
 from django.urls import include, path
-
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularSwaggerView,
-    SpectacularRedocView,
-)
-from drf_spectacular.utils import extend_schema
-
-
-@extend_schema(exclude=True)
-class HiddenSchemaView(SpectacularAPIView):
-    pass
-
 
 urlpatterns = [
     path(
@@ -39,26 +34,13 @@ urlpatterns = [
         name='password_reset_complete',
     ),
     path('admin/', admin.site.urls),
-    path(
-        'api/schema/',
-        HiddenSchemaView.as_view(),
-        name='schema',
-    ),
-    path(
-        'api/docs/swagger-ui/',
-        SpectacularSwaggerView.as_view(
-            url_name='schema',
-        ),
-        name='swagger-ui',
-    ),
-    path(
-        'api/docs/redoc/',
-        SpectacularRedocView.as_view(url_name='schema'),
-        name='redoc',
-    ),
     path('api/', include('content.urls')),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
 ]
 if settings.DEBUG:
+    urlpatterns = [
+        path('__debug__/', include('debug_toolbar.urls'))
+    ] + urlpatterns
     urlpatterns += static(
         settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
     )

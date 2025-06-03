@@ -1,3 +1,15 @@
+"""Модуль конфигурации проекта 'АПЦ Рассвет'.
+
+Этот модуль содержит все настройки проекта, включая:
+- Базовые параметры проекта (SECRET_KEY, DEBUG и т.д.)
+- Настройки приложений (INSTALLED_APPS)
+- Конфигурацию базы данных (PostgreSQL)
+- Настройки статических файлов и медиа
+- Настройки аутентификации и авторизации
+- Конфигурацию REST Framework и DRF Spectacular для API
+- Настройки редактора CKEditor 5
+"""
+
 import os
 from pathlib import Path
 
@@ -6,8 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'default-key')
 
-# DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1').split(',')
 
@@ -18,13 +29,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'drf_spectacular',
+    'django_ckeditor_5',
     'content',
     'users',
+    'debug_toolbar',
+    'ordered_model',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -33,8 +49,36 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
+INTERNAL_IPS = ALLOWED_HOSTS
+
+CORS_ALLOW_ALL_ORIGINS = (
+    os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'True') == 'True'
+)
+CORS_ALLOW_CREDENTIALS = (
+    os.environ.get('CORS_ALLOW_CREDENTIALS', 'True') == 'True'
+)
+CORS_ALLOW_METHODS = [
+    'GET',
+    'PATCH',
+    'POST',
+    'PUT',
+    'DELETE',
+    'OPTIONS',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'accept-language',
+    'authorization',
+    'content-type',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 ROOT_URLCONF = 'rassvet.urls'
 
 TEMPLATES = [
@@ -58,25 +102,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rassvet.wsgi.application'
 
-# sqlite3 - Для локальной разработки
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
     }
 }
-
-# postgresql - prod
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('POSTGRES_DB'),
-#         'USER': os.environ.get('POSTGRES_USER'),
-#         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-#         'HOST': os.environ.get('DB_HOST'),
-#         'PORT': os.environ.get('DB_PORT', '5432'),
-#     }
-# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -136,3 +167,136 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'Rassvet API',
     'VERSION': '1.0.0',
 }
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
+}
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': [
+            'heading',
+            '|',
+            'fontfamily',
+            'fontsize',
+            'fontColor',
+            'fontBackgroundColor',
+            '|',
+            'bold',
+            'italic',
+            'underline',
+            'strikethrough',
+            'code',
+            '|',
+            'alignment',
+            '|',
+            'bulletedList',
+            'numberedList',
+            '|',
+            'outdent',
+            'indent',
+            '|',
+            'link',
+            'blockQuote',
+            'insertTable',
+            '|',
+            'horizontalLine',
+            'pageBreak',
+            '|',
+            'findAndReplace',
+            '|',
+            'undo',
+            'redo',
+            '|',
+            'highlight',
+            'removeFormat',
+            '|',
+            'specialCharacters',
+            'subscript',
+            'superscript',
+            '|',
+            'todoList',
+        ],
+        'image': {
+            'toolbar': [
+                'imageTextAlternative',
+                'imageStyle:inline',
+                'imageStyle:block',
+                'imageStyle:side',
+                'linkImage',
+            ]
+        },
+        'table': {
+            'contentToolbar': [
+                'tableColumn',
+                'tableRow',
+                'mergeTableCells',
+                'tableCellProperties',
+                'tableProperties',
+            ]
+        },
+        'heading': {
+            'options': [
+                {
+                    'model': 'paragraph',
+                    'title': 'Paragraph',
+                    'class': 'ck-heading_paragraph',
+                },
+                {
+                    'model': 'heading1',
+                    'view': 'h1',
+                    'title': 'Heading 1',
+                    'class': 'ck-heading_heading1',
+                },
+                {
+                    'model': 'heading2',
+                    'view': 'h2',
+                    'title': 'Heading 2',
+                    'class': 'ck-heading_heading2',
+                },
+                {
+                    'model': 'heading3',
+                    'view': 'h3',
+                    'title': 'Heading 3',
+                    'class': 'ck-heading_heading3',
+                },
+                {
+                    'model': 'heading4',
+                    'view': 'h4',
+                    'title': 'Heading 4',
+                    'class': 'ck-heading_heading4',
+                },
+                {
+                    'model': 'heading5',
+                    'view': 'h5',
+                    'title': 'Heading 5',
+                    'class': 'ck-heading_heading5',
+                },
+                {
+                    'model': 'heading6',
+                    'view': 'h6',
+                    'title': 'Heading 6',
+                    'class': 'ck-heading_heading6',
+                },
+            ]
+        },
+        'height': '500px',
+        'width': '100%',
+        'fontSize': {
+            'options': [9, 11, 13, 'default', 17, 19, 21, 27, 35],
+            'supportAllValues': True,
+        },
+        'language': 'ru',
+        'link': {
+            'decorators': {
+                'openInNewTab': {
+                    'mode': 'manual',
+                    'label': 'Открыть в новой вкладке',
+                    'defaultValue': True,
+                }
+            }
+        },
+    },
+}
+CKEDITOR_5_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+CKEDITOR_5_UPLOAD_PATH = 'uploads/ckeditor5/'

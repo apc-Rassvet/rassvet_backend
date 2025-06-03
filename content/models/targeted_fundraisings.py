@@ -1,49 +1,63 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
+"""Модуль содержит модели, связанные с адресными сборами.
 
-from content.constants import (
-    LENGTH_FUNDRAISING_TITLE,
-    LENGTH_FUNDRAISING_STATUS,
-)
+Классы:
+    FundraisingStatus: Перечисление возможных статусов для адресного сбора.
+
+Модели:
+    1. TargetedFundraising: Модель для хранения информации об адресном сборе
+    2. FundraisingPhoto: Модель для хранения фотографий адресных сборов
+    3. FundraisingTextBlock: Модель для хранения текстовых блоков
+       адресных сборов
+"""
+
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django_ckeditor_5.fields import CKEditor5Field
+
+from content.mixins import OrderMixin, TimestampMixin, TitleMixin
+from content.validators import validate_not_empty_html
+
+
+def upload_file(instance, filename):
+    """Генерирует путь к файлу для загрузки."""
+    return f'fundraisings/{instance.fundraising.id}/{filename}'
 
 
 class FundraisingStatus(models.TextChoices):
+    """Класс, определяющий возможные статусы адресного сбора."""
+
     ACTIVE = 'active', 'Актуальный сбор'
     COMPLETED = 'completed', 'Завершенный сбор'
 
 
-class TargetedFundraising(models.Model):
-    """Модель 'Адресного сбора'."""
+class TargetedFundraising(
+    TitleMixin, OrderMixin, TimestampMixin, models.Model
+):
+    """Модель для хранения информации об адресных сборах."""
 
-    title = models.CharField(
-        max_length=LENGTH_FUNDRAISING_TITLE, verbose_name='Заголовок'
-    )
     short_description = models.TextField(verbose_name='Краткое описание')
+    fundraising_link = models.URLField('Ссылка на сбор')
     status = models.CharField(
-        max_length=LENGTH_FUNDRAISING_STATUS,
+        max_length=max(len(value) for value, _ in FundraisingStatus.choices),
         choices=FundraisingStatus.choices,
         default=FundraisingStatus.ACTIVE,
         verbose_name='Статус сбора',
     )
-    order = models.PositiveIntegerField(
-        default=0,
-        verbose_name='Порядок отображения',
-        help_text='Чем меньше значение, тем первее в списке',
-    )
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-    updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
     class Meta:
+        """Класс Meta для TargetedFundraising, содержащий мета-данные."""
+
         verbose_name = 'Адресный сбор'
         verbose_name_plural = 'Адресные сборы'
         ordering = ['order', '-created_at']
 
     def __str__(self):
+        """Возвращает строковое представление адресного сбора."""
         return self.title
 
 
-class FundraisingPhoto(models.Model):
-    """Модель 'Фотография' адресного сбора."""
+class FundraisingPhoto(TitleMixin, models.Model):
+    """Модель для хранения информации о фотографиях адресных сборов."""
 
     fundraising = models.ForeignKey(
         TargetedFundraising,
@@ -52,18 +66,18 @@ class FundraisingPhoto(models.Model):
         verbose_name='Адресный сбор',
     )
     image = models.ImageField(
-        upload_to='fundraisings/',
+        upload_to=upload_file,
         verbose_name='Фотография',
-        blank=False,
-        null=False,
     )
-    position = models.PositiveIntegerField(
+    position = models.PositiveSmallIntegerField(
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(3)],
         verbose_name='Позиция фотографии (1-3)',
     )
 
     class Meta:
+        """Класс Meta для FundraisingPhoto, содержащий мета-данные."""
+
         verbose_name = 'Фотография сбора'
         verbose_name_plural = 'Фотографии сборов'
         ordering = ['position']
@@ -75,11 +89,12 @@ class FundraisingPhoto(models.Model):
         ]
 
     def __str__(self):
+        """Возвращает строковое представление фотографии."""
         return f'Фотография {self.position} для {self.fundraising.title}'
 
 
 class FundraisingTextBlock(models.Model):
-    """Модель 'Текстовый блок' адресного сбора."""
+    """Модель для хранения информации о текстовых блоках адресных сборов."""
 
     fundraising = models.ForeignKey(
         TargetedFundraising,
@@ -87,21 +102,21 @@ class FundraisingTextBlock(models.Model):
         related_name='text_blocks',
         verbose_name='Адресный сбор',
     )
-    title = models.CharField(
-        max_length=LENGTH_FUNDRAISING_TITLE,
-        blank=True,
-        verbose_name='Заголовок блока',
+    content = CKEditor5Field(
+        verbose_name='Текстовый блок',
+        config_name='default',
+        blank=False,
+        validators=[validate_not_empty_html],
     )
-    content = models.TextField(
-        verbose_name='Текстовый блок', blank=False, null=False
-    )
-    position = models.PositiveIntegerField(
+    position = models.PositiveSmallIntegerField(
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(3)],
         verbose_name='Позиция блока (1-3)',
     )
 
     class Meta:
+        """Класс Meta для FundraisingTextBlock, содержащий мета-данные."""
+
         verbose_name = 'Текстовый блок'
         verbose_name_plural = 'Текстовые блоки'
         ordering = ['position']
@@ -113,4 +128,5 @@ class FundraisingTextBlock(models.Model):
         ]
 
     def __str__(self):
+        """Возвращает строковое представление текстового блока."""
         return f'Текстовый блок {self.position} для {self.fundraising.title}'
