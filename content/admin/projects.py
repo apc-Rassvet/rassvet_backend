@@ -35,24 +35,34 @@ class ProjectAdmin(OrderedModelAdmin):
 
     list_display = (
         'title',
-        'order',
-        'move_up_down_links',
         'status',
         'logo_preview',
+        'move_up_down_links',
     )
     list_editable = ('status',)
     list_filter = (
-        'order',
         'title',
         'status',
     )
     search_fields = (
-        'order',
         'title',
         'status',
     )
     inlines = (ProjectPhotoAdmin,)
     empty_value_display = '-пусто-'
+
+    def save_model(self, request, obj, form, change):
+        """Сохраняет объект модели в админке.
+
+        При создании нового объекта автоматически перемещает его
+        на верхнюю позицию (в начало списка), чтобы новые элементы
+        отображались первыми. Для уже существующих объектов сохраняет
+        стандартное поведение.
+        """
+        super().save_model(request, obj, form, change)
+        if change is False:
+            obj.top()
+            obj.save()
 
     @admin.display(description='Логотип')
     def logo_preview(self, obj):

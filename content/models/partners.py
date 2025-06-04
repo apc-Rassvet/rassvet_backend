@@ -6,6 +6,7 @@
 
 from django.db import models
 from ordered_model.models import OrderedModel
+
 from content.mixins import TimestampMixin
 
 
