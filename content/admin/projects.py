@@ -8,8 +8,8 @@
 
 from django.contrib import admin
 from django.utils.html import format_html
-from ordered_model.admin import OrderedModelAdmin
 
+from content.base_models import BaseOrderedModelAdmin
 from content.models.projects import ProgramsProjects, Project, ProjectPhoto
 
 
@@ -30,7 +30,7 @@ class ProjectPhotoAdmin(admin.StackedInline):
 
 
 @admin.register(Project)
-class ProjectAdmin(OrderedModelAdmin):
+class ProjectAdmin(BaseOrderedModelAdmin):
     """Админ зона Проектов."""
 
     list_display = (
@@ -50,19 +50,6 @@ class ProjectAdmin(OrderedModelAdmin):
     )
     inlines = (ProjectPhotoAdmin,)
     empty_value_display = '-пусто-'
-
-    def save_model(self, request, obj, form, change):
-        """Сохраняет объект модели в админке.
-
-        При создании нового объекта автоматически перемещает его
-        на верхнюю позицию (в начало списка), чтобы новые элементы
-        отображались первыми. Для уже существующих объектов сохраняет
-        стандартное поведение.
-        """
-        super().save_model(request, obj, form, change)
-        if change is False:
-            obj.top()
-            obj.save()
 
     @admin.display(description='Логотип')
     def logo_preview(self, obj):

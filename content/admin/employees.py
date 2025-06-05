@@ -7,8 +7,8 @@
 """
 
 from django.contrib import admin
-from ordered_model.admin import OrderedModelAdmin
 
+from content.base_models import BaseOrderedModelAdmin
 from content.models import Document, Employee, TypeDocument
 
 
@@ -34,7 +34,7 @@ class DocumentInline(admin.TabularInline):
 
 
 @admin.register(Employee)
-class EmployeeAdmin(OrderedModelAdmin):
+class EmployeeAdmin(BaseOrderedModelAdmin):
     """Конфигурация админки для модели Employee.
 
     Определяет отображаемые поля, фильтрацию, поиск, inline-классы и fieldsets.
@@ -69,16 +69,3 @@ class EmployeeAdmin(OrderedModelAdmin):
             {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
         ),
     )
-
-    def save_model(self, request, obj, form, change):
-        """Сохраняет объект модели в админке.
-
-        При создании нового объекта автоматически перемещает его
-        на верхнюю позицию (в начало списка), чтобы новые элементы
-        отображались первыми. Для уже существующих объектов сохраняет
-        стандартное поведение.
-        """
-        super().save_model(request, obj, form, change)
-        if not change:
-            obj.top()
-            obj.save()

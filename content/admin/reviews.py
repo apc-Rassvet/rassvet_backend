@@ -5,13 +5,13 @@
 """
 
 from django.contrib import admin
-from ordered_model.admin import OrderedModelAdmin
 
+from content.base_models import BaseOrderedModelAdmin
 from content.models import Review
 
 
 @admin.register(Review)
-class ReviewAdmin(OrderedModelAdmin):
+class ReviewAdmin(BaseOrderedModelAdmin):
     """Настройка отображения списка Review и форм редактирования.
 
     Определяет отображаемые и редактируемые поля, фильтры, поиск и секции.
@@ -32,16 +32,3 @@ class ReviewAdmin(OrderedModelAdmin):
             {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
         ),
     )
-
-    def save_model(self, request, obj, form, change):
-        """Сохраняет объект модели в админке.
-
-        При создании нового объекта автоматически перемещает его
-        на верхнюю позицию (в начало списка), чтобы новые элементы
-        отображались первыми. Для уже существующих объектов сохраняет
-        стандартное поведение.
-        """
-        super().save_model(request, obj, form, change)
-        if change is False:
-            obj.top()
-            obj.save()
