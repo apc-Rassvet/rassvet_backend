@@ -77,13 +77,6 @@ MODEL_CONFIG = {
             'logo': {
                 'source': 'logo',
             },
-            'order': {
-                'source': 'order',
-                'default': 0,
-                'transform': lambda val, row, row_num: (
-                    int(val) if str(val).isdigit() else 0
-                ),
-            },
         },
         'required_fields': ['logo'],
     },
