@@ -195,13 +195,13 @@ class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):
         ),
     ),
 )
-class FitbakFormView(APIView):
+class FeedbackFormView(APIView):
     """Форма обратной связи."""
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
 
     def post(self, request, *args, **kwargs):
         """Создание новой записи в базе данных."""
-        serializer = serializers.FitbakFormSerializer(data=request.data)
+        serializer = serializers.FeedbackFormSerializer(data=request.data)
         if serializer.is_valid():
             name = serializer.validated_data['name']
             phone_number = serializer.validated_data['phone_number']

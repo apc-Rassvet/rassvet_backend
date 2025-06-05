@@ -32,8 +32,8 @@ from content.models import (
     Review,
     TargetedFundraising,
     TypeDocument,
-)
 
+from .validators import validate_phone_number
 
 class GratitudeSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Gratitude."""
@@ -282,18 +282,9 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
         ).data
 
 
-class FitbakFormSerializer(serializers.Serializer):
+class FeedbackFormSerializer(serializers.Serializer):
     """Сериализатор для формы обратной связи."""
 
     name = serializers.CharField(max_length=255)
-    phone_number = serializers.CharField(max_length=25)
-    message = serializers.CharField()
-
-    def validate_phone_number(self, value):
-        """Валидация номера телефона."""
-        pattern = r'^((\+7|8)[ \-]?)?$?\d{3}$?[ \-]?\d{3}[ \-]?\d{2}[ \-]?\d{2}$'
-        if not re.match(pattern, value):
-            raise serializers.ValidationError(
-                'Номер телефона должен быть в формате +79998887766 или 89998887766'
-            )
-        return value
+    phone_number = serializers.CharField(max_length=25,validators=[validate_phone_number])
+    message = serializers.CharField(max_length=1000) # около 200 слов
