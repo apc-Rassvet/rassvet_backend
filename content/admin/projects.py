@@ -8,8 +8,8 @@
 
 from django.contrib import admin
 from django.utils.html import format_html
-from ordered_model.admin import OrderedModelAdmin
 
+from content.base_models import BaseOrderedModelAdmin
 from content.models.projects import ProgramsProjects, Project, ProjectPhoto
 
 
@@ -30,24 +30,21 @@ class ProjectPhotoAdmin(admin.StackedInline):
 
 
 @admin.register(Project)
-class ProjectAdmin(OrderedModelAdmin):
+class ProjectAdmin(BaseOrderedModelAdmin):
     """Админ зона Проектов."""
 
     list_display = (
         'title',
-        'order',
-        'move_up_down_links',
         'status',
         'logo_preview',
+        'move_up_down_links',
     )
     list_editable = ('status',)
     list_filter = (
-        'order',
         'title',
         'status',
     )
     search_fields = (
-        'order',
         'title',
         'status',
     )

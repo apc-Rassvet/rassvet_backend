@@ -12,7 +12,7 @@ from django.db import models
 from django.db.models import CheckConstraint, F, Q
 from ordered_model.models import OrderedModel
 
-from content.mixins import OrderMixin, TitleMixin
+from content.mixins import TitleMixin
 from content.utils import ckeditor_function
 
 from .partners import Partner
@@ -39,7 +39,7 @@ class ProgramsProjects(TitleMixin, models.Model):
         return self.title
 
 
-class Project(OrderMixin, TitleMixin, OrderedModel):
+class Project(TitleMixin, OrderedModel):
     """Модель Проекта."""
 
     logo = models.ImageField(
@@ -91,9 +91,8 @@ class Project(OrderMixin, TitleMixin, OrderedModel):
         null=True,
         validators=[],
     )
-    order_field_name = 'order'
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         """Класс Meta для Project, содержащий мета-данные."""
 
         verbose_name = 'Проект'

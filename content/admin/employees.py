@@ -8,6 +8,7 @@
 
 from django.contrib import admin
 
+from content.base_models import BaseOrderedModelAdmin
 from content.models import Document, Employee, TypeDocument
 
 
@@ -33,20 +34,18 @@ class DocumentInline(admin.TabularInline):
 
 
 @admin.register(Employee)
-class EmployeeAdmin(admin.ModelAdmin):
+class EmployeeAdmin(BaseOrderedModelAdmin):
     """Конфигурация админки для модели Employee.
 
     Определяет отображаемые поля, фильтрацию, поиск, inline-классы и fieldsets.
     """
 
-    list_display = ('name', 'order', 'category_on_main')
-    list_editable = ('order', 'category_on_main')
-    list_filter = ('order',)
-    search_fields = [
-        'name',
-    ]
+    list_display = ('name', 'category_on_main', 'move_up_down_links')
+    list_editable = ('category_on_main',)
+    list_filter = ('created_at', 'updated_at')
+    search_fields = ('name',)
+    readonly_fields = ('created_at', 'updated_at')
     inlines = [DocumentInline]
-
     fieldsets = (
         (
             'Основные данные',
@@ -57,7 +56,6 @@ class EmployeeAdmin(admin.ModelAdmin):
                     'main_specialities',
                     'interviews',
                     'specialists_register',
-                    'order',
                     'category_on_main',
                     'specialities',
                     'education',
@@ -71,4 +69,3 @@ class EmployeeAdmin(admin.ModelAdmin):
             {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
         ),
     )
-    readonly_fields = ('created_at', 'updated_at')
