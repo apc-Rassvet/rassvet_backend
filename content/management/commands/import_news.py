@@ -1,123 +1,210 @@
 """Django management команда для импорта новостей из дампа SQL."""
 
-from datetime import date
+import os
 import re
+
 from django.core.management.base import BaseCommand
+from django.core.files import File
 from django.utils.dateparse import parse_date
-from content.models import (
-    News,
-    Project,
-    Direction,
-    GalleryImage,
-)
-from content.management.utils import (
-    clean_media_path,
-    parse_sql_tuples,
-    split_gallery,
-)
+
+from content.models import News, Project, GalleryImage
+
+
+def safe_str(val):
+    """Приводит строковое значение к читаемому виду для дальнейшей обработки.
+
+    - Убирает пустые и 'None'-подобные значения.
+    - Удаляет внешние кавычки и экранирование,
+      если строка обёрнута в одинарные кавычки.
+    """
+    val = val.strip()
+    if val == "''" or val.lower() in ('none', 'nan'):
+        return ''
+    if val.startswith("'") and val.endswith("'"):
+        return val[1:-1].replace("\\'", "'").replace('\\"', '"')
+    return val
+
+
+def safe_date(val):
+    """Приводит строку к дате (или возвращает None), если это возможно.
+
+    - Использует safe_str для предобработки.
+    - Обрезает до 10 символов (YYYY-MM-DD).
+    """
+    val = safe_str(val)
+    try:
+        return parse_date(val[:10])
+    except Exception:
+        return None
+
+
+def get_detail_page_type(ext_url, detail_text):
+    """Определяет тип подробной страницы новости для поля detail_page_type.
+
+    - Если есть внешняя ссылка, возвращает LINK.
+    - Если есть detail_text, возвращает CREATE.
+    - Если нет подробной страницы, возвращает NONE.
+    """
+    if ext_url:
+        return News.DetailPageChoices.LINK
+    if detail_text:
+        return News.DetailPageChoices.CREATE
+    return News.DetailPageChoices.NONE
+
+
+def parse_sql_values_block(values_block, expected_fields=15):
+    """Парсит SQL VALUES (...),(...); с учётом запятых, кавычек и переносов."""
+    result = []
+    current = []
+    field = ''
+    in_string = False
+    escape = False
+    paren_level = 0
+    for char in values_block:
+        if escape:
+            field += char
+            escape = False
+        elif char == '\\':
+            field += char
+            escape = True
+        elif char == "'":
+            in_string = not in_string
+            field += char
+        elif char == ',' and not in_string and paren_level == 1:
+            current.append(field.strip())
+            field = ''
+        elif char == '(' and not in_string:
+            paren_level += 1
+            if paren_level == 1:
+                field = ''
+                current = []
+        elif char == ')' and not in_string:
+            paren_level -= 1
+            current.append(field.strip())
+            field = ''
+            if paren_level == 0:
+                if len(current) == expected_fields:
+                    result.append(current)
+                else:
+                    print(
+                        f'!! Кортеж странной длины '
+                        f'{len(current)}: {current[:3]} ... {current[-3:]}'
+                    )
+        else:
+            field += char
+    return result
 
 
 class Command(BaseCommand):
-    """Django management команда для импорта новостей из дампа SQL."""
+    """Django management-команда для импорта новостей из SQL-дампа."""
 
-    help = 'Импортирует новости с галереей из дампа SQL'
+    help = 'Импортирует новости из SQL-дампа'
 
     def handle(self, *args, **options):
-        """Основной метод команды."""
-        sql_file = 'data/rassvet_dump.sql'
-        with open(sql_file, 'r', encoding='utf-8') as f:
-            sql_dump = f.read()
-        news_items = self.extract_news(sql_dump)
-        created, skipped = 0, 0
+        """Основной метод для выполнения команды импорта."""
+        sql_path = 'data/dump.sql'
+        images_dir = 'media_data/'
 
-        for n in news_items:
-            project = None
-            if n['project_id'] and n['project_id'] != '0':
-                try:
-                    project_obj = Project.objects.get(id=int(n['project_id']))
-                    project = Project.objects.filter(
-                        title=project_obj.title
-                    ).first()
-                except (Project.DoesNotExist, ValueError):
-                    self.stdout.write(
-                        self.style.WARNING(
-                            f"Проект с id={n['project_id']} "
-                            f"не найден для новости '{n['title']}'"
-                        )
-                    )
-
-            news_obj, is_created = News.objects.get_or_create(
-                title=n['title'],
-                date=n['date'] if n['date'] else date(2024, 1, 1),
-                defaults={
-                    'summary': n['short_text'],
-                    'full_text': n['detail_text'],
-                    'photo': clean_media_path(n['photo']),
-                    'detail_page_type': (
-                        News.DetailPageChoices.CREATE
-                        if n['detail_text']
-                        else News.DetailPageChoices.NONE
-                    ),
-                    'detail_page_link': n['ext_url'],
-                    'video_url': n['video'],
-                    'project': project,
-                },
-            )
-            if is_created:
-                created += 1
-                if n['section_name']:
-                    direction, _ = Direction.objects.get_or_create(
-                        name=n['section_name']
-                    )
-                    news_obj.directions.add(direction)
-                gallery_paths = split_gallery(n['gallery'])
-                for img_path in gallery_paths:
-                    GalleryImage.objects.create(
-                        news=news_obj,
-                        image=img_path,
-                        name=img_path.split('/')[-1],
-                    )
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"Создана новость: {news_obj.title}, фото: "
-                        f"{n['photo']}, галерея: {len(gallery_paths)}"
-                    )
-                )
-            else:
-                skipped += 1
+        with open(sql_path, encoding='utf-8') as f:
+            sql = f.read()
+        news_insert_re = re.compile(
+            r'INSERT INTO [`\"]?news[`\"]? \([^)]+\) VALUES\s*(\(.*?\));',
+            re.DOTALL | re.IGNORECASE,
+        )
+        matches = news_insert_re.findall(sql)
+        if not matches:
+            self.stdout.write(self.style.ERROR('Не найдено вставок новостей!'))
+            return
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f'Импорт завершён: создано {created}, пропущено {skipped}'
-            )
+            self.style.WARNING('Удаляем все новости и фотографии галерей...')
         )
-
-    def extract_news(self, sql_dump):
-        """Извлекает и парсит все новости из SQL-дампа (таблица `news`)."""
-        insert_regex = re.compile(
-            r'INSERT INTO `news`.*?VALUES\s*(.+);', re.DOTALL
+        GalleryImage.objects.all().delete()
+        News.objects.all().delete()
+        count = 0
+        for match in matches:
+            news_tuples = parse_sql_values_block(match, expected_fields=15)
+            for parts in news_tuples:
+                (
+                    nid,
+                    ntype,
+                    title,
+                    short_text,
+                    detail_text,
+                    img_url,
+                    date,
+                    gallery,
+                    video,
+                    ext_url,
+                    section_name,
+                    section_url,
+                    longread,
+                    code,
+                    project_id,
+                ) = parts
+                project = None
+                pid = safe_str(project_id)
+                if pid.isdigit() and int(pid) > 0:
+                    project = Project.objects.filter(id=int(pid)).first()
+                photo_file = None
+                img = safe_str(img_url).lstrip('/')
+                print(img)
+                if img:
+                    photo_path = os.path.join(images_dir, img)
+                    if os.path.isfile(photo_path):
+                        photo_file = File(open(photo_path, 'rb'))
+                news = News(
+                    title=safe_str(title),
+                    date=safe_date(date),
+                    summary=safe_str(short_text),
+                    full_text=safe_str(detail_text),
+                    detail_page_type=get_detail_page_type(
+                        safe_str(ext_url), safe_str(detail_text)
+                    ),
+                    detail_page_link=safe_str(ext_url),
+                    video_url=safe_str(video),
+                    project=project,
+                    show_on_main=True,
+                )
+                if photo_file:
+                    news.photo.save(
+                        os.path.basename(img), photo_file, save=False
+                    )
+                news.save()
+                gal = safe_str(gallery)
+                if gal:
+                    images = re.split(r'[;,]', gal)
+                    for img_path in images:
+                        img_path = (
+                            img_path.replace(r'\r\n', '').strip().lstrip('/')
+                        )
+                        if not img_path:
+                            continue
+                        gallery_img_path = os.path.join(images_dir, img_path)
+                        if os.path.isfile(gallery_img_path):
+                            with open(gallery_img_path, 'rb') as img_f:
+                                gal_file = File(img_f)
+                                img_filename = os.path.basename(img_path)
+                                gal_img = GalleryImage(
+                                    news=news, name=img_filename
+                                )
+                                gal_img.image.save(
+                                    img_filename, gal_file, save=True
+                                )
+                                self.stdout.write(
+                                    f'Добавлено фото в галерею: '
+                                    f'{gal_img.image.url}'
+                                )
+                        else:
+                            self.stdout.write(
+                                self.style.WARNING(
+                                    f'Фото галереи {img_path} не найдено.'
+                                )
+                            )
+                self.stdout.write(
+                    self.style.SUCCESS(f'Новость "{news.title}" импортирована')
+                )
+                count += 1
+        self.stdout.write(
+            self.style.SUCCESS(f'Импорт завершён. Всего новостей: {count}')
         )
-        match = insert_regex.search(sql_dump)
-        if not match:
-            raise ValueError('Не найден блок INSERT INTO `news`')
-        values_section = match.group(1)
-        tuples = parse_sql_tuples(values_section)
-        news = []
-        for t in tuples:
-            if len(t) < 15:
-                continue
-            news.append(
-                {
-                    'title': t[2],
-                    'short_text': t[3],
-                    'detail_text': t[4],
-                    'photo': t[5],
-                    'date': parse_date(t[6]) if t[6] else None,
-                    'gallery': t[7],
-                    'video': t[8],
-                    'ext_url': t[9],
-                    'section_name': t[10],
-                    'project_id': t[14],
-                }
-            )
-        return news
