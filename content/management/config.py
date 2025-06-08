@@ -1,6 +1,7 @@
 """Модуль конфигурации для импорта данных в модели контентного приложения.
 
 Словарь MODEL_CONFIG описывает правила импорта данных для следующих моделей:
+- Direction (направления)
 - Gratitude (благодарности)
 - Review (отзывы)
 - Partner (партнеры)
@@ -21,7 +22,16 @@
 обработки и валидации данных перед их сохранением в базу данных.
 """
 
-from content.models import Employee, Gratitude, Partner, Review
+from content.models import (
+    Direction,
+    Employee,
+    Gratitude,
+    Partner,
+    Project,
+    ProjectsStatus,
+    ProgramsProjects,
+    Review,
+)
 from content.models.targeted_fundraisings import (
     FundraisingStatus,
     TargetedFundraising,
@@ -39,6 +49,13 @@ MODEL_CONFIG = {
             'is_active': {'default': True},
         },
         'required_fields': ['file'],
+    },
+    Direction: {
+        'fields': {
+            'name': {
+                'source': 'name',
+            },
+        },
     },
     Review: {
         'fields': {
@@ -127,4 +144,40 @@ MODEL_CONFIG = {
         },
         'required_fields': ['name'],
     },
+    Project: {
+        'fields': {
+            'title': {'source': 'title'},
+            'status': {'default': ProjectsStatus.ACTIVE},
+            'project_rassvet': {'default': True},
+            'program': {
+                'default': lambda val,
+                r,
+                r_num: ProgramsProjects.objects.get_or_create(
+                    title='Основная программа'
+                )[0],
+            },
+            'logo': {'default': 'projects/default.png'},
+            'project_goal': {'default': ''},
+            'project_tasks': {'default': ''},
+            'project_description': {'default': ''},
+            'achieved_results': {'default': ''},
+        },
+        'required_fields': ['title'],
+    },
+}
+
+
+DIRECTION_MAP = {
+    '1': 'Другие новости',
+    '2': 'Досуг для детей с РАС',
+    '3': 'Обучение специалистов',
+    '4': 'АВА-терапия',
+    '5': 'Информирование',
+    '9': 'Помощь родителям',
+    '12': 'Адаптивная физкультура',
+    '13': 'СМИ о нас',
+    '16': 'Жизнь «Рассвета»',
+    '18': 'Дом синего слона',
+    '19': 'Ресурсные классы',
+    '22': 'Мы благодарим',
 }

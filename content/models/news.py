@@ -124,7 +124,7 @@ class GalleryImage(OrderMixin, TimestampMixin, models.Model):
     class Meta:
         """Мета-настройки модели GalleryImage."""
 
-        ordering = ['order', '-created_at']
+        ordering = ['order', 'created_at']
         verbose_name = 'Фотография'
         verbose_name_plural = 'Фотографии'
 
