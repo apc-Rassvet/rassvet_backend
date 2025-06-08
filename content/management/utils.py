@@ -139,7 +139,7 @@ class ImporterBase(BaseCommand):
         if missing:
             self.stdout.write(
                 self.style.WARNING(
-                    f"Пропущена строка {row_num}: "
+                    f'Пропущена строка {row_num}: '
                     f'отсутствуют поля {", ".join(missing)}'
                 )
             )
