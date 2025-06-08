@@ -159,7 +159,7 @@ class NewsProcessor:
         if self.parser.safe_str(ntype) in SKIP_DIRECTIONS:
             return None
         news = News(
-            title=self.parser.safe_str(title),
+            title=self.parser.safe_str(self.parser.clean_text(title)),
             date=self.parser.safe_date(date),
             summary=self.parser.safe_str(self.parser.clean_text(short_text)),
             full_text=self.parser.safe_str(
