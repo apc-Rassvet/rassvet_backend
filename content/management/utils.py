@@ -15,7 +15,6 @@ Media файлы считываются из папки MEDIA_PATH, данные
 
 import csv
 import os
-import re
 
 from django.core.files import File
 from django.core.management.base import BaseCommand
@@ -202,92 +201,3 @@ class ImporterBase(BaseCommand):
                 )
             )
             return False
-
-
-def extract_projects_from_sql(sql_dump):
-    """Возвращает список словарей."""
-    regex = re.compile(r'INSERT INTO `projects`.*?VALUES\s*(.+);', re.DOTALL)
-    match = regex.search(sql_dump)
-    if not match:
-        raise ValueError('Не найден блок INSERT INTO `projects` в дампе')
-    values_section = match.group(1)
-    tuples = []
-    tuple_pattern = re.compile(r'\(([^()]*)\)[,;]?', re.DOTALL)
-    for m in tuple_pattern.finditer(values_section):
-        fields = []
-        buf = ''
-        in_quotes = False
-        last_char = ''
-        tuple_str = m.group(1)
-        for c in tuple_str:
-            if c == "'" and last_char != '\\':
-                in_quotes = not in_quotes
-            if c == ',' and not in_quotes:
-                fields.append(buf.strip())
-                buf = ''
-            else:
-                buf += c
-            last_char = c
-        fields.append(buf.strip())
-        clean = []
-        for f in fields:
-            if f.startswith("'") and f.endswith("'"):
-                f = f[1:-1].replace("\\'", "'").replace('\\"', '"')
-            elif f == 'NULL':
-                f = None
-            clean.append(f)
-        tuples.append(clean)
-    projects = []
-    for t in tuples:
-        if len(t) >= 4:
-            projects.append(
-                {
-                    'id': t[0],
-                    'name': t[2],
-                    'description': t[3],
-                }
-            )
-    return projects
-
-
-def parse_sql_tuples(values_section):
-    """Парсит строки в дампе sql."""
-    tuple_pattern = re.compile(r'\(([^()]*)\)[,;]?', re.DOTALL)
-    tuples = []
-    for m in tuple_pattern.finditer(values_section):
-        fields = []
-        buf = ''
-        in_quotes = False
-        last_char = ''
-        tuple_str = m.group(1)
-        for c in tuple_str:
-            if c == "'" and last_char != '\\':
-                in_quotes = not in_quotes
-            if c == ',' and not in_quotes:
-                fields.append(buf.strip())
-                buf = ''
-            else:
-                buf += c
-            last_char = c
-        fields.append(buf.strip())
-        clean = []
-        for f in fields:
-            if f.startswith("'") and f.endswith("'"):
-                f = f[1:-1].replace("\\'", "'").replace('\\"', '"')
-            elif f == 'NULL':
-                f = None
-            clean.append(f)
-        tuples.append(clean)
-    return tuples
-
-
-def clean_media_path(path):
-    """Очищает строку пути для файла."""
-    return path.lstrip('/') if path else ''
-
-
-def split_gallery(gallery_str):
-    """Парсит строку галереи вида 'img1.jpg; img2.jpg' -> список путей."""
-    if not gallery_str:
-        return []
-    return [p.strip().lstrip('/') for p in gallery_str.split(';') if p.strip()]
