@@ -9,20 +9,20 @@ from django.core.files import File
 from content.models import Project, ProgramsProjects, Partner, ProjectPhoto
 
 
-def safe_date(val):
+def safe_date(value):
     """Преобразует значение в объект даты."""
-    if pd.isna(val):
+    if pd.isna(value):
         return None
-    if isinstance(val, pd.Timestamp):
-        return val.date()
-    return pd.to_datetime(val).date()
+    if isinstance(value, pd.Timestamp):
+        return value.date()
+    return pd.to_datetime(value).date()
 
 
-def safe_str(val):
+def safe_str(value):
     """Преобразует значение в строку."""
-    if pd.isna(val):
+    if pd.isna(value):
         return ''
-    return str(val)
+    return str(value)
 
 
 class Command(BaseCommand):
@@ -46,9 +46,9 @@ class Command(BaseCommand):
             'действующий': 'active',
             'завершен': 'completed',
         }
-        df = pd.read_excel(excel_path)
-        for i, row in df.iterrows():
-            row_num = i + 2  # для удобства (с учётом заголовка)
+        data_frame = pd.read_excel(excel_path)
+        for index, row in data_frame.iterrows():
+            row_num = index + 2
             if pd.isna(row['title']):
                 continue
             program_title = (
@@ -144,13 +144,11 @@ class Command(BaseCommand):
                                 photo_file,
                                 save=True,
                             )
-                            self.stdout.write(
-                                f'    + Фото: {photo_obj.image.url}'
-                            )
+                            self.stdout.write(f'Фото: {photo_obj.image.url}')
                     else:
                         self.stdout.write(
                             self.style.WARNING(
-                                f"    + Фото '{photo_path}' не найдено. "
+                                f"Фото '{photo_path}' не найдено. "
                                 'Пропущено.'
                             )
                         )
