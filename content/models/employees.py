@@ -8,11 +8,13 @@
 
 import html
 
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.html import strip_tags
 from django_ckeditor_5.fields import CKEditor5Field
 from ordered_model.models import OrderedModel
 
+from content.constants import FILE_CONTENT_TYPES, IMAGE_CONTENT_TYPES
 from content.mixins import TimestampMixin
 from content.validators import validate_not_empty_html
 
@@ -26,7 +28,11 @@ class Employee(TimestampMixin, OrderedModel):
     """Модель для хранения информации о членах команды."""
 
     name = models.CharField(max_length=100, verbose_name='ФИО')
-    image = models.ImageField(upload_to='team', verbose_name='Фото')
+    image = models.ImageField(
+        upload_to='team',
+        verbose_name='Фото',
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
+    )
     main_specialities = CKEditor5Field(
         verbose_name='Специальности на общей странице',
         config_name='default',
@@ -123,6 +129,7 @@ class Document(models.Model):
     file = models.FileField(
         upload_to=upload_file,
         verbose_name='Файл документа',
+        validators=[FileExtensionValidator(FILE_CONTENT_TYPES)],
     )
     type = models.ForeignKey(
         TypeDocument,

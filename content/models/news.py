@@ -7,9 +7,11 @@
 """
 
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone
 
+from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import (
     CleanEmptyHTMLMixin,
     OrderMixin,
@@ -52,7 +54,11 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
         LINK = 'link', 'Прикрепить ссылку'
         NONE = 'none', 'Не создавать страницу'
 
-    photo = models.ImageField('Фото', upload_to='news_photos/')
+    photo = models.ImageField(
+        verbose_name='Фото',
+        upload_to='news_photos/',
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
+    )
     date = models.DateField('Дата новости', default=timezone.now)
     course_start = models.DateField('Старт курса', null=True, blank=True)
     summary = ckeditor_function('Краткий текст')
@@ -118,7 +124,11 @@ class GalleryImage(OrderMixin, TimestampMixin, models.Model):
         related_name='gallery_images',
         verbose_name='Новость',
     )
-    image = models.ImageField('Фото', upload_to=upload_file)
+    image = models.ImageField(
+        verbose_name='Фото',
+        upload_to=upload_file,
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
+    )
     name = models.CharField('Название', max_length=100, default=image.name)
 
     class Meta:

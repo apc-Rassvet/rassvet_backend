@@ -4,9 +4,11 @@
     - Partner: Модель для хранения информации о партнёрах
 """
 
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from ordered_model.models import OrderedModel
 
+from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import TimestampMixin
 
 
@@ -20,6 +22,7 @@ class Partner(TimestampMixin, OrderedModel):
     logo = models.ImageField(
         upload_to='partners/logos/',
         verbose_name='Логотип партнера',
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
     description = models.TextField(
         verbose_name='Описание',

@@ -4,15 +4,21 @@
     - Gratitude: Модель для хранения информации о благодарностях
 """
 
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
+from content.constants import FILE_CONTENT_TYPES
 from content.mixins import OrderMixin, TimestampMixin, TitleMixin
 
 
 class Gratitude(TitleMixin, OrderMixin, TimestampMixin, models.Model):
     """Модель для хранения информации о благодарностях."""
 
-    file = models.FileField('Файл благодарности', upload_to='gratitudes/')
+    file = models.FileField(
+        verbose_name='Файл благодарности',
+        upload_to='gratitudes/',
+        validators=[FileExtensionValidator(FILE_CONTENT_TYPES)],
+    )
     is_active = models.BooleanField('Видимость в ленте', default=True)
 
     class Meta:

@@ -5,8 +5,11 @@
     - Chapter: Модель для хранения информации о разделах отчётов
 """
 
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone
+
+from content.constants import FILE_CONTENT_TYPES
 
 
 def upload_file(instance, filename):
@@ -49,7 +52,11 @@ class Report(models.Model):
         verbose_name='Дата публикации',
         help_text='Публикации сортируются от новых к старым',
     )
-    file = models.FileField(upload_to=upload_file, verbose_name='Файл отчета')
+    file = models.FileField(
+        upload_to=upload_file,
+        verbose_name='Файл отчета',
+        validators=[FileExtensionValidator(FILE_CONTENT_TYPES)],
+    )
 
     class Meta:
         """Мета-настройки модели Report."""
