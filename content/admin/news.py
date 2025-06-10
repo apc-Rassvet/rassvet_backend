@@ -1,19 +1,30 @@
 """Модуль настройки административного интерфейса для новостей."""
 
 from django.contrib import admin
+from ordered_model.admin import (
+    OrderedTabularInline,
+    OrderedInlineModelAdminMixin,
+)
 from content.models import News, Direction, GalleryImage
 
 
-class GalleryImageInline(admin.TabularInline):
+class GalleryImageInline(OrderedTabularInline):
     """Инлайн для изображений галереи новости (до 15 штук)."""
 
     model = GalleryImage
+    fields = (
+        'image',
+        'name',
+        'move_up_down_links',
+    )
+    readonly_fields = ('move_up_down_links',)
+    ordering = ('order',)
     extra = 1
     max_num = 15
 
 
 @admin.register(News)
-class NewsAdmin(admin.ModelAdmin):
+class NewsAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     """Настройка административного интерфейса для модели News."""
 
     inlines = [GalleryImageInline]

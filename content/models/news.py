@@ -10,11 +10,11 @@ from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone
+from ordered_model.models import OrderedModel
 
 from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import (
     CleanEmptyHTMLMixin,
-    OrderMixin,
     TimestampMixin,
     TitleMixin,
 )
@@ -86,7 +86,12 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
     show_on_main = models.BooleanField(
         'Отображение на странице Новости', default=True
     )
-    full_text = ckeditor_function('Основной текст', blank=True, validators=[])
+    full_text = ckeditor_function(
+        verbose_name='Основной текст',
+        blank=True,
+        null=True,
+        validators=[],
+    )
     video_url = models.URLField('Ссылка на видео', blank=True, null=True)
     clean_html_fields = ('full_text', 'summary')
 
@@ -117,7 +122,7 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
             raise ValidationError('Укажите ссылку на внешнюю страницу.')
 
 
-class GalleryImage(OrderMixin, TimestampMixin, models.Model):
+class GalleryImage(TimestampMixin, OrderedModel):
     """Модель изображения в галерее новости."""
 
     news = models.ForeignKey(
@@ -132,11 +137,14 @@ class GalleryImage(OrderMixin, TimestampMixin, models.Model):
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
     name = models.CharField('Название', max_length=100, default=image.name)
+    order_with_respect_to = 'news'
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         """Мета-настройки модели GalleryImage."""
 
-        ordering = ['order', '-created_at']
+        ordering = [
+            'order',
+        ]
         verbose_name = 'Фотография'
         verbose_name_plural = 'Фотографии'
 
