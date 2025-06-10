@@ -77,7 +77,6 @@ class Project(TitleMixin, OrderedModel):
         related_name='project',
         verbose_name='Источник софинансирования - Партнёр',
     )
-    project_rassvet = models.BooleanField('Проект НКО Рассвет', default=False)
     program = models.ForeignKey(
         ProgramsProjects,
         on_delete=models.SET_NULL,

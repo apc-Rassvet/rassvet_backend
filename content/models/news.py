@@ -61,7 +61,9 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
     )
     date = models.DateField('Дата новости', default=timezone.now)
     course_start = models.DateField('Старт курса', null=True, blank=True)
-    summary = ckeditor_function('Краткий текст')
+    summary = models.TextField(
+        verbose_name='Краткий текст',
+    )
     directions = models.ManyToManyField(
         Direction, verbose_name='Направление деятельности'
     )
@@ -82,7 +84,7 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
         'Ссылка на подробную страницу', blank=True, null=True
     )
     show_on_main = models.BooleanField(
-        'Отображение на главной странице', default=True
+        'Отображение на странице Новости', default=True
     )
     full_text = ckeditor_function('Основной текст', blank=True, validators=[])
     video_url = models.URLField('Ссылка на видео', blank=True, null=True)

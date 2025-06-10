@@ -33,11 +33,8 @@ class Employee(TimestampMixin, OrderedModel):
         verbose_name='Фото',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
-    main_specialities = CKEditor5Field(
+    main_specialities = models.TextField(
         verbose_name='Специальности на общей странице',
-        config_name='default',
-        blank=False,
-        validators=[validate_not_empty_html],
     )
     interviews = models.URLField(verbose_name='Интервью', blank=True)
     specialists_register = models.URLField(

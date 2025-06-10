@@ -15,3 +15,6 @@ IMAGE_CONTENT_TYPES = [
 
 FILE_CONTENT_TYPES = ['pdf']
 """Формат загрузки файлов для FileField."""
+
+EMPTY_VALUE_DISPLAY = '-пусто-'
+"""Отображение пустого поля."""
