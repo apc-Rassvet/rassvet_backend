@@ -34,6 +34,7 @@ class NewsAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     search_fields = ('title', 'summary', 'full_text')
     filter_horizontal = ('directions',)
     fieldsets = (
+        ('Сортировка', {'fields': ('date',)}),
         (
             None,
             {
@@ -66,7 +67,6 @@ class NewsAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
                 )
             },
         ),
-        ('Сортировка', {'fields': ('date',)}),
     )
 
 
