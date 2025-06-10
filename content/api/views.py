@@ -248,7 +248,7 @@ class NewsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = News.objects.select_related('project').prefetch_related(
         'directions', 'gallery_images'
     )
-    # filter_backends = [DjangoFilterBackend]
+    # filter_backends = [DjangoFilterBackend] ? зачем?
     filterset_class = filters.NewsFilter
 
     def get_serializer_class(self):
