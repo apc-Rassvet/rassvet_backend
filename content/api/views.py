@@ -13,7 +13,7 @@
 Используются только для чтения (GET-запросов).
 """
 
-from django_filters.rest_framework import DjangoFilterBackend
+# from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
@@ -248,7 +248,7 @@ class NewsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = News.objects.select_related('project').prefetch_related(
         'directions', 'gallery_images'
     )
-    filter_backends = [DjangoFilterBackend]
+    # filter_backends = [DjangoFilterBackend]
     filterset_class = filters.NewsFilter
 
     def get_serializer_class(self):
