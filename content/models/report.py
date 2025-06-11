@@ -50,6 +50,9 @@ class Report(models.Model):
         help_text='Публикации сортируются от новых к старым',
     )
     file = models.FileField(upload_to=upload_file, verbose_name='Файл отчета')
+    download_icon = models.BooleanField(
+        default=True, verbose_name='Иконка скачивания'
+    )
 
     class Meta:
         """Мета-настройки модели Report."""
