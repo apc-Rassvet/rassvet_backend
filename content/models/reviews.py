@@ -5,11 +5,12 @@
 """
 
 from django.db import models
+from ordered_model.models import OrderedModel
 
-from content.mixins import OrderMixin, TimestampMixin
+from content.mixins import TimestampMixin
 
 
-class Review(OrderMixin, TimestampMixin, models.Model):
+class Review(TimestampMixin, OrderedModel):
     """Модель для хранения информации об отзывах."""
 
     author_name = models.CharField(
@@ -19,12 +20,14 @@ class Review(OrderMixin, TimestampMixin, models.Model):
     content = models.TextField('Текст отзыва')
     is_active = models.BooleanField('Активный', default=True)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         """Класс Meta для модели Review, содержащий мета-данные."""
 
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ['order', '-created_at']
+        ordering = [
+            'order',
+        ]
 
     def __str__(self):
         """Возвращает строковое представление отзыва."""

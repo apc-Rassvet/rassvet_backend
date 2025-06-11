@@ -9,6 +9,7 @@ from .partners import PartnersAdmin
 from .projects import ProgramsProjectsAdmin, ProjectAdmin
 from .reviews import ReviewAdmin
 from .targeted_fundraisings import TargetedFundraisingAdmin
+from .report import ChapterAdmin
 
 __all__ = [
     'AboutUsVideoAdmin',
@@ -22,4 +23,5 @@ __all__ = [
     'ProgramsProjectsAdmin',
     'ReviewAdmin',
     'TargetedFundraisingAdmin',
+    'ChapterAdmin',
 ]
