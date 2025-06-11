@@ -40,10 +40,7 @@ class ProjectAdmin(BaseOrderedModelAdmin):
         'move_up_down_links',
     )
     list_editable = ('status',)
-    list_filter = (
-        'title',
-        'status',
-    )
+    list_filter = ('status',)
     search_fields = (
         'title',
         'status',
