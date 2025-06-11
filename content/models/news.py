@@ -78,7 +78,9 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
     show_on_main = models.BooleanField(
         'Отображение на главной странице', default=True
     )
-    full_text = ckeditor_function('Основной текст', blank=True, validators=[])
+    full_text = ckeditor_function(
+        'Основной текст', blank=True, null=True, validators=[]
+    )
     video_url = models.URLField('Ссылка на видео', blank=True, null=True)
     clean_html_fields = ('full_text', 'summary')
 
