@@ -7,12 +7,20 @@
 
 from django.db import models
 
-from content.mixins import TimestampMixin, TitleMixin
+from content.constants import EMPTY_VALUE_DISPLAY, TITLE_LENGTH
+from content.mixins import TimestampMixin
 
 
-class AboutUsVideo(TimestampMixin, TitleMixin, models.Model):
+class AboutUsVideo(TimestampMixin, models.Model):
     """Модель для хранения информации о видео в разделе 'О нас'."""
 
+    title = models.CharField(
+        verbose_name='Заголовок',
+        max_length=TITLE_LENGTH,
+        help_text='"Заголовок" не отображается на сайте.',
+        blank=True,
+        null=True,
+    )
     url = models.URLField('Ссылка на видео')
 
     class Meta:
@@ -23,7 +31,7 @@ class AboutUsVideo(TimestampMixin, TitleMixin, models.Model):
 
     def __str__(self):
         """Возвращает строковое представление объекта видео."""
-        return self.title
+        return self.title if self.title is not None else EMPTY_VALUE_DISPLAY
 
     @classmethod
     def get_solo(cls):

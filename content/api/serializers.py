@@ -324,7 +324,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'project_start',
             'project_end',
             'source_financing',
-            'project_rassvet',
             'program',
             'photo',
             'project_goal',
