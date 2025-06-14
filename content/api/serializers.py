@@ -433,7 +433,7 @@ class ReportSerializer(serializers.ModelSerializer):
         """Meta класс с настройками сериализатора ReportSerializer."""
 
         model = Report
-        fields = ('id', 'title', 'file', 'pub_date')
+        fields = ('id', 'title', 'file', 'download_icon', 'order')
 
 
 class ChapterSerializer(serializers.ModelSerializer):
@@ -445,4 +445,4 @@ class ChapterSerializer(serializers.ModelSerializer):
         """Meta класс с настройками сериализатора ChapterSerializer."""
 
         model = Chapter
-        fields = ('id', 'title', 'reports', 'position')
+        fields = ('id', 'title', 'reports', 'order')
