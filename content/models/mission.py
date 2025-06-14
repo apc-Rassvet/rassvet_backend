@@ -6,11 +6,10 @@
 
 from django.db import models
 
-from content.mixins import OrderMixin
 from content.utils import ckeditor_function
 
 
-class Mission(OrderMixin, models.Model):
+class Mission(models.Model):
     """Модель Миссии."""
 
     organization_mission = ckeditor_function('Миссия организации')
@@ -23,7 +22,6 @@ class Mission(OrderMixin, models.Model):
 
         verbose_name = 'Миссия'
         verbose_name_plural = 'Миссии'
-        ordering = ['order']
 
     def __str__(self):
         """Возвращает строковое представление Миссии организации."""

@@ -7,12 +7,14 @@
 """
 
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone
+from ordered_model.models import OrderedModel
 
+from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import (
     CleanEmptyHTMLMixin,
-    OrderMixin,
     TimestampMixin,
     TitleMixin,
 )
@@ -53,10 +55,16 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
         LINK = 'link', 'Прикрепить ссылку'
         NONE = 'none', 'Не создавать страницу'
 
-    photo = models.ImageField('Фото', upload_to='news_photos/')
+    photo = models.ImageField(
+        verbose_name='Фото',
+        upload_to='news_photos/',
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
+    )
     date = models.DateField('Дата новости', default=timezone.now)
     course_start = models.DateField('Старт курса', null=True, blank=True)
-    summary = ckeditor_function('Краткий текст')
+    summary = models.TextField(
+        verbose_name='Краткий текст',
+    )
     directions = models.ManyToManyField(
         Direction, verbose_name='Направление деятельности'
     )
@@ -77,10 +85,13 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
         'Ссылка на подробную страницу', blank=True, null=True
     )
     show_on_main = models.BooleanField(
-        'Отображение на главной странице', default=True
+        'Отображение на странице Новости', default=True
     )
     full_text = ckeditor_function(
-        'Основной текст', blank=True, null=True, validators=[]
+        verbose_name='Основной текст',
+        blank=True,
+        null=True,
+        validators=[],
     )
     video_url = models.URLField('Ссылка на видео', blank=True, null=True)
     clean_html_fields = ('full_text', 'summary')
@@ -113,7 +124,7 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
             raise ValidationError('Укажите ссылку на внешнюю страницу.')
 
 
-class GalleryImage(OrderMixin, TimestampMixin, models.Model):
+class GalleryImage(TimestampMixin, OrderedModel):
     """Модель изображения в галерее новости."""
 
     news = models.ForeignKey(
@@ -122,13 +133,20 @@ class GalleryImage(OrderMixin, TimestampMixin, models.Model):
         related_name='gallery_images',
         verbose_name='Новость',
     )
-    image = models.ImageField('Фото', upload_to=upload_file)
+    image = models.ImageField(
+        verbose_name='Фото',
+        upload_to=upload_file,
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
+    )
     name = models.CharField('Название', max_length=100, default=image.name)
+    order_with_respect_to = 'news'
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         """Мета-настройки модели GalleryImage."""
 
-        ordering = ['order', 'created_at']
+        ordering = [
+            'order',
+        ]
         verbose_name = 'Фотография'
         verbose_name_plural = 'Фотографии'
 

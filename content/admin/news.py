@@ -2,8 +2,12 @@
 
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from ordered_model.admin import (
+    OrderedTabularInline,
+    OrderedInlineModelAdminMixin,
+)
 
-from content.models import Direction, GalleryImage, News, Project
+from content.models import News, Direction, GalleryImage, Project
 
 
 class ProjectFilter(SimpleListFilter):
@@ -27,16 +31,23 @@ class ProjectFilter(SimpleListFilter):
         return queryset
 
 
-class GalleryImageInline(admin.TabularInline):
+class GalleryImageInline(OrderedTabularInline):
     """Инлайн для изображений галереи новости (до 15 штук)."""
 
     model = GalleryImage
+    fields = (
+        'image',
+        'name',
+        'move_up_down_links',
+    )
+    readonly_fields = ('move_up_down_links',)
+    ordering = ('order',)
     extra = 1
     max_num = 15
 
 
 @admin.register(News)
-class NewsAdmin(admin.ModelAdmin):
+class NewsAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     """Настройка административного интерфейса для модели News."""
 
     inlines = [GalleryImageInline]
@@ -46,6 +57,7 @@ class NewsAdmin(admin.ModelAdmin):
     search_fields = ('title', 'summary', 'full_text')
     filter_horizontal = ('directions',)
     fieldsets = (
+        ('Сортировка', {'fields': ('date',)}),
         (
             None,
             {
@@ -78,7 +90,6 @@ class NewsAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        ('Сортировка', {'fields': ('date',)}),
     )
 
 
