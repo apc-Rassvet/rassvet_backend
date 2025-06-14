@@ -13,12 +13,16 @@ def ckeditor_function(
     verbose_name='verbose_name',
     config_name='default',
     blank=False,
-    validators=[validate_not_empty_html],
+    null=False,
+    validators=None,
 ):
     """Функция создающая text поля для моделей проекта."""
     return CKEditor5Field(
         verbose_name=verbose_name,
         config_name=config_name,
         blank=blank,
-        validators=validators,
+        null=null,
+        validators=validators
+        if validators is not None
+        else [validate_not_empty_html],
     )

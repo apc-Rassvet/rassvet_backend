@@ -6,33 +6,29 @@
 
 from django.contrib import admin
 
+from content.base_models import BaseOrderedModelAdmin
 from content.models import Review
 
 
 @admin.register(Review)
-class ReviewAdmin(admin.ModelAdmin):
+class ReviewAdmin(BaseOrderedModelAdmin):
     """Настройка отображения списка Review и форм редактирования.
 
     Определяет отображаемые и редактируемые поля, фильтры, поиск и секции.
     """
 
-    list_display = ('author_name', 'order', 'is_active')
-    list_editable = (
-        'order',
-        'is_active',
-    )
+    list_display = ('author_name', 'is_active', 'move_up_down_links')
+    list_editable = ('is_active',)
     list_filter = ('is_active', 'created_at')
     search_fields = ('content', 'author_name')
-
+    readonly_fields = ('created_at', 'updated_at')
     fieldsets = (
         (
             'Основные данные',
-            {'fields': ('author_name', 'content', 'order', 'is_active')},
+            {'fields': ('author_name', 'content', 'is_active')},
         ),
         (
             'Системная информация',
             {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
         ),
     )
-
-    readonly_fields = ('created_at', 'updated_at')

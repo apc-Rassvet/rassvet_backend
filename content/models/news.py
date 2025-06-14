@@ -16,6 +16,7 @@ from content.mixins import (
     TimestampMixin,
     TitleMixin,
 )
+from content.validators import validate_not_empty_html
 from content.utils import ckeditor_function
 from .projects import Project
 
@@ -78,7 +79,9 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
     show_on_main = models.BooleanField(
         'Отображение на главной странице', default=True
     )
-    full_text = ckeditor_function('Основной текст', blank=True, validators=[])
+    full_text = ckeditor_function(
+        'Основной текст', blank=True, null=True, validators=[]
+    )
     video_url = models.URLField('Ссылка на видео', blank=True, null=True)
     clean_html_fields = ('full_text', 'summary')
 
@@ -100,10 +103,11 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
 
     def clean(self):
         """Валидация полей в зависимости от типа подробной страницы."""
-        if self.detail_page_type == 'create' and not self.full_text:
-            raise ValidationError(
+        if self.detail_page_type == 'create':
+            validate_not_empty_html(
+                self.full_text,
                 'Для создания подробной страницы '
-                'необходимо заполнить основное описание.'
+                'необходимо заполнить основной текст:.',
             )
         if self.detail_page_type == 'link' and not self.detail_page_link:
             raise ValidationError('Укажите ссылку на внешнюю страницу.')
@@ -124,7 +128,7 @@ class GalleryImage(OrderMixin, TimestampMixin, models.Model):
     class Meta:
         """Мета-настройки модели GalleryImage."""
 
-        ordering = ['order', '-created_at']
+        ordering = ['order', 'created_at']
         verbose_name = 'Фотография'
         verbose_name_plural = 'Фотографии'
 

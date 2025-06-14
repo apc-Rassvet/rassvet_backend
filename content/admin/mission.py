@@ -21,12 +21,6 @@ class MissionAdmin(admin.ModelAdmin):
         'goal_for_five_years',
         'tasks',
     )
-    # list_editable = (
-    #     'organization_mission',
-    #     'ambitions',
-    #     'goal_for_five_years',
-    #     'tasks',
-    # )
     list_filter = ('order',)
     empty_value_display = '-пусто-'
 

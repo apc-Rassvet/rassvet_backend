@@ -13,15 +13,15 @@
 Используются только для чтения (GET-запросов).
 """
 
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
-from django_filters.rest_framework import DjangoFilterBackend
-
 from content import filters
 from content.models import (
     AboutUsVideo,
+    Chapter,
     Direction,
     Employee,
     Gratitude,
@@ -199,7 +199,11 @@ class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):
 class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список Проектов, или конкретный по его ID."""
 
-    queryset = Project.objects.all()
+    queryset = (
+        Project.objects.select_related('source_financing', 'program')
+        .prefetch_related('photo')
+        .all()
+    )
     serializer_class = serializers.ProjectSerializer
 
 
@@ -272,3 +276,25 @@ class DirectionViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Direction.objects.all()
     serializer_class = serializers.DirectionSerializer
+
+
+@extend_schema(tags=['Reports'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список отчетов.',
+        description="""
+        Получить список отчетов с сортировкой по разделам.
+        """,
+    ),
+    retrieve=extend_schema(
+        summary='Получить список отчетов раздела.',
+        description="""
+        Получить список отчетов одного раздела.
+        """,
+    ),
+)
+class ReportViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список отчетов, или конкретный по его ID."""
+
+    queryset = Chapter.objects.prefetch_related('reports').all()
+    serializer_class = serializers.ChapterSerializer

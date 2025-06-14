@@ -19,16 +19,18 @@ from .gratitudes import Gratitude
 from .mission import Mission
 from .news import Direction, GalleryImage, News
 from .partners import Partner
-from .projects import ProgramsProjects, Project, ProjectPhoto
+from .projects import ProgramsProjects, Project, ProjectPhoto, ProjectsStatus
 from .reviews import Review
 from .targeted_fundraisings import (
     FundraisingPhoto,
     FundraisingTextBlock,
     TargetedFundraising,
 )
+from .report import Report, Chapter
 
 __all__ = [
     'AboutUsVideo',
+    'Chapter',
     'Direction',
     'Document',
     'Employee',
@@ -42,6 +44,8 @@ __all__ = [
     'ProgramsProjects',
     'Project',
     'ProjectPhoto',
+    'ProjectsStatus',
+    'Report',
     'Review',
     'TargetedFundraising',
     'TypeDocument',

@@ -1,7 +1,30 @@
 """Модуль настройки административного интерфейса для новостей."""
 
 from django.contrib import admin
-from content.models import News, Direction, GalleryImage
+from django.contrib.admin import SimpleListFilter
+
+from content.models import Direction, GalleryImage, News, Project
+
+
+class ProjectFilter(SimpleListFilter):
+    """Кастомный фильтр для проектов в административном интерфейсе новостей.
+
+    Обеспечивает сортировку списка проектов по алфавиту в фильтре.
+    """
+
+    title = 'проект'
+    parameter_name = 'project'
+
+    def lookups(self, request, model_admin):
+        """Возвращает список вариантов для фильтра."""
+        projects = Project.objects.all().order_by('title')
+        return [(project.pk, project.title) for project in projects]
+
+    def queryset(self, request, queryset):
+        """Фильтрует queryset на основе выбранного значения."""
+        if self.value():
+            return queryset.filter(project=self.value())
+        return queryset
 
 
 class GalleryImageInline(admin.TabularInline):
@@ -19,7 +42,7 @@ class NewsAdmin(admin.ModelAdmin):
     inlines = [GalleryImageInline]
     list_display = ('title', 'date', 'show_on_main', 'project')
     list_editable = ('date', 'show_on_main')
-    list_filter = ('date', 'show_on_main', 'project', 'detail_page_type')
+    list_filter = ('date', 'show_on_main', ProjectFilter, 'detail_page_type')
     search_fields = ('title', 'summary', 'full_text')
     filter_horizontal = ('directions',)
     fieldsets = (

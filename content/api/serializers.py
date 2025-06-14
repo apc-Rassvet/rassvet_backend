@@ -26,6 +26,7 @@ from rest_framework import serializers
 
 from content.models import (
     AboutUsVideo,
+    Chapter,
     Direction,
     Document,
     Employee,
@@ -38,6 +39,7 @@ from content.models import (
     Partner,
     Project,
     ProjectPhoto,
+    Report,
     Review,
     TargetedFundraising,
     TypeDocument,
@@ -73,6 +75,7 @@ class PartnersSerializer(serializers.ModelSerializer):
             'name',
             'logo',
             'description',
+            'order',
             'created_at',
             'updated_at',
         ]
@@ -306,7 +309,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     photo = ProjectPhotoSerializer(many=True)
     program = serializers.CharField(source='program.title')
-    source_financing = serializers.CharField(source='source_financing.name')
+    source_financing = serializers.SerializerMethodField()
 
     class Meta:
         """Meta класс с настройками сериализатора ProjectSerializer."""
@@ -329,6 +332,10 @@ class ProjectSerializer(serializers.ModelSerializer):
             'project_description',
             'achieved_results',
         )
+
+    def get_source_financing(self, obj):
+        """Возвращает None, если не привязан Партнёр."""
+        return obj.source_financing.name if obj.source_financing else None
 
 
 class MissionSerializer(serializers.ModelSerializer):
@@ -417,3 +424,25 @@ class NewsDetailSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         )
+
+
+class ReportSerializer(serializers.ModelSerializer):
+    """Сериализатор для отчетов."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора ReportSerializer."""
+
+        model = Report
+        fields = ('id', 'title', 'file', 'download_icon', 'order')
+
+
+class ChapterSerializer(serializers.ModelSerializer):
+    """Сериализатор для глав отчетов."""
+
+    reports = ReportSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора ChapterSerializer."""
+
+        model = Chapter
+        fields = ('id', 'title', 'reports', 'order')
