@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_ckeditor_5',
     'content',
+    'forms',
     'users',
 ]
 

@@ -1,3 +1,9 @@
+"""Валидаторы для API приложения forms.
+
+Содержит представления для следующих форм:
+- validate_phone_number: валидатор правильности введенного номера телефона.
+"""
+
 import re
 from rest_framework import serializers
 
