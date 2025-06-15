@@ -346,7 +346,6 @@ class MissionSerializer(serializers.ModelSerializer):
         model = Mission
         fields = (
             'id',
-            'order',
             'organization_mission',
             'ambitions',
             'goal_for_five_years',
