@@ -41,6 +41,7 @@ v1_router_api.register(
     r'directions', views.DirectionViewSet, basename='direction'
 )
 v1_router_api.register(r'report', views.ReportViewSet, basename='report')
+v1_router_api.register(r'coaching', views.CoachingViewSet, basename='coaching')
 
 api_urls.extend(v1_router_api.urls)
 

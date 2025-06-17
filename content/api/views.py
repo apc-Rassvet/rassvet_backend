@@ -22,6 +22,7 @@ from content import filters
 from content.models import (
     AboutUsVideo,
     Chapter,
+    Coaching,
     Direction,
     Employee,
     Gratitude,
@@ -298,3 +299,23 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Chapter.objects.prefetch_related('reports').all()
     serializer_class = serializers.ChapterSerializer
+
+
+@extend_schema(tags=['Coachings group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список "Консультация и обучение".',
+    ),
+    retrieve=extend_schema(
+        summary='Получить "Консультация и обучение" по ID.',
+    ),
+)
+class CoachingViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список "Консультация и обучение", или конкретный по его ID."""
+
+    queryset = Coaching.objects.prefetch_related(
+        'photo',
+        'button_link',
+    ).all()
+
+    serializer_class = serializers.CoachingSerializer
