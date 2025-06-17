@@ -476,7 +476,7 @@ class CoachingSerializer(serializers.ModelSerializer):
     """Сериализатор Coaching."""
 
     photo = CoachingPhotoSerializer(many=True)
-    button_link = ButtonLinkSerializer()
+    button_link = ButtonLinkSerializer(many=True)
 
     class Meta:
         """Meta класс с настройками сериализатора CoachingSerializer."""
