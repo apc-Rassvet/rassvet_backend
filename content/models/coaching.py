@@ -123,4 +123,4 @@ class ButtonLink(models.Model):
 
     def __str__(self):
         """Возвращает строковое представление кнопки."""
-        return f'Фотография для проекта {self.button}'
+        return f'Кнопка для coaching {self.coaching.title}'
