@@ -35,6 +35,5 @@ v1_router_api.register(
 api_urls.extend(v1_router_api.urls)
 
 urlpatterns = [
-    path('v1/form/', include('forms.urls')),
     path('v1/', include(api_urls)),
 ]
