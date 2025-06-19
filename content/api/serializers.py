@@ -461,6 +461,7 @@ class VacancySerializer(serializers.ModelSerializer):
             'schedule',
             'location',
             'redirect_type',
+            'order',
         )
 
 

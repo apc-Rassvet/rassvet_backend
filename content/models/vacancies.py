@@ -10,13 +10,15 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 
+from ordered_model.models import OrderedModel
+
 from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import TimestampMixin
 from content.utils import ckeditor_function, html_cleaner
 from content.validators import validate_not_empty_html
 
 
-class Vacancy(TimestampMixin, models.Model):
+class Vacancy(TimestampMixin, OrderedModel):
     """Модель вакансий."""
 
     class RedirectChoises(models.TextChoices):
@@ -58,10 +60,10 @@ class Vacancy(TimestampMixin, models.Model):
         blank=True, null=True, verbose_name='Ссылка на внешнюю платформу'
     )
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = 'Вакансия'
         verbose_name_plural = 'Вакансии'
-        ordering = ['-created_at']
+        ordering = ['order']
 
     def __str__(self):
         """Возвращает строковое представление вакансии."""

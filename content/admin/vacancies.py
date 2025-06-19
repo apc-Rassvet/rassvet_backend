@@ -2,11 +2,13 @@
 
 from django.contrib import admin
 
+from content.base_models import BaseOrderedModelAdmin
+
 from content.models import Vacancy
 
 
 @admin.register(Vacancy)
-class VacancyAdmin(admin.ModelAdmin):
+class VacancyAdmin(BaseOrderedModelAdmin):
     """Административная панель для управления вакансиями."""
 
     list_display = [
@@ -14,6 +16,7 @@ class VacancyAdmin(admin.ModelAdmin):
         'salary',
         'schedule',
         'location',
+        'move_up_down_links',
     ]
 
     list_editable = [
