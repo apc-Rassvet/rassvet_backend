@@ -7,11 +7,13 @@
     1. Vacancy: содержит информацию о вакансиях.
 """
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 
 from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import TimestampMixin
 from content.utils import ckeditor_function
+from content.validators import validate_not_empty_html
 
 
 class Vacancy(TimestampMixin, models.Model):
@@ -44,11 +46,16 @@ class Vacancy(TimestampMixin, models.Model):
         verbose_name='Тип перехода',
     )
     additional_description = ckeditor_function(
-        verbose_name='Дополнительное описание'
+        verbose_name='Дополнительное описание',
+        blank=True,
+        null=True,
+        validators=[],
     )
-    detailed_description = ckeditor_function(verbose_name='Описание вакансии')
+    detailed_description = ckeditor_function(
+        verbose_name='Описание вакансии', blank=True, null=True, validators=[]
+    )
     external_link = models.URLField(
-        blank=True, verbose_name='Ссылка на внешнюю платформу'
+        blank=True, null=True, verbose_name='Ссылка на внешнюю платформу'
     )
 
     class Meta:
@@ -59,6 +66,35 @@ class Vacancy(TimestampMixin, models.Model):
     def __str__(self):
         """Возвращает строковое представление вакансии."""
         return self.profession
+
+    def save(self, *args, **kwargs):
+        """Сохранение с валидацией."""
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        """Валидация модели."""
+        super().clean()
+        errors = {}
+        if self.redirect_type == self.RedirectChoises.DETAIL:
+            try:
+                validate_not_empty_html(
+                    self.additional_description,
+                    'Обязательное поле при выборе '
+                    '"На страницу Вакансии_подробная"',
+                )
+            except ValidationError as e:
+                errors['additional_description'] = e.message
+            try:
+                validate_not_empty_html(
+                    self.detailed_description,
+                    'Обязательное поле при выборе '
+                    '"На страницу Вакансии_подробная"',
+                )
+            except ValidationError as e:
+                errors['detailed_description'] = e.message
+        if errors:
+            raise ValidationError(errors)
 
     @property
     def has_external_link(self):
