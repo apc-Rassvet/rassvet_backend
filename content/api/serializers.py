@@ -26,7 +26,6 @@ from rest_framework import serializers
 
 from content.models import (
     AboutUsVideo,
-    ButtonLink,
     Chapter,
     Coaching,
     CoachingPhoto,
@@ -459,24 +458,10 @@ class CoachingPhotoSerializer(serializers.ModelSerializer):
         fields = ('image',)
 
 
-class ButtonLinkSerializer(serializers.ModelSerializer):
-    """Сериализатор ButtonLink."""
-
-    class Meta:
-        """Meta класс с настройками сериализатора ButtonLinkSerializer."""
-
-        model = ButtonLink
-        fields = (
-            'button',
-            'link_button',
-        )
-
-
 class CoachingSerializer(serializers.ModelSerializer):
     """Сериализатор Coaching."""
 
     photo = CoachingPhotoSerializer(many=True)
-    button_link = ButtonLinkSerializer(many=True)
 
     class Meta:
         """Meta класс с настройками сериализатора CoachingSerializer."""
@@ -492,5 +477,6 @@ class CoachingSerializer(serializers.ModelSerializer):
             'date',
             'place',
             'course_format',
-            'button_link',
+            'button',
+            'link_button',
         )

@@ -9,15 +9,7 @@
 from django.contrib import admin
 
 from content.base_models import BaseOrderedModelAdmin
-from content.models.coaching import ButtonLink, Coaching, CoachingPhoto
-
-
-class ButtonLinkAdmin(admin.StackedInline):
-    """Inline-класс для кнопок, прикреплённых к coaching."""
-
-    model = ButtonLink
-    min_num = 1
-    max_num = 1
+from content.models.coaching import Coaching, CoachingPhoto
 
 
 class CoachingPhotoAdmin(admin.StackedInline):
@@ -40,8 +32,5 @@ class CoachingAdmin(BaseOrderedModelAdmin):
     )
     list_filter = ('date',)
     search_fields = ('date',)
-    inlines = (
-        ButtonLinkAdmin,
-        CoachingPhotoAdmin,
-    )
+    inlines = (CoachingPhotoAdmin,)
     empty_value_display = '-пусто-'

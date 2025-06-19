@@ -315,7 +315,5 @@ class CoachingViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Coaching.objects.prefetch_related(
         'photo',
-        'button_link',
     ).all()
-
     serializer_class = serializers.CoachingSerializer

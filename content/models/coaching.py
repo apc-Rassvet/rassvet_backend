@@ -24,6 +24,13 @@ class Coaching(TitleMixin, OrderedModel):
         ONLINE = 'online', 'онлайн'
         OFFLINE = 'offline', 'офлайн'
 
+    class Buttons(models.TextChoices):
+        """Выбор перехода на страницу."""
+
+        ABA_THERAPY = 'aba_therapy', 'Узнать больше о АБА-терапия'
+        CONTACTS = 'contacts', 'Позвонить'
+        NEWS = 'news', 'Узнать больше о новости'
+
     short_text = models.TextField(
         verbose_name='Краткий текст',
     )
@@ -46,6 +53,17 @@ class Coaching(TitleMixin, OrderedModel):
         max_length=max(len(value) for value, _ in CourseFormatChoices.choices),
         choices=CourseFormatChoices.choices,
         verbose_name='формат курса',
+    )
+    button = models.CharField(
+        max_length=max(len(value) for value, _ in Buttons.choices),
+        choices=Buttons.choices,
+        verbose_name='Кнопка',
+    )
+    link_button = models.URLField(
+        verbose_name='Ссылка на страницу новости',
+        help_text='Ссылка вводится только для новости',
+        blank=True,
+        null=True,
     )
 
     class Meta(OrderedModel.Meta):
@@ -85,42 +103,3 @@ class CoachingPhoto(models.Model):
     def __str__(self):
         """Возвращает строковое представление фотографии coaching."""
         return f'Фотография для coaching {self.coaching.title}'
-
-
-class ButtonLink(models.Model):
-    """Модель ссылок для кнопок перехода."""
-
-    class Buttons(models.TextChoices):
-        """Выбор перехода на страницу."""
-
-        ABA_THERAPY = 'aba_therapy', 'Узнать больше о АБА-терапия'
-        CONTACTS = 'contacts', 'Позвонить'
-        NEWS = 'news', 'Узнать больше о новости'
-
-    coaching = models.ForeignKey(
-        Coaching,
-        on_delete=models.CASCADE,
-        related_name='button_link',
-        verbose_name='Консультации и обучение',
-    )
-    button = models.CharField(
-        max_length=max(len(value) for value, _ in Buttons.choices),
-        choices=Buttons.choices,
-        verbose_name='Кнопка',
-    )
-    link_button = models.URLField(
-        verbose_name='Ссылка на страницу новости',
-        help_text='Ссылка вводится только для новости',
-        blank=True,
-        null=True,
-    )
-
-    class Meta:
-        """Класс Meta для ButtonLink, содержащий мета-данные."""
-
-        verbose_name = 'кнопка'
-        verbose_name_plural = 'кнопки'
-
-    def __str__(self):
-        """Возвращает строковое представление кнопки."""
-        return f'Кнопка для coaching {self.coaching.title}'

@@ -14,7 +14,7 @@
 """
 
 from .about_us_video import AboutUsVideo
-from .coaching import ButtonLink, Coaching, CoachingPhoto
+from .coaching import Coaching, CoachingPhoto
 from .employees import Document, Employee, TypeDocument
 from .gratitudes import Gratitude
 from .mission import Mission
@@ -31,7 +31,6 @@ from .report import Report, Chapter
 
 __all__ = [
     'AboutUsVideo',
-    'ButtonLink',
     'Coaching',
     'CoachingPhoto',
     'Chapter',
