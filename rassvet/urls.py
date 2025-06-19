@@ -34,6 +34,7 @@ urlpatterns = [
         name='password_reset_complete',
     ),
     path('admin/', admin.site.urls),
+    path('api/v1/forms/', include('form_sender.urls')),
     path('api/', include('content.urls')),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
 ]
