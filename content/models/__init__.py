@@ -28,6 +28,7 @@ from .targeted_fundraisings import (
 )
 from .report import Report, Chapter
 from .vacancies import Vacancy
+from .training_and_internships import FormatStudy, ActionOmButton, TrainingAndInternships, TAIPhoto
 
 __all__ = [
     'AboutUsVideo',
@@ -51,4 +52,8 @@ __all__ = [
     'TargetedFundraising',
     'TypeDocument',
     'Vacancy',
+    'FormatStudy',
+    'ActionOmButton',
+    'TrainingAndInternships',
+    'TAIPhoto',
 ]
