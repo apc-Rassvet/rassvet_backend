@@ -12,7 +12,7 @@ from django.core.validators import FileExtensionValidator
 
 from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import TimestampMixin
-from content.utils import ckeditor_function
+from content.utils import ckeditor_function, html_cleaner
 from content.validators import validate_not_empty_html
 
 
@@ -68,8 +68,14 @@ class Vacancy(TimestampMixin, models.Model):
         return self.profession
 
     def save(self, *args, **kwargs):
-        """Сохранение с валидацией."""
+        """Сохранение с валидацией и очисткой пустый ckeditor полей."""
         self.full_clean()
+        self.additional_description = html_cleaner(
+            self.additional_description, '<p>&nbsp;</p>'
+        )
+        self.detailed_description = html_cleaner(
+            self.detailed_description, '<p>&nbsp;</p>'
+        )
         super().save(*args, **kwargs)
 
     def clean(self):
@@ -95,8 +101,3 @@ class Vacancy(TimestampMixin, models.Model):
                 errors['detailed_description'] = e.message
         if errors:
             raise ValidationError(errors)
-
-    @property
-    def has_external_link(self):
-        """Есть ли ссылка на внешнюю платформу."""
-        return bool(self.external_link)
