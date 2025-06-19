@@ -43,6 +43,7 @@ from content.models import (
     Review,
     TargetedFundraising,
     TypeDocument,
+    Vacancy,
 )
 
 
@@ -444,3 +445,38 @@ class ChapterSerializer(serializers.ModelSerializer):
 
         model = Chapter
         fields = ('id', 'title', 'reports', 'order')
+
+
+class VacancySerializer(serializers.ModelSerializer):
+    """Сериализатор для вакансий на общей странице."""
+
+    class Meta:
+        model = Vacancy
+        fields = (
+            'id',
+            'profession',
+            'photo',
+            'salary',
+            'short_description',
+            'schedule',
+            'location',
+            'redirect_type',
+            'order',
+        )
+
+
+class VacancyDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для вакансий на общей странице."""
+
+    class Meta:
+        model = Vacancy
+        fields = (
+            'id',
+            'profession',
+            'photo',
+            'salary',
+            'additional_description',
+            'detailed_description',
+            'external_link',
+            'redirect_type',
+        )

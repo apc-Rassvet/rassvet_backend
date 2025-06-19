@@ -31,6 +31,7 @@ from content.models import (
     Project,
     Review,
     TargetedFundraising,
+    Vacancy,
 )
 
 from . import serializers
@@ -278,7 +279,7 @@ class DirectionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.DirectionSerializer
 
 
-@extend_schema(tags=['Reports'])
+@extend_schema(tags=['Reports group'])
 @extend_schema_view(
     list=extend_schema(
         summary='Получить список отчетов.',
@@ -298,3 +299,28 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Chapter.objects.prefetch_related('reports').all()
     serializer_class = serializers.ChapterSerializer
+
+
+@extend_schema(tags=['Vacancies group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Вакансий.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Вакансию по ID.',
+    ),
+)
+class VacancyViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Вакансий, или конкретную по её ID."""
+
+    queryset = Vacancy.objects.all()
+
+    def get_serializer_class(self):
+        """Выбирает сериализатор в зависимости от действия.
+
+        Возвращает краткий сериализатор для списка (list)
+        и детальный для отдельного сотрудника (retrieve).
+        """
+        if self.action == 'retrieve':
+            return serializers.VacancyDetailSerializer
+        return serializers.VacancySerializer

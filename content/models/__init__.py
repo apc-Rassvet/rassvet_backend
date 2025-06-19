@@ -27,6 +27,7 @@ from .targeted_fundraisings import (
     TargetedFundraising,
 )
 from .report import Report, Chapter
+from .vacancies import Vacancy
 
 __all__ = [
     'AboutUsVideo',
@@ -49,4 +50,5 @@ __all__ = [
     'Review',
     'TargetedFundraising',
     'TypeDocument',
+    'Vacancy',
 ]
