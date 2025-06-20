@@ -1,6 +1,7 @@
 """Пакет админских классов для приложения content."""
 
 from .about_us_video import AboutUsVideoAdmin
+from .coaching import CoachingAdmin
 from .employees import EmployeeAdmin
 from .gratitudes import GratitudeAdmin
 from .mission import MissionAdmin
@@ -14,6 +15,7 @@ from .vacancies import VacancyAdmin
 
 __all__ = [
     'AboutUsVideoAdmin',
+    'CoachingAdmin',
     'DirectionAdmin',
     'EmployeeAdmin',
     'GratitudeAdmin',

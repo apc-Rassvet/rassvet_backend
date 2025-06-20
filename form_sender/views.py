@@ -29,7 +29,7 @@ from .serializers import (
 )
 
 
-@extend_schema(tags=['Forms'])
+@extend_schema(tags=['Forms group'])
 @extend_schema_view(
     post=extend_schema(
         summary='Отправить форму обратной связи',

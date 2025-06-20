@@ -27,6 +27,8 @@ from rest_framework import serializers
 from content.models import (
     AboutUsVideo,
     Chapter,
+    Coaching,
+    CoachingPhoto,
     Direction,
     Document,
     Employee,
@@ -479,4 +481,38 @@ class VacancyDetailSerializer(serializers.ModelSerializer):
             'detailed_description',
             'external_link',
             'redirect_type',
+        )
+
+
+class CoachingPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор CoachingPhoto."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора CoachingPhotoSerializer."""
+
+        model = CoachingPhoto
+        fields = ('image',)
+
+
+class CoachingSerializer(serializers.ModelSerializer):
+    """Сериализатор Coaching."""
+
+    photo = CoachingPhotoSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора CoachingSerializer."""
+
+        model = Coaching
+        fields = (
+            'id',
+            'order',
+            'title',
+            'photo',
+            'short_text',
+            'service_price',
+            'date',
+            'place',
+            'course_format',
+            'button',
+            'link_button',
         )

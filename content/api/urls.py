@@ -42,6 +42,7 @@ v1_router_api.register(
 )
 v1_router_api.register(r'reports', views.ReportViewSet, basename='report')
 v1_router_api.register(r'vacancies', views.VacancyViewSet, basename='vacancy')
+v1_router_api.register(r'coaching', views.CoachingViewSet, basename='coaching')
 
 api_urls.extend(v1_router_api.urls)
 
