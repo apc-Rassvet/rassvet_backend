@@ -6,6 +6,7 @@
     3. ButtonLink: Модель для хранения ссылок для кнопок перехода
 """
 
+from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone
@@ -75,6 +76,17 @@ class Coaching(TitleMixin, OrderedModel):
     def __str__(self):
         """Возвращает строковое представление Coaching."""
         return self.title
+
+    def clean(self):
+        """Валидация поля link_button в зависмисти от выбора в поле button."""
+        if self.button == 'news' and self.link_button is None:
+            raise ValidationError(
+                'Укажите ссылку для "Узнать больше о новости".'
+            )
+        if self.button in ['aba_therapy', 'contacts'] and self.link_button:
+            raise ValidationError(
+                'Ссылка вводится только для "Узнать больше о новости".'
+            )
 
 
 class CoachingPhoto(models.Model):
