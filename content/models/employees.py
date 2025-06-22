@@ -47,7 +47,6 @@ class Employee(TimestampMixin, OrderedModel):
     specialities = CKEditor5Field(
         verbose_name='Специальности',
         config_name='default',
-        blank=False,
         validators=[validate_not_empty_html],
     )
     education = CKEditor5Field(

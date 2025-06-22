@@ -1,6 +1,10 @@
 """Модуль содержит миксины для классов."""
 
+from typing import Optional, Type
+
 from django.db import models
+
+from rest_framework.serializers import Serializer
 
 from .constants import ORDER_DEFAULT, TITLE_LENGTH
 
@@ -67,3 +71,16 @@ class CleanEmptyHTMLMixin:
         if cleared == '<p>&nbsp;</p>':
             return None
         return raw_html
+
+
+class MultiSerializerViewSetMixin:
+    """Миксин для выбора подходящего сериализатора из `serializer_classes`."""
+
+    serializer_classes: Optional[dict[str, Type[Serializer]]] = None
+
+    def get_serializer_class(self):
+        """Выбирает сериализатор из словаря по действию."""
+        try:
+            return self.serializer_classes[self.action]
+        except (KeyError, TypeError):
+            return super().get_serializer_class()

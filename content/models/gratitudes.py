@@ -44,4 +44,4 @@ class Gratitude(TimestampMixin, OrderedModel):
 
     def __str__(self):
         """Возвращает строковое представление благодарности."""
-        return self.title if self.title is not None else EMPTY_VALUE_DISPLAY
+        return self.title or EMPTY_VALUE_DISPLAY

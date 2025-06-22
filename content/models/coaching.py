@@ -100,8 +100,6 @@ class CoachingPhoto(models.Model):
         upload_to='coaching/',
         verbose_name='Фотография',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
-        blank=False,
-        null=False,
     )
 
     class Meta:
