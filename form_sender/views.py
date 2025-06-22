@@ -18,7 +18,7 @@ from drf_spectacular.utils import (
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .serializers import (
@@ -93,7 +93,8 @@ from .serializers import (
 class FeedbackFormView(APIView):
     """Форма обратной связи."""
 
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'feedback'
 
     def post(self, request, *args, **kwargs):
         """Создание новой записи в базе данных."""
