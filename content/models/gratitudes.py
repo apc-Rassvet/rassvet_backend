@@ -4,24 +4,44 @@
     - Gratitude: Модель для хранения информации о благодарностях
 """
 
+from django.core.validators import FileExtensionValidator
 from django.db import models
+from ordered_model.models import OrderedModel
 
-from content.mixins import OrderMixin, TimestampMixin, TitleMixin
+from content.constants import (
+    EMPTY_VALUE_DISPLAY,
+    IMAGE_CONTENT_TYPES,
+    TITLE_LENGTH,
+)
+from content.mixins import TimestampMixin
 
 
-class Gratitude(TitleMixin, OrderMixin, TimestampMixin, models.Model):
+class Gratitude(TimestampMixin, OrderedModel):
     """Модель для хранения информации о благодарностях."""
 
-    file = models.FileField('Файл благодарности', upload_to='gratitudes/')
+    title = models.CharField(
+        verbose_name='Заголовок',
+        max_length=TITLE_LENGTH,
+        help_text='"Заголовок" не отображается на сайте.',
+        blank=True,
+        null=True,
+    )
+    file = models.ImageField(
+        verbose_name='Файл благодарности',
+        upload_to='gratitudes/',
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
+    )
     is_active = models.BooleanField('Видимость в ленте', default=True)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         """Класс Meta для модели Gratitude, содержащий мета-данные."""
 
         verbose_name = 'Благодарность'
         verbose_name_plural = 'Благодарности'
-        ordering = ['order', '-created_at']
+        ordering = [
+            'order',
+        ]
 
     def __str__(self):
         """Возвращает строковое представление благодарности."""
-        return self.title
+        return self.title or EMPTY_VALUE_DISPLAY

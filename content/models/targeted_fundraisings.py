@@ -10,10 +10,15 @@
        адресных сборов
 """
 
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import (
+    FileExtensionValidator,
+    MaxValueValidator,
+    MinValueValidator,
+)
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 
+from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import OrderMixin, TimestampMixin, TitleMixin
 from content.validators import validate_not_empty_html
 
@@ -68,6 +73,7 @@ class FundraisingPhoto(TitleMixin, models.Model):
     image = models.ImageField(
         upload_to=upload_file,
         verbose_name='Фотография',
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
     position = models.PositiveSmallIntegerField(
         default=1,
@@ -105,7 +111,6 @@ class FundraisingTextBlock(models.Model):
     content = CKEditor5Field(
         verbose_name='Текстовый блок',
         config_name='default',
-        blank=False,
         validators=[validate_not_empty_html],
     )
     position = models.PositiveSmallIntegerField(

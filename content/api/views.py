@@ -19,9 +19,11 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
 from content import filters
+from content.mixins import MultiSerializerViewSetMixin
 from content.models import (
     AboutUsVideo,
     Chapter,
+    Coaching,
     Direction,
     Employee,
     Gratitude,
@@ -31,6 +33,7 @@ from content.models import (
     Project,
     Review,
     TargetedFundraising,
+    Vacancy,
 )
 
 from . import serializers
@@ -138,7 +141,9 @@ class AboutUsVideoViewSet(viewsets.GenericViewSet):
         """,
     ),
 )
-class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
+class TargetedFundraisingViewSet(
+    MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
     """Информация об адресных сборах.
 
     Используйте этот эндпоинт, чтобы отобразить информацию об адресных сборах.
@@ -146,16 +151,10 @@ class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     queryset = TargetedFundraising.objects.all()
-
-    def get_serializer_class(self):
-        """Выбирает сериализатор в зависимости от действия.
-
-        Возвращает краткий сериализатор для списка (list)
-        и детальный для отдельного сбора (retrieve).
-        """
-        if self.action == 'retrieve':
-            return serializers.TargetedFundraisingDetailSerializer
-        return serializers.TargetedFundraisingListSerializer
+    serializer_classes = {
+        'list': serializers.TargetedFundraisingListSerializer,
+        'retrieve': serializers.TargetedFundraisingDetailSerializer,
+    }
 
 
 @extend_schema(tags=['Employees group'])
@@ -167,7 +166,9 @@ class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
         summary='Получить карточку Сотрудника по ID.',
     ),
 )
-class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):
+class EmployeeViewSet(
+    MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
     """Информация о сотрудниках.
 
     Используйте этот эндпоинт, чтобы отобразить информацию о сотрудниках.
@@ -175,16 +176,10 @@ class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     queryset = Employee.objects.all()
-
-    def get_serializer_class(self):
-        """Выбирает сериализатор в зависимости от действия.
-
-        Возвращает краткий сериализатор для списка (list)
-        и детальный для отдельного сотрудника (retrieve).
-        """
-        if self.action == 'retrieve':
-            return serializers.EmployeeDetailSerializer
-        return serializers.EmployeeSerializer
+    serializer_classes = {
+        'list': serializers.EmployeeSerializer,
+        'retrieve': serializers.EmployeeDetailSerializer,
+    }
 
 
 @extend_schema(tags=['Projects group'])
@@ -242,7 +237,7 @@ class MissionViewSet(
         summary='Получить Новость по ID.',
     ),
 )
-class NewsViewSet(viewsets.ReadOnlyModelViewSet):
+class NewsViewSet(MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """Получить список Новостей, или конкретную по её ID."""
 
     queryset = News.objects.select_related('project').prefetch_related(
@@ -250,16 +245,10 @@ class NewsViewSet(viewsets.ReadOnlyModelViewSet):
     )
     filter_backends = [DjangoFilterBackend]
     filterset_class = filters.NewsFilter
-
-    def get_serializer_class(self):
-        """Выбирает сериализатор в зависимости от действия.
-
-        Возвращает краткий сериализатор для списка (list)
-        и детальный для отдельного сотрудника (retrieve).
-        """
-        if self.action == 'retrieve':
-            return serializers.NewsDetailSerializer
-        return serializers.NewsSerializer
+    serializer_classes = {
+        'list': serializers.NewsSerializer,
+        'retrieve': serializers.NewsDetailSerializer,
+    }
 
 
 @extend_schema(tags=['Directions group'])
@@ -278,7 +267,7 @@ class DirectionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.DirectionSerializer
 
 
-@extend_schema(tags=['Reports'])
+@extend_schema(tags=['Reports group'])
 @extend_schema_view(
     list=extend_schema(
         summary='Получить список отчетов.',
@@ -298,3 +287,42 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Chapter.objects.prefetch_related('reports').all()
     serializer_class = serializers.ChapterSerializer
+
+
+@extend_schema(tags=['Coachings group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список "Консультация и обучение".',
+    ),
+    retrieve=extend_schema(
+        summary='Получить "Консультация и обучение" по ID.',
+    ),
+)
+class CoachingViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список "Консультация и обучение", или конкретный по его ID."""
+
+    queryset = Coaching.objects.prefetch_related(
+        'photo',
+    ).all()
+    serializer_class = serializers.CoachingSerializer
+
+
+@extend_schema(tags=['Vacancies group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Вакансий.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Вакансию по ID.',
+    ),
+)
+class VacancyViewSet(
+    MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
+    """Получить список Вакансий, или конкретную по её ID."""
+
+    queryset = Vacancy.objects.all()
+    serializer_classes = {
+        'list': serializers.VacancySerializer,
+        'retrieve': serializers.VacancyDetailSerializer,
+    }

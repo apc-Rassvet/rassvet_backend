@@ -27,6 +27,8 @@ from rest_framework import serializers
 from content.models import (
     AboutUsVideo,
     Chapter,
+    Coaching,
+    CoachingPhoto,
     Direction,
     Document,
     Employee,
@@ -43,6 +45,7 @@ from content.models import (
     Review,
     TargetedFundraising,
     TypeDocument,
+    Vacancy,
 )
 
 
@@ -324,7 +327,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'project_start',
             'project_end',
             'source_financing',
-            'project_rassvet',
             'program',
             'photo',
             'project_goal',
@@ -347,7 +349,6 @@ class MissionSerializer(serializers.ModelSerializer):
         model = Mission
         fields = (
             'id',
-            'order',
             'organization_mission',
             'ambitions',
             'goal_for_five_years',
@@ -446,3 +447,72 @@ class ChapterSerializer(serializers.ModelSerializer):
 
         model = Chapter
         fields = ('id', 'title', 'reports', 'order')
+
+
+class VacancySerializer(serializers.ModelSerializer):
+    """Сериализатор для вакансий на общей странице."""
+
+    class Meta:
+        model = Vacancy
+        fields = (
+            'id',
+            'profession',
+            'photo',
+            'salary',
+            'short_description',
+            'schedule',
+            'location',
+            'redirect_type',
+            'order',
+        )
+
+
+class VacancyDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для вакансий на общей странице."""
+
+    class Meta:
+        model = Vacancy
+        fields = (
+            'id',
+            'profession',
+            'photo',
+            'salary',
+            'additional_description',
+            'detailed_description',
+            'external_link',
+            'redirect_type',
+        )
+
+
+class CoachingPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор CoachingPhoto."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора CoachingPhotoSerializer."""
+
+        model = CoachingPhoto
+        fields = ('image',)
+
+
+class CoachingSerializer(serializers.ModelSerializer):
+    """Сериализатор Coaching."""
+
+    photo = CoachingPhotoSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора CoachingSerializer."""
+
+        model = Coaching
+        fields = (
+            'id',
+            'order',
+            'title',
+            'photo',
+            'short_text',
+            'service_price',
+            'date',
+            'place',
+            'course_format',
+            'button',
+            'link_button',
+        )

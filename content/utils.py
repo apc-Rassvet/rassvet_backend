@@ -26,3 +26,10 @@ def ckeditor_function(
         if validators is not None
         else [validate_not_empty_html],
     )
+
+
+def html_cleaner(field, tags):
+    """Используется для очистки ckeditor полей от дефолтных тегов."""
+    if field == tags:
+        return None
+    return field

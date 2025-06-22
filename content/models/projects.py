@@ -8,10 +8,12 @@
     3. Project: Модель для хранения информации о проекте
 """
 
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import CheckConstraint, F, Q
 from ordered_model.models import OrderedModel
 
+from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import TitleMixin
 from content.utils import ckeditor_function
 
@@ -45,8 +47,7 @@ class Project(TitleMixin, OrderedModel):
     logo = models.ImageField(
         upload_to='projects/',
         verbose_name='Логотип',
-        blank=False,
-        null=False,
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
     status = models.CharField(
         max_length=max(len(value) for value, _ in ProjectsStatus.choices),
@@ -74,7 +75,6 @@ class Project(TitleMixin, OrderedModel):
         related_name='project',
         verbose_name='Источник софинансирования - Партнёр',
     )
-    project_rassvet = models.BooleanField('Проект НКО Рассвет', default=False)
     program = models.ForeignKey(
         ProgramsProjects,
         on_delete=models.SET_NULL,
@@ -132,8 +132,7 @@ class ProjectPhoto(models.Model):
     image = models.ImageField(
         upload_to='projects/',
         verbose_name='Фотография',
-        blank=False,
-        null=False,
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
 
     class Meta:
