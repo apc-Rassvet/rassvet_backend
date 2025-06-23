@@ -32,4 +32,4 @@ class NewsFilter(django_filters.FilterSet):
         """Метаданные фильтра: настраивает модель и поля фильтрации."""
 
         model = News
-        fields = ('year_from', 'year_to', 'directions')
+        fields = ('year_from', 'year_to', 'project')
