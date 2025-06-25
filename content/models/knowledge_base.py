@@ -79,8 +79,9 @@ class Article(TitleMixin, OrderedModel):
 
     def clean(self):
         """Валидация поля link_button в зависмисти от выбора в поле button."""
-        if self.detailed_page == 'detailed' and (
-            self.detailed_knowledge_base is None
+        if (
+            self.detailed_page == 'detailed'
+            and self.detailed_knowledge_base is None
         ):
             raise ValidationError('Заполни "База знаний подробная".')
         if self.detailed_page == 'link' and self.link is None:
