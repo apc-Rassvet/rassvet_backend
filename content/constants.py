@@ -17,6 +17,12 @@ IMAGE_CONTENT_TYPES = [
 ]
 """Формат загрузки файлов для ImageField."""
 
+VIDEO_CONTENT_TYPES = [
+    'avi',
+    'mp4',
+]
+"""Формат загрузки файлов для FileField video."""
+
 FILE_CONTENT_TYPES = ['pdf']
 """Формат загрузки файлов для FileField."""
 
