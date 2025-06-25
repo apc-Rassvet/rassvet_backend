@@ -55,6 +55,9 @@ MODEL_CONFIG = {
             'name': {
                 'source': 'name',
             },
+            'slug': {
+                'source': 'slug',
+            },
         },
     },
     Review: {
