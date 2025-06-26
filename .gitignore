@@ -64,6 +64,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+*.sql
 
 # Flask stuff:
 instance/
@@ -137,8 +138,32 @@ dmypy.json
 # .idea
 .idea
 .vscode
-.isort.cfg
+# .isort.cfg
 
 static/
 media/
-setup_django.sh
+media_data/
+data/
+help_file.py
+
+# === Бэкапы PostgreSQL ===
+backup/pg_dumps/
+*.sql
+*.sql.gz
+*.dump
+*.backup
+
+# === Скрипты бэкапа (если локальные и не для репозитория) ===
+backup/backup_pg.sh
+
+# === Docker ===
+*.pid
+*.log
+*.sock
+
+# === Общие системные исключения ===
+__pycache__/
+*.py[cod]
+*.swp
+.DS_Store
+Thumbs.db
