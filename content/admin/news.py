@@ -97,5 +97,5 @@ class NewsAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
 class DirectionAdmin(admin.ModelAdmin):
     """Настройка административного интерфейса для модели Direction."""
 
-    list_display = ('id', 'name')
+    list_display = ('id', 'name', 'slug')
     search_fields = ('name',)

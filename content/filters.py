@@ -15,6 +15,10 @@ def get_max_year():
 class NewsFilter(django_filters.FilterSet):
     """Фильтр новостей по диапазону годов и направлениям деятельности."""
 
+    direction_slug = django_filters.CharFilter(
+        field_name='directions__slug', lookup_expr='exact'
+    )
+
     year_from = django_filters.NumberFilter(
         field_name='date',
         lookup_expr='year__gte',
@@ -32,4 +36,4 @@ class NewsFilter(django_filters.FilterSet):
         """Метаданные фильтра: настраивает модель и поля фильтрации."""
 
         model = News
-        fields = ('year_from', 'year_to', 'directions')
+        fields = ('year_from', 'year_to', 'project', 'direction_slug')

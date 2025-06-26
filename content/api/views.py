@@ -35,6 +35,7 @@ from content.models import (
     TargetedFundraising,
     Vacancy,
 )
+from content.pagination import NewsLimitOffsetPagination
 
 from . import serializers
 
@@ -245,6 +246,7 @@ class NewsViewSet(MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet):
     )
     filter_backends = [DjangoFilterBackend]
     filterset_class = filters.NewsFilter
+    pagination_class = NewsLimitOffsetPagination
     serializer_classes = {
         'list': serializers.NewsSerializer,
         'retrieve': serializers.NewsDetailSerializer,

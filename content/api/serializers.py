@@ -363,7 +363,7 @@ class DirectionSerializer(serializers.ModelSerializer):
         """Meta класс с настройками сериализатора DirectionSerializer."""
 
         model = Direction
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'slug')
 
 
 class GalleryImageSerializer(serializers.ModelSerializer):
