@@ -46,6 +46,7 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
     price = models.IntegerField(
         verbose_name='Цена',
         null=True,
+        blank=True,
     )
     date = models.DateField(
         verbose_name='Дата',
@@ -74,13 +75,11 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
         default=ActionOmButton.DETEIL,
         verbose_name='Действие на кнопке',
     )
-    linked_news = models.ForeignKey(
-        News,
-        on_delete=models.SET_NULL,
-        related_name='+',
-        verbose_name='Ссылка на новость',
+    linked_news = models.URLField(
+        verbose_name='Произвольная ссылка',
         blank=True,
         null=True,
+        max_length=200, 
     )
 
     class Meta(OrderedModel.Meta):

@@ -32,6 +32,7 @@ from content.models import (
     Review,
     TargetedFundraising,
     Vacancy,
+    TrainingAndInternships,
 )
 
 from . import serializers
@@ -324,3 +325,29 @@ class VacancyViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return serializers.VacancyDetailSerializer
         return serializers.VacancySerializer
+    
+
+@extend_schema(tags=['Training and internships'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список обучений и стажировок.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить подробно об обучению или стажировке.',
+    ),
+)
+class TrainingAndInternshipsViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Обучений и Стажировок, или конкретную по её ID."""
+
+    queryset = TrainingAndInternships.objects.all()
+
+    def get_serializer_class(self):
+        """Выбирает сериализатор в зависимости от действия.
+
+        Возвращает краткий сериализатор для списка (list)
+        и детальный для отдельного сотрудника (retrieve).
+        """
+        if self.action == 'retrieve':
+            return serializers.TrainAndInternDetailSerializer
+        return serializers.TrainAndInternSerializer
+

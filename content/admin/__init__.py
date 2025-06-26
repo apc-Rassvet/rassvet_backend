@@ -11,6 +11,7 @@ from .reviews import ReviewAdmin
 from .targeted_fundraisings import TargetedFundraisingAdmin
 from .report import ChapterAdmin
 from .vacancies import VacancyAdmin
+from .training_and_internships import TrainingAndInternshipsAdmin
 
 __all__ = [
     'AboutUsVideoAdmin',
@@ -26,4 +27,5 @@ __all__ = [
     'TargetedFundraisingAdmin',
     'ChapterAdmin',
     'VacancyAdmin',
+    'TrainingAndInternshipsAdmin',
 ]

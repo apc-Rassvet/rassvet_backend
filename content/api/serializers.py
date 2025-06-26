@@ -23,6 +23,7 @@
 
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
+from django.urls import reverse
 
 from content.models import (
     AboutUsVideo,
@@ -44,6 +45,7 @@ from content.models import (
     TargetedFundraising,
     TypeDocument,
     Vacancy,
+    TrainingAndInternships,
 )
 
 
@@ -479,4 +481,54 @@ class VacancyDetailSerializer(serializers.ModelSerializer):
             'detailed_description',
             'external_link',
             'redirect_type',
+        )
+
+class TrainAndInternBaseSerializer(serializers.ModelSerializer):
+    """Сериализатор для обучения и стажировок."""
+    price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TrainingAndInternships
+        fields = (
+            'id',
+            'add_info',
+            'info',
+            'price',
+            'date',
+            'format_study',
+            'location',
+        )
+
+    def get_price(self, obj):
+        if obj.price == 0 or obj.price == None:
+            return 'FREE'
+        return obj.price
+
+class TrainAndInternSerializer(TrainAndInternBaseSerializer):
+    """Сериализатор для обучения и стажировок."""
+    linked_news = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TrainingAndInternships
+        fields = TrainAndInternBaseSerializer.Meta.fields + (
+            'short_description',
+            'text_on_button',
+            'action_on_button',
+            'linked_news',
+        )
+    
+    def get_linked_news(self, obj):
+        if obj.action_on_button == 'deteil':
+            return self.context['request'].build_absolute_uri(
+                reverse('trainigs-detail', args=[obj.id])
+            )
+        return obj.linked_news
+
+class TrainAndInternDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для обучения и стажировок."""
+
+    class Meta:
+        model = TrainingAndInternships
+        fields = TrainAndInternBaseSerializer.Meta.fields + (
+            'text',
         )
