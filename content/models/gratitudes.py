@@ -1,26 +1,47 @@
+"""Модуль содержит модель для работы с благодарностями.
+
+Модели:
+    - Gratitude: Модель для хранения информации о благодарностях
+"""
+
+from django.core.validators import FileExtensionValidator
 from django.db import models
-from content.constants import LENGTH_GRATITUDE_TITLE
+from ordered_model.models import OrderedModel
+
+from content.constants import (
+    EMPTY_VALUE_DISPLAY,
+    IMAGE_CONTENT_TYPES,
+    TITLE_LENGTH,
+)
+from content.mixins import TimestampMixin
 
 
-class Gratitude(models.Model):
-    """Модель для 'Благодарности' в разделе 'О нас'."""
+class Gratitude(TimestampMixin, OrderedModel):
+    """Модель для хранения информации о благодарностях."""
 
-    title = models.CharField('Заголовок', max_length=LENGTH_GRATITUDE_TITLE)
-    description = models.TextField('Описание', blank=True)
-    file = models.FileField('Файл благодарности', upload_to='gratitudes/')
-    order = models.PositiveIntegerField(
-        'Порядок отображения',
-        default=0,
-        help_text='Чем меньше значение, тем первее в списке',
+    title = models.CharField(
+        verbose_name='Заголовок',
+        max_length=TITLE_LENGTH,
+        help_text='"Заголовок" не отображается на сайте.',
+        blank=True,
+        null=True,
+    )
+    file = models.ImageField(
+        verbose_name='Файл благодарности',
+        upload_to='gratitudes/',
+        validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
     is_active = models.BooleanField('Видимость в ленте', default=True)
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-    updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
+        """Класс Meta для модели Gratitude, содержащий мета-данные."""
+
         verbose_name = 'Благодарность'
         verbose_name_plural = 'Благодарности'
-        ordering = ['order', '-created_at']
+        ordering = [
+            'order',
+        ]
 
     def __str__(self):
-        return self.title
+        """Возвращает строковое представление благодарности."""
+        return self.title or EMPTY_VALUE_DISPLAY

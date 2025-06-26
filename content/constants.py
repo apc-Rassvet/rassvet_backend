@@ -1,6 +1,24 @@
-LENGTH_GRATITUDE_TITLE = 200
-LENGTH_ABOUT_VIDEO_TITLE = 200
-LENGTH_FUNDRAISING_TITLE = 200
-LENGTH_REVIEW_TITLE = 200
-LENGTH_REVIEW_AUTHOR = 100
-LENGTH_FUNDRAISING_STATUS = 10
+"""Константы приложения content."""
+
+TITLE_LENGTH = 255
+"""Максимальная длина заголовка."""
+
+CHAR_FIELD_LENGTH = 255
+"""Максимальная длина поля CharField."""
+
+ORDER_DEFAULT = 0
+"""Значение по умолчанию для порядка отображения элементов."""
+
+IMAGE_CONTENT_TYPES = [
+    'jpg',
+    'jpeg',
+    'png',
+    'webp',
+]
+"""Формат загрузки файлов для ImageField."""
+
+FILE_CONTENT_TYPES = ['pdf']
+"""Формат загрузки файлов для FileField."""
+
+EMPTY_VALUE_DISPLAY = '-пусто-'
+"""Отображение пустого поля."""

@@ -1,10 +1,42 @@
+"""Представления для API приложения content.
+
+Содержит представления для следующих моделей:
+- Gratitude (благодарности)
+- Mission (миссии)
+- Partner (партнеры)
+- Project (проекты)
+- Review (отзывы)
+- AboutUsVideo (видео о нас)
+- TargetedFundraising (адресные сборы)
+- Employee (сотрудники)
+
+Используются только для чтения (GET-запросов).
+"""
+
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import filters, status, viewsets
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
-from content import models
+from content import filters
+from content.mixins import MultiSerializerViewSetMixin
+from content.models import (
+    AboutUsVideo,
+    Chapter,
+    Coaching,
+    Direction,
+    Employee,
+    Gratitude,
+    Mission,
+    News,
+    Partner,
+    Project,
+    Review,
+    Supervisor,
+    TargetedFundraising,
+    Vacancy,
+)
+from content.pagination import NewsLimitOffsetPagination
 
 from . import serializers
 
@@ -19,11 +51,13 @@ from . import serializers
     ),
 )
 class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Получить все Благодарности списком, или конкретную по ID.
+    """Получение благодарностей.
+
+    Используйте этот эндпоинт, чтобы отобразить благодарности.
+    Можно получить как весь список, так и одну благодарность по ID.
     """
 
-    queryset = models.Gratitude.objects.filter(is_active=True)
+    queryset = Gratitude.objects.filter(is_active=True)
     serializer_class = serializers.GratitudeSerializer
 
 
@@ -37,16 +71,14 @@ class GratitudeViewSet(viewsets.ReadOnlyModelViewSet):
     ),
 )
 class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Получить все карточки Партнеров списком, или конкретную по ID.
+    """Информация о партнёрах.
+
+    Используйте этот эндпоинт, чтобы отобразить информацию о партнёрах.
+    Можно получить как весь список, так и одного партнёра по ID.
     """
 
-    queryset = models.Partner.objects.all()
+    queryset = Partner.objects.all()
     serializer_class = serializers.PartnersSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['name', 'created_at']
-    ordering = ['-created_at']
-    pagination_class = LimitOffsetPagination
 
 
 @extend_schema(tags=['Reviews group'])
@@ -59,11 +91,13 @@ class PartnersViewSet(viewsets.ReadOnlyModelViewSet):
     ),
 )
 class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Получить все Отзывы списком, или конкретный по его ID.
+    """Информация об отзывах.
+
+    Используйте этот эндпоинт, чтобы отобразить информацию об отзывах.
+    Можно получить как весь список, так и один отзыв по ID.
     """
 
-    queryset = models.Review.objects.filter(is_active=True)
+    queryset = Review.objects.filter(is_active=True)
     serializer_class = serializers.ReviewSerializer
 
 
@@ -74,14 +108,20 @@ class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
     )
 )
 class AboutUsVideoViewSet(viewsets.GenericViewSet):
-    """
-    Получить Видео для раздела 'О нас'.
+    """Информация о видео об организации.
+
+    Возвращает одно видео с названием и ссылкой на источник.
+    Используется для блока "О нас".
     """
 
     serializer_class = serializers.AboutUsVideoSerializer
 
     def list(self, request, *args, **kwargs):
-        video = models.AboutUsVideo.get_solo()
+        """Возвращает единственное видео для блока 'О нас'.
+
+        Если видео не найдено, возвращает 404.
+        """
+        video = AboutUsVideo.get_solo()
         if not video:
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(video)
@@ -92,35 +132,210 @@ class AboutUsVideoViewSet(viewsets.GenericViewSet):
 @extend_schema_view(
     list=extend_schema(
         summary='Получить список Адресных сборов.',
-        description='''
+        description="""
         Получить список Адресных сборов с достаточной информацией о сборе.
-        ''',
+        """,
     ),
     retrieve=extend_schema(
         summary='Получить Адресный сбор по ID.',
-        description='''
+        description="""
         Получить Адресный сбор по ID с полной информацией о сборе.
-        ''',
+        """,
     ),
 )
-class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Получить список Адресных сборов, или конкретный по его ID.
+class TargetedFundraisingViewSet(
+    MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
+    """Информация об адресных сборах.
+
+    Используйте этот эндпоинт, чтобы отобразить информацию об адресных сборах.
+    Можно получить как весь список, так и один адресный сбор по ID.
     """
 
-    queryset = models.TargetedFundraising.objects.all()
+    queryset = TargetedFundraising.objects.all()
+    serializer_classes = {
+        'list': serializers.TargetedFundraisingListSerializer,
+        'retrieve': serializers.TargetedFundraisingDetailSerializer,
+    }
 
-    def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return serializers.TargetedFundraisingDetailSerializer
-        return serializers.TargetedFundraisingListSerializer
+
+@extend_schema(tags=['Employees group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Сотрудников.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить карточку Сотрудника по ID.',
+    ),
+)
+class EmployeeViewSet(
+    MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
+    """Информация о сотрудниках.
+
+    Используйте этот эндпоинт, чтобы отобразить информацию о сотрудниках.
+    Можно получить как весь список, так и одного сотрудника по ID.
+    """
+
+    queryset = Employee.objects.all()
+    serializer_classes = {
+        'list': serializers.EmployeeSerializer,
+        'retrieve': serializers.EmployeeDetailSerializer,
+    }
+
+
+@extend_schema(tags=['Projects group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Проектов.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Проект по ID.',
+    ),
+)
+class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Проектов, или конкретный по его ID."""
+
+    queryset = (
+        Project.objects.select_related('source_financing', 'program')
+        .prefetch_related('photo')
+        .all()
+    )
+    serializer_class = serializers.ProjectSerializer
+
+
+@extend_schema(tags=['Missions group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить Миссию.',
+    ),
+)
+class MissionViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Получить Миссию."""
+
+    serializer_class = serializers.MissionSerializer
+
+    def list(self, request, *args, **kwargs):
+        """Возвращает единственную Миссию'.
+
+        Если Миссия не найдена, возвращает 404.
+        """
+        mission = Mission.get_solo()
+        if not mission:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(mission)
+        return Response(serializer.data)
+
+
+@extend_schema(tags=['News group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Новостей.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Новость по ID.',
+    ),
+)
+class NewsViewSet(MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet):
+    """Получить список Новостей, или конкретную по её ID."""
+
+    queryset = News.objects.select_related('project').prefetch_related(
+        'directions', 'gallery_images'
+    )
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = filters.NewsFilter
+    pagination_class = NewsLimitOffsetPagination
+    serializer_classes = {
+        'list': serializers.NewsSerializer,
+        'retrieve': serializers.NewsDetailSerializer,
+    }
+
+
+@extend_schema(tags=['Directions group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Направлений.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Направление по ID.',
+    ),
+)
+class DirectionViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Направлений, или конкретное по его ID."""
+
+    queryset = Direction.objects.all()
+    serializer_class = serializers.DirectionSerializer
+
+
+@extend_schema(tags=['Reports group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список отчетов.',
+        description="""
+        Получить список отчетов с сортировкой по разделам.
+        """,
+    ),
+    retrieve=extend_schema(
+        summary='Получить список отчетов раздела.',
+        description="""
+        Получить список отчетов одного раздела.
+        """,
+    ),
+)
+class ReportViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список отчетов, или конкретный по его ID."""
+
+    queryset = Chapter.objects.prefetch_related('reports').all()
+    serializer_class = serializers.ChapterSerializer
+
+
+@extend_schema(tags=['Coachings group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список "Консультация и обучение".',
+    ),
+    retrieve=extend_schema(
+        summary='Получить "Консультация и обучение" по ID.',
+    ),
+)
+class CoachingViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список "Консультация и обучение", или конкретный по его ID."""
+
+    queryset = Coaching.objects.prefetch_related(
+        'photo',
+    ).all()
+    serializer_class = serializers.CoachingSerializer
+
+
+@extend_schema(tags=['Vacancies group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Вакансий.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Вакансию по ID.',
+    ),
+)
+class VacancyViewSet(
+    MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
+    """Получить список Вакансий, или конкретную по её ID."""
+
+    queryset = Vacancy.objects.all()
+    serializer_classes = {
+        'list': serializers.VacancySerializer,
+        'retrieve': serializers.VacancyDetailSerializer,
+    }
 
 
 @extend_schema(tags=['Supervisors group'])
 @extend_schema_view(
     list=extend_schema(
         summary='Получить супервизоров.',
-        description='''
+        description="""
         Получить список супервизоров центра.
         Фильтрация доступна через ?page='slug-страницы'
         Slug страниц:
@@ -129,13 +344,13 @@ class TargetedFundraisingViewSet(viewsets.ReadOnlyModelViewSet):
         creative-workshops 'Творческие мастерские'
         resource-classes 'Ресурсные классы'
         children-leisure 'Досуг для детей'
-        ''',
+        """,
     ),
 )
 class SupervisorViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список Супервизоров."""
 
-    queryset = models.Supervisor.objects.all()
+    queryset = Supervisor.objects.all()
     serializer_class = serializers.SupervisorSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('page',)

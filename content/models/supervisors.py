@@ -29,4 +29,5 @@ class Supervisor(models.Model):
         ordering = ['ordering']
 
     def __str__(self):
+        """Возвращает строковое представление супервизора."""
         return self.name
