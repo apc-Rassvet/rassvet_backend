@@ -190,14 +190,6 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
         )
 
 
-class SupervisorSerializer(serializers.ModelSerializer):
-    """Сериализатор для супервизоров."""
-
-    class Meta:
-        model = Supervisor
-        fields = ('id', 'name', 'position', 'image', 'ordering')
-
-
 class EmployeeSerializer(serializers.ModelSerializer):
     """Сериализатор для краткого отображения информации о сотруднике."""
 
@@ -525,3 +517,13 @@ class CoachingSerializer(serializers.ModelSerializer):
             'button',
             'link_button',
         )
+
+
+class SupervisorSerializer(serializers.ModelSerializer):
+    """Сериализатор для супервизоров."""
+
+    directions = DirectionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Supervisor
+        fields = ('id', 'name', 'position', 'image', 'order', 'directions')

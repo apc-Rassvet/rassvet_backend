@@ -334,23 +334,16 @@ class VacancyViewSet(
 @extend_schema(tags=['Supervisors group'])
 @extend_schema_view(
     list=extend_schema(
-        summary='Получить супервизоров.',
-        description="""
-        Получить список супервизоров центра.
-        Фильтрация доступна через ?page='slug-страницы'
-        Slug страниц:
-        aba-therapy 'ABA-терапия'
-        adaptive-physical-culture 'Адаптивная физкультура'
-        creative-workshops 'Творческие мастерские'
-        resource-classes 'Ресурсные классы'
-        children-leisure 'Досуг для детей'
-        """,
+        summary='Получить список Супервизоров.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Супервизора по ID.',
     ),
 )
 class SupervisorViewSet(viewsets.ReadOnlyModelViewSet):
-    """Получить список Супервизоров."""
+    """Получить список Супервизоров, или конкретного по его ID."""
 
-    queryset = Supervisor.objects.all()
+    queryset = Supervisor.objects.prefetch_related('directions')
     serializer_class = serializers.SupervisorSerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('page',)
+    filterset_class = filters.SupervisorFilter
