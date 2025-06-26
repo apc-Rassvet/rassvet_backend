@@ -16,7 +16,7 @@ class NewsFilter(django_filters.FilterSet):
     """Фильтр новостей по диапазону годов и направлениям деятельности."""
 
     direction_slug = django_filters.CharFilter(
-        field_name='directions__slug', lookup_expr='exact'
+        field_name='directions__slug', lookup_expr='in'
     )
 
     year_from = django_filters.NumberFilter(
