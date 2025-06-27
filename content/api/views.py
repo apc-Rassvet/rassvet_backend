@@ -32,6 +32,7 @@ from content.models import (
     Partner,
     Project,
     Review,
+    Supervisor,
     TargetedFundraising,
     Vacancy,
 )
@@ -328,3 +329,21 @@ class VacancyViewSet(
         'list': serializers.VacancySerializer,
         'retrieve': serializers.VacancyDetailSerializer,
     }
+
+
+@extend_schema(tags=['Supervisors group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Супервизоров.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Супервизора по ID.',
+    ),
+)
+class SupervisorViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Супервизоров, или конкретного по его ID."""
+
+    queryset = Supervisor.objects.prefetch_related('directions')
+    serializer_class = serializers.SupervisorSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = filters.SupervisorFilter

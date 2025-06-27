@@ -43,6 +43,7 @@ from content.models import (
     ProjectPhoto,
     Report,
     Review,
+    Supervisor,
     TargetedFundraising,
     TypeDocument,
     Vacancy,
@@ -516,3 +517,13 @@ class CoachingSerializer(serializers.ModelSerializer):
             'button',
             'link_button',
         )
+
+
+class SupervisorSerializer(serializers.ModelSerializer):
+    """Сериализатор для супервизоров."""
+
+    directions = DirectionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Supervisor
+        fields = ('id', 'name', 'position', 'image', 'order', 'directions')

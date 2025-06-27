@@ -22,6 +22,7 @@ from .news import Direction, GalleryImage, News
 from .partners import Partner
 from .projects import ProgramsProjects, Project, ProjectPhoto, ProjectsStatus
 from .reviews import Review
+from .supervisors import Supervisor
 from .targeted_fundraisings import (
     FundraisingPhoto,
     FundraisingTextBlock,
@@ -51,6 +52,7 @@ __all__ = [
     'ProjectsStatus',
     'Report',
     'Review',
+    'Supervisor',
     'TargetedFundraising',
     'TypeDocument',
     'Vacancy',

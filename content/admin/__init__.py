@@ -8,24 +8,26 @@ from .mission import MissionAdmin
 from .news import DirectionAdmin, NewsAdmin
 from .partners import PartnersAdmin
 from .projects import ProgramsProjectsAdmin, ProjectAdmin
-from .reviews import ReviewAdmin
-from .targeted_fundraisings import TargetedFundraisingAdmin
 from .report import ChapterAdmin
+from .reviews import ReviewAdmin
+from .supervisors import SupervisorAdmin
+from .targeted_fundraisings import TargetedFundraisingAdmin
 from .vacancies import VacancyAdmin
 
 __all__ = [
     'AboutUsVideoAdmin',
+    'ChapterAdmin',
     'CoachingAdmin',
     'DirectionAdmin',
     'EmployeeAdmin',
     'GratitudeAdmin',
     'MissionAdmin',
     'NewsAdmin',
+    'SupervisorAdmin',
     'PartnersAdmin',
     'ProjectAdmin',
     'ProgramsProjectsAdmin',
     'ReviewAdmin',
     'TargetedFundraisingAdmin',
-    'ChapterAdmin',
     'VacancyAdmin',
 ]
