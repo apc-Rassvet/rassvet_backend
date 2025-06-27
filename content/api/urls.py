@@ -31,6 +31,9 @@ v1_router_api.register(r'partners', views.PartnersViewSet, basename='partner')
 v1_router_api.register(r'projects', views.ProjectViewSet, basename='project')
 v1_router_api.register(r'reviews', views.ReviewViewSet, basename='review')
 v1_router_api.register(
+    r'about-video', views.AboutUsVideoViewSet, basename='about-video'
+)
+v1_router_api.register(
     r'supervisors', views.SupervisorViewSet, basename='supervisor'
 )
 v1_router_api.register(

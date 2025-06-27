@@ -10,7 +10,7 @@ from .partners import PartnersAdmin
 from .projects import ProgramsProjectsAdmin, ProjectAdmin
 from .report import ChapterAdmin
 from .reviews import ReviewAdmin
-from .supervisors import PageAdmin
+from .supervisors import SupervisorAdmin
 from .targeted_fundraisings import TargetedFundraisingAdmin
 from .vacancies import VacancyAdmin
 
@@ -23,7 +23,7 @@ __all__ = [
     'GratitudeAdmin',
     'MissionAdmin',
     'NewsAdmin',
-    'PageAdmin',
+    'SupervisorAdmin',
     'PartnersAdmin',
     'ProjectAdmin',
     'ProgramsProjectsAdmin',

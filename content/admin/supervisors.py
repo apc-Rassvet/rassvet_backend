@@ -5,7 +5,7 @@ from content.models.supervisors import Supervisor
 
 
 @admin.register(Supervisor)
-class PageAdmin(BaseOrderedModelAdmin):
+class SupervisorAdmin(BaseOrderedModelAdmin):
     """Модель администрирования супервизоров."""
 
     list_display = ('name', 'position', 'move_up_down_links')
