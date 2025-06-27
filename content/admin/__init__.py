@@ -4,6 +4,7 @@ from .about_us_video import AboutUsVideoAdmin
 from .coaching import CoachingAdmin
 from .employees import EmployeeAdmin
 from .gratitudes import GratitudeAdmin
+from .knowledge_base import ArticleAdmin, ChapterKnowledgeBaseAdmin
 from .mission import MissionAdmin
 from .news import DirectionAdmin, NewsAdmin
 from .partners import PartnersAdmin
@@ -15,7 +16,9 @@ from .vacancies import VacancyAdmin
 
 __all__ = [
     'AboutUsVideoAdmin',
+    'ArticleAdmin',
     'CoachingAdmin',
+    'ChapterKnowledgeBaseAdmin',
     'DirectionAdmin',
     'EmployeeAdmin',
     'GratitudeAdmin',

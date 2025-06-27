@@ -1,7 +1,6 @@
 """Административная конфигурация для Консультации и обучение.
 
 Этот модуль содержит:
-- ButtonLinkAdmin: Inline-класс для кнопок, прикреплённых к coaching.
 - CoachingPhotoAdmin: Inline-класс для фотографий, прикреплённых к coaching.
 - CoachingAdmin: Админ зона Coaching..
 """

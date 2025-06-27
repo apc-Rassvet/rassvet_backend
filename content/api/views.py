@@ -22,7 +22,9 @@ from content import filters
 from content.mixins import MultiSerializerViewSetMixin
 from content.models import (
     AboutUsVideo,
+    Article,
     Chapter,
+    ChapterKnowledgeBase,
     Coaching,
     Direction,
     Employee,
@@ -326,3 +328,44 @@ class VacancyViewSet(
         'list': serializers.VacancySerializer,
         'retrieve': serializers.VacancyDetailSerializer,
     }
+
+
+@extend_schema(tags=['ChapterKnowledgeBase group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список "Разделов Базы знаний".',
+    ),
+    retrieve=extend_schema(
+        summary='Получить "Раздел Базы знаний" по ID.',
+    ),
+)
+class ChapterKnowledgeBaseViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список "Разделов Базы знаний", или конкретный по его ID."""
+
+    queryset = ChapterKnowledgeBase.objects.prefetch_related(
+        'article',
+    ).all()
+    serializer_class = serializers.ChapterKnowledgeBaseSerializer
+
+
+@extend_schema(tags=['Article group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список "Статьи Базы знаний".',
+    ),
+    retrieve=extend_schema(
+        summary='Получить "Статью Базы знаний" по ID.',
+    ),
+)
+class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список "Разделов Базы знаний", или конкретный по его ID."""
+
+    queryset = (
+        Article.objects.select_related('chapter')
+        .prefetch_related(
+            'gallery',
+            'text_block',
+        )
+        .all()
+    )
+    serializer_class = serializers.ArticlSerializer
