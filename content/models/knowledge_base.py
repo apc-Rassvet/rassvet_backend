@@ -79,7 +79,7 @@ class Article(TitleMixin, models.Model):
         return self.title
 
     def clean(self):
-        """Валидация поля link_button в зависмисти от выбора в поле button."""
+        """Валидация поля link в зависмисти от выбора в поле detailed_page."""
         if self.detailed_page == 'link' and self.link is None:
             raise ValidationError('Заполни "Ссылка на существующую страницу".')
 
