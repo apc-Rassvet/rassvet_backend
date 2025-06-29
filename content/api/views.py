@@ -330,7 +330,7 @@ class VacancyViewSet(
     }
 
 
-@extend_schema(tags=['ChapterKnowledgeBase group'])
+@extend_schema(tags=['KnowledgeBase group'])
 @extend_schema_view(
     list=extend_schema(
         summary='Получить список "Разделов Базы знаний".',
@@ -348,7 +348,7 @@ class ChapterKnowledgeBaseViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ChapterKnowledgeBaseSerializer
 
 
-@extend_schema(tags=['Article group'])
+@extend_schema(tags=['KnowledgeBase group'])
 @extend_schema_view(
     list=extend_schema(
         summary='Получить список "Статьи Базы знаний".',

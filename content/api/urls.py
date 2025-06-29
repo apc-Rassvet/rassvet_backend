@@ -26,11 +26,13 @@ v1_router_api.register(
 v1_router_api.register(
     r'gratitudes', views.GratitudeViewSet, basename='gratitude'
 )
-v1_router_api.register(r'article', views.ArticleViewSet, basename='article')
 v1_router_api.register(
-    r'knowledge_base',
+    r'knowledge_base/article', views.ArticleViewSet, basename='article'
+)
+v1_router_api.register(
+    r'knowledge_base/chapter',
     views.ChapterKnowledgeBaseViewSet,
-    basename='knowledge_base',
+    basename='сhapter',
 )
 v1_router_api.register(r'mission', views.MissionViewSet, basename='mission')
 v1_router_api.register(r'partners', views.PartnersViewSet, basename='partner')

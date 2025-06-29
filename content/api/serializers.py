@@ -529,7 +529,10 @@ class ArticleGallerySerializer(serializers.ModelSerializer):
         """Meta класс с настройками сериализатора ArticleGallerySerializer."""
 
         model = ArticleGallery
-        fields = ('foto',)
+        fields = (
+            'id',
+            'foto',
+        )
 
 
 class ArticleTextBlockSerializer(serializers.ModelSerializer):
@@ -540,6 +543,7 @@ class ArticleTextBlockSerializer(serializers.ModelSerializer):
 
         model = ArticleTextBlock
         fields = (
+            'id',
             'text',
             'foto',
         )
@@ -555,6 +559,8 @@ class ArticlMiniSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+            'detailed_page',
+            'link',
         )
 
 
@@ -570,11 +576,11 @@ class ArticlSerializer(serializers.ModelSerializer):
 
         model = Article
         fields = (
+            'id',
             'title',
             'chapter',
             'detailed_page',
             'link',
-            'video',
             'video_link',
             'text_block',
             'gallery',
@@ -591,6 +597,7 @@ class ChapterKnowledgeBaseSerializer(serializers.ModelSerializer):
 
         model = ChapterKnowledgeBase
         fields = (
+            'id',
             'title',
             'article',
         )

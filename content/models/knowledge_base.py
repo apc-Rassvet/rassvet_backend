@@ -11,9 +11,14 @@ from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 
-from content.constants import IMAGE_CONTENT_TYPES, VIDEO_CONTENT_TYPES
+from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import TitleMixin
 from content.utils import ckeditor_function
+
+
+def upload_file(instance, filename):
+    """Генерирует путь к файлу для загрузки."""
+    return f'article_gallery_images/{instance.article.id}/{filename}'
 
 
 class ChapterKnowledgeBase(TitleMixin, models.Model):
@@ -22,8 +27,8 @@ class ChapterKnowledgeBase(TitleMixin, models.Model):
     class Meta:
         """Класс Meta для ChapterKnowledgeBase, содержащий мета-данные."""
 
-        verbose_name = 'Раздел Базы знаний'
-        verbose_name_plural = 'Разделы Базы знаний'
+        verbose_name = 'Раздел'
+        verbose_name_plural = 'База знаний - разделы'
         ordering = ('title',)
 
     def __str__(self):
@@ -56,13 +61,6 @@ class Article(TitleMixin, models.Model):
         blank=True,
         null=True,
     )
-    video = models.FileField(
-        upload_to='article/',
-        verbose_name='Видео файл',
-        validators=[FileExtensionValidator(VIDEO_CONTENT_TYPES)],
-        blank=True,
-        null=True,
-    )
     video_link = models.URLField(
         verbose_name='Ссылка на видео',
         blank=True,
@@ -72,8 +70,8 @@ class Article(TitleMixin, models.Model):
     class Meta:
         """Класс Meta для Article, содержащий мета-данные."""
 
-        verbose_name = 'Статья Базы знаний'
-        verbose_name_plural = 'Статьи Базы знаний'
+        verbose_name = 'Статья'
+        verbose_name_plural = 'База знаний - статьи'
         ordering = ('title',)
 
     def __str__(self):
@@ -125,7 +123,7 @@ class ArticleGallery(models.Model):
         verbose_name='статья',
     )
     foto = models.ImageField(
-        upload_to='article/',
+        upload_to=upload_file,
         verbose_name='Фотография',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
