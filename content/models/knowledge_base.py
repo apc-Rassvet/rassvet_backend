@@ -18,7 +18,7 @@ from content.utils import ckeditor_function
 
 def upload_file(instance, filename):
     """Генерирует путь к файлу для загрузки."""
-    return f'article_gallery_images/{instance.article.id}/{filename}'
+    return f'{instance.__class__.__name__}/{instance.article.id}/{filename}'
 
 
 class ChapterKnowledgeBase(TitleMixin, models.Model):
@@ -95,7 +95,7 @@ class ArticleTextBlock(models.Model):
     )
     text = ckeditor_function(verbose_name='текст статьи')
     foto = models.ImageField(
-        upload_to='article/',
+        upload_to=upload_file,
         verbose_name='Фотография',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
         blank=True,
