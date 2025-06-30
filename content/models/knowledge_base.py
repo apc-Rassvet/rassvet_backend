@@ -59,12 +59,10 @@ class Article(TitleMixin, models.Model):
     link = models.URLField(
         verbose_name='Ссылка на существующую страницу',
         blank=True,
-        null=True,
     )
     video_link = models.URLField(
         verbose_name='Ссылка на видео',
         blank=True,
-        null=True,
     )
 
     class Meta:
@@ -99,7 +97,6 @@ class ArticleTextBlock(models.Model):
         verbose_name='Фотография',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
         blank=True,
-        null=True,
     )
 
     class Meta:
