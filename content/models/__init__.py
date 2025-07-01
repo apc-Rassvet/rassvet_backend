@@ -17,6 +17,12 @@ from .about_us_video import AboutUsVideo
 from .coaching import Coaching, CoachingPhoto
 from .employees import Document, Employee, TypeDocument
 from .gratitudes import Gratitude
+from .knowledge_base import (
+    Article,
+    ArticleGallery,
+    ArticleTextBlock,
+    ChapterKnowledgeBase,
+)
 from .mission import Mission
 from .news import Direction, GalleryImage, News
 from .partners import Partner
@@ -33,6 +39,10 @@ from .vacancies import Vacancy
 
 __all__ = [
     'AboutUsVideo',
+    'Article',
+    'ArticleGallery',
+    'ArticleTextBlock',
+    'ChapterKnowledgeBase',
     'Coaching',
     'CoachingPhoto',
     'Chapter',

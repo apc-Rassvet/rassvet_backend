@@ -26,7 +26,11 @@ from rest_framework import serializers
 
 from content.models import (
     AboutUsVideo,
+    Article,
+    ArticleGallery,
+    ArticleTextBlock,
     Chapter,
+    ChapterKnowledgeBase,
     Coaching,
     CoachingPhoto,
     Direction,
@@ -527,3 +531,84 @@ class SupervisorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supervisor
         fields = ('id', 'name', 'position', 'image', 'order', 'directions')
+
+
+class ArticleGallerySerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleGallery."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора ArticleGallerySerializer."""
+
+        model = ArticleGallery
+        fields = (
+            'id',
+            'foto',
+        )
+
+
+class ArticleTextBlockSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleTextBlock."""
+
+    class Meta:
+        """Meta класс с настройками сериализатор ArticleTextBlockSerializer."""
+
+        model = ArticleTextBlock
+        fields = (
+            'id',
+            'text',
+            'foto',
+        )
+
+
+class ArticlMiniSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticlMini."""
+
+    class Meta:
+        """Meta класс с настройками сериализатор ArticlMiniSerializer."""
+
+        model = Article
+        fields = (
+            'id',
+            'title',
+            'detailed_page',
+            'link',
+        )
+
+
+class ArticlSerializer(serializers.ModelSerializer):
+    """Сериализатор Articl."""
+
+    chapter = serializers.CharField(source='chapter.title')
+    gallery = ArticleGallerySerializer(many=True)
+    text_block = ArticleTextBlockSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатор ArticlSerializer."""
+
+        model = Article
+        fields = (
+            'id',
+            'title',
+            'chapter',
+            'detailed_page',
+            'link',
+            'video_link',
+            'text_block',
+            'gallery',
+        )
+
+
+class ChapterKnowledgeBaseSerializer(serializers.ModelSerializer):
+    """Сериализатор ChapterKnowledgeBase."""
+
+    article = ArticlMiniSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора."""
+
+        model = ChapterKnowledgeBase
+        fields = (
+            'id',
+            'title',
+            'article',
+        )
