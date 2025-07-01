@@ -34,6 +34,7 @@ from .targeted_fundraisings import (
     FundraisingTextBlock,
     TargetedFundraising,
 )
+from .useful_links import ArticleUsefulLinks, ChapterUsefulLinks
 from .report import Report, Chapter
 from .vacancies import Vacancy
 
@@ -42,7 +43,9 @@ __all__ = [
     'Article',
     'ArticleGallery',
     'ArticleTextBlock',
+    'ArticleUsefulLinks',
     'ChapterKnowledgeBase',
+    'ChapterUsefulLinks',
     'Coaching',
     'CoachingPhoto',
     'Chapter',

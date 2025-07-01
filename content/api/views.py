@@ -25,6 +25,7 @@ from content.models import (
     Article,
     Chapter,
     ChapterKnowledgeBase,
+    ChapterUsefulLinks,
     Coaching,
     Direction,
     Employee,
@@ -390,3 +391,21 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
         .all()
     )
     serializer_class = serializers.ArticlSerializer
+
+
+@extend_schema(tags=['UsefulLinks group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Разделов Полезные ссылки.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Раздел Полезные ссылки по ID.',
+    ),
+)
+class ChapterUsefulLinksViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Разделов Полезные ссылки, или конкретный по его ID."""
+
+    queryset = ChapterUsefulLinks.objects.prefetch_related(
+        'article_useful_links',
+    ).all()
+    serializer_class = serializers.ChapterUsefulLinksSerializer

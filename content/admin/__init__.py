@@ -13,12 +13,14 @@ from .report import ChapterAdmin
 from .reviews import ReviewAdmin
 from .supervisors import SupervisorAdmin
 from .targeted_fundraisings import TargetedFundraisingAdmin
+from .useful_links import ChapterUsefulLinksAdmin
 from .vacancies import VacancyAdmin
 
 __all__ = [
     'AboutUsVideoAdmin',
     'ArticleAdmin',
     'ChapterAdmin',
+    'ChapterUsefulLinksAdmin',
     'CoachingAdmin',
     'ChapterKnowledgeBaseAdmin',
     'DirectionAdmin',
