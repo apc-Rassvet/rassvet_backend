@@ -22,3 +22,18 @@ FILE_CONTENT_TYPES = ['pdf']
 
 EMPTY_VALUE_DISPLAY = '-пусто-'
 """Отображение пустого поля."""
+
+LITERATURE_CONTENT_TYPES = [
+    'pdf',
+    'epub',
+    'mobi',
+    'azw',
+    'azw3',
+    'fb2',
+    'djvu',
+    'txt',
+    'rtf',
+    'doc',
+    'docx',
+]
+"""Формат загрузки файлов для Литературы."""
