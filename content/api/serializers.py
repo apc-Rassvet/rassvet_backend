@@ -29,8 +29,10 @@ from content.models import (
     Article,
     ArticleGallery,
     ArticleTextBlock,
+    ArticleUsefulLinks,
     Chapter,
     ChapterKnowledgeBase,
+    ChapterUsefulLinks,
     Coaching,
     CoachingPhoto,
     Direction,
@@ -611,4 +613,30 @@ class ChapterKnowledgeBaseSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'article',
+        )
+
+
+class ArticleUsefulLinksSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleUsefulLinksSerializer."""
+
+    class Meta:
+        model = ArticleUsefulLinks
+        fields = (
+            'id',
+            'title',
+            'link',
+        )
+
+
+class ChapterUsefulLinksSerializer(serializers.ModelSerializer):
+    """Сериализатор ChapterUsefulLinks."""
+
+    article_useful_links = ArticleUsefulLinksSerializer(many=True)
+
+    class Meta:
+        model = ChapterUsefulLinks
+        fields = (
+            'id',
+            'title',
+            'article_useful_links',
         )
