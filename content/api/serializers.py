@@ -517,7 +517,7 @@ class TrainAndInternSerializer(TrainAndInternBaseSerializer):
         )
     
     def get_linked_news(self, obj):
-        if obj.action_on_button == 'deteil':
+        if obj.action_on_button == 'detail':
             return self.context['request'].build_absolute_uri(
                 reverse('trainigs-detail', args=[obj.id])
             )

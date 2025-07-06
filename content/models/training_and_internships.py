@@ -27,10 +27,10 @@ class FormatStudy(models.TextChoices):
     HYBRID = 'hybrid', 'Гибридный'
 
 
-class ActionOmButton(models.TextChoices):
+class ActionOnButton(models.TextChoices):
     """Действие кнопки"""
 
-    DETEIL = 'deteil', 'Подробная страница'
+    DETAIL = 'detail', 'Подробная страница'
     REGISTRATION = 'registration', 'Форма регистрации и отклика'
     URL_NEWS = 'url', 'Ссылка на новость'
 
@@ -80,9 +80,9 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
         blank=True,
     )
     action_on_button = models.CharField(
-        max_length=max(len(value) for value, _ in ActionOmButton.choices),
-        choices=ActionOmButton.choices,
-        default=ActionOmButton.DETEIL,
+        max_length=max(len(value) for value, _ in ActionOnButton.choices),
+        choices=ActionOnButton.choices,
+        default=ActionOnButton.DETAIL,
         verbose_name='Действие на кнопке',
     )
     linked_news = models.URLField(
@@ -119,9 +119,9 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
             'linked_news', 
             self.instance.linked_news if self.instance else None
         )
-        if action_on_button == ActionOmButton.DETEIL and not text_value:
+        if action_on_button == ActionOnButton.DETAIL and not text_value:
             raise ValidationError('Текстовый блок не может быть пустым')
-        elif action_on_button == ActionOmButton.URL_NEWS and not linked_news:
+        elif action_on_button == ActionOnButton.URL_NEWS and not linked_news:
             raise ValidationError('Ссылка на новость не может быть пустой')
         return data
 
