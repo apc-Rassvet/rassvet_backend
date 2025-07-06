@@ -9,6 +9,7 @@
 
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.forms import ValidationError
 from ordered_model.models import OrderedModel
 
 from content.constants import IMAGE_CONTENT_TYPES
@@ -37,19 +38,23 @@ class ActionOmButton(models.TextChoices):
 class TrainingAndInternships(TitleMixin, OrderedModel):
     """Модель обучения и стажировки."""
 
+    title = models.CharField(
+        max_length=255, 
+        verbose_name='Заголовок'
+    )
     add_info = models.CharField(
         max_length=25,
-        verbose_name='Дополнительная информация',
+        verbose_name='Плашка с дополнительной информацией ',
         blank=True,
     )
-    info = ckeditor_function(verbose_name='Дополнительная информация')
-    price = models.IntegerField(
+    price = models.CharField(
+        max_length=255,
         verbose_name='Цена',
-        null=True,
         blank=True,
     )
-    date = models.DateField(
+    date = models.CharField(
         verbose_name='Дата',
+        max_length=255,
     )
     format_study = models.CharField(
         max_length=max(len(value) for value, _ in FormatStudy.choices),
@@ -62,8 +67,13 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
         verbose_name='Место проведения',
         blank=True,
     )
-    short_description = ckeditor_function(verbose_name='Краткое описание')
-    text = ckeditor_function(verbose_name='Текстовый блок')
+    short_description = models.TextField(
+        verbose_name='Краткое описание'
+    )
+    text = ckeditor_function(
+        blank=True, 
+        verbose_name='Текстовый блок'
+    )
     text_on_button = models.CharField(
         max_length=255,
         verbose_name='Текст на кнопке',
@@ -93,6 +103,27 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
     def __str__(self):
         """Возвращает строковое представление обучения и стажировок."""
         return self.title
+    
+
+    def validate(self, data):
+        """Валидация полей модели."""
+        action_on_button = data.get(
+            'action_on_button', 
+            self.instance.action_on_button if self.instance else None
+        )
+        text_value = data.get(
+            'text', 
+            self.instance.text if self.instance else None
+        )
+        linked_news = data.get(
+            'linked_news', 
+            self.instance.linked_news if self.instance else None
+        )
+        if action_on_button == ActionOmButton.DETEIL and not text_value:
+            raise ValidationError('Текстовый блок не может быть пустым')
+        elif action_on_button == ActionOmButton.URL_NEWS and not linked_news:
+            raise ValidationError('Ссылка на новость не может быть пустой')
+        return data
 
 
 class TAIPhoto(models.Model):
@@ -114,6 +145,10 @@ class TAIPhoto(models.Model):
     on_main = models.BooleanField(
         default=False,
         verbose_name='На главной странице',
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Порядок отображения',
     )
 
     class Meta:

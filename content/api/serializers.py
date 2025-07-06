@@ -46,6 +46,7 @@ from content.models import (
     TypeDocument,
     Vacancy,
     TrainingAndInternships,
+    TAIPhoto,
 )
 
 
@@ -483,30 +484,27 @@ class VacancyDetailSerializer(serializers.ModelSerializer):
             'redirect_type',
         )
 
+
 class TrainAndInternBaseSerializer(serializers.ModelSerializer):
     """Сериализатор для обучения и стажировок."""
-    price = serializers.SerializerMethodField()
 
     class Meta:
         model = TrainingAndInternships
         fields = (
             'id',
             'add_info',
-            'info',
+            'title',
             'price',
             'date',
             'format_study',
             'location',
         )
 
-    def get_price(self, obj):
-        if obj.price == 0 or obj.price == None:
-            return 'FREE'
-        return obj.price
 
 class TrainAndInternSerializer(TrainAndInternBaseSerializer):
     """Сериализатор для обучения и стажировок."""
     linked_news = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = TrainingAndInternships
@@ -515,6 +513,7 @@ class TrainAndInternSerializer(TrainAndInternBaseSerializer):
             'text_on_button',
             'action_on_button',
             'linked_news',
+            'image', 
         )
     
     def get_linked_news(self, obj):
@@ -523,12 +522,22 @@ class TrainAndInternSerializer(TrainAndInternBaseSerializer):
                 reverse('trainigs-detail', args=[obj.id])
             )
         return obj.linked_news
+    
+    def get_image(self, obj):
+        image = TAIPhoto.objects.filter(training=obj, on_main=True)
+        return [image.image.url for image in image]
 
 class TrainAndInternDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для обучения и стажировок."""
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = TrainingAndInternships
         fields = TrainAndInternBaseSerializer.Meta.fields + (
             'text',
+            'image',
         )
+    
+    def get_image(self, obj):
+        image = TAIPhoto.objects.filter(training=obj).order_by('order')
+        return [image.image.url for image in image]
