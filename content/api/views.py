@@ -30,6 +30,7 @@ from content.models import (
     Direction,
     Employee,
     Gratitude,
+    Literature,
     Mission,
     News,
     Partner,
@@ -39,7 +40,10 @@ from content.models import (
     TargetedFundraising,
     Vacancy,
 )
-from content.pagination import NewsLimitOffsetPagination
+from content.pagination import (
+    LiteraturePageNumberPagination,
+    NewsLimitOffsetPagination,
+)
 
 from . import serializers
 
@@ -409,3 +413,20 @@ class ChapterUsefulLinksViewSet(viewsets.ReadOnlyModelViewSet):
         'article_useful_links',
     ).all()
     serializer_class = serializers.ChapterUsefulLinksSerializer
+
+
+@extend_schema(tags=['Literature group'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список Литературы.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить Литературу по ID.',
+    ),
+)
+class LiteratureViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получить список Литературы, или конкретную по ID."""
+
+    queryset = Literature.objects.all()
+    pagination_class = LiteraturePageNumberPagination
+    serializer_class = serializers.LiteratureSerializer

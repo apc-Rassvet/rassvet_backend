@@ -6,6 +6,7 @@ from .employees import EmployeeAdmin
 from .gratitudes import GratitudeAdmin
 from .knowledge_base import ArticleAdmin, ChapterKnowledgeBaseAdmin
 from .mission import MissionAdmin
+from .literatures import Literature
 from .news import DirectionAdmin, NewsAdmin
 from .partners import PartnersAdmin
 from .projects import ProgramsProjectsAdmin, ProjectAdmin
@@ -26,6 +27,7 @@ __all__ = [
     'DirectionAdmin',
     'EmployeeAdmin',
     'GratitudeAdmin',
+    'Literature',
     'MissionAdmin',
     'NewsAdmin',
     'SupervisorAdmin',

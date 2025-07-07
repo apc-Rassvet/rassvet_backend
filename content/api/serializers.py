@@ -42,6 +42,7 @@ from content.models import (
     FundraisingTextBlock,
     GalleryImage,
     Gratitude,
+    Literature,
     Mission,
     News,
     Partner,
@@ -639,4 +640,22 @@ class ChapterUsefulLinksSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'article_useful_links',
+        )
+
+
+class LiteratureSerializer(serializers.ModelSerializer):
+    """Сериализатор Literature."""
+
+    class Meta:
+        model = Literature
+        fields = (
+            'id',
+            'title',
+            'author',
+            'publication_year',
+            'cover',
+            'description',
+            'button_type',
+            'file',
+            'literature_url',
         )

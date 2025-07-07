@@ -57,7 +57,9 @@ v1_router_api.register(r'coaching', views.CoachingViewSet, basename='coaching')
 v1_router_api.register(
     r'useful_links', views.ChapterUsefulLinksViewSet, basename='useful_links'
 )
-
+v1_router_api.register(
+    r'literatures', views.LiteratureViewSet, basename='literatures'
+)
 
 api_urls.extend(v1_router_api.urls)
 

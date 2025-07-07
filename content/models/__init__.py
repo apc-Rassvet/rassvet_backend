@@ -9,6 +9,7 @@
 - Сотрудники и их документы
 - Проекты
 - Новости
+- Литература
 
 Все модели регистрируются здесь для обеспечения корректного импорта и миграций.
 """
@@ -23,6 +24,7 @@ from .knowledge_base import (
     ArticleTextBlock,
     ChapterKnowledgeBase,
 )
+from .literatures import Literature
 from .mission import Mission
 from .news import Direction, GalleryImage, News
 from .partners import Partner
@@ -56,6 +58,7 @@ __all__ = [
     'FundraisingTextBlock',
     'GalleryImage',
     'Gratitude',
+    'Literature',
     'Mission',
     'News',
     'Partner',
