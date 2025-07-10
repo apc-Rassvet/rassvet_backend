@@ -28,7 +28,12 @@ from .targeted_fundraisings import (
 )
 from .report import Report, Chapter
 from .vacancies import Vacancy
-from .training_and_internships import FormatStudy, ActionOmButton, TrainingAndInternships, TAIPhoto
+from .training_and_internships import (
+    FormatStudy,
+    ActionOmButton,
+    TrainingAndInternships,
+    TAIPhoto,
+)
 
 __all__ = [
     'AboutUsVideo',

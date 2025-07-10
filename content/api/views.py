@@ -325,7 +325,7 @@ class VacancyViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return serializers.VacancyDetailSerializer
         return serializers.VacancySerializer
-    
+
 
 @extend_schema(tags=['Training and internships'])
 @extend_schema_view(
@@ -350,4 +350,3 @@ class TrainingAndInternshipsViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return serializers.TrainAndInternDetailSerializer
         return serializers.TrainAndInternSerializer
-

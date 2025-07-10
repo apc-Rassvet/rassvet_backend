@@ -16,11 +16,9 @@ from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import TitleMixin
 from content.utils import ckeditor_function
 
-from .news import News
-
 
 class FormatStudy(models.TextChoices):
-    """Формат учебы"""
+    """Формат учебы."""
 
     ONLINE = 'online', 'Онлайн'
     OFFLINE = 'offline', 'Оффлайн'
@@ -28,7 +26,7 @@ class FormatStudy(models.TextChoices):
 
 
 class ActionOnButton(models.TextChoices):
-    """Действие кнопки"""
+    """Действие кнопки."""
 
     DETAIL = 'detail', 'Подробная страница'
     REGISTRATION = 'registration', 'Форма регистрации и отклика'
@@ -38,10 +36,7 @@ class ActionOnButton(models.TextChoices):
 class TrainingAndInternships(TitleMixin, OrderedModel):
     """Модель обучения и стажировки."""
 
-    title = models.CharField(
-        max_length=255, 
-        verbose_name='Заголовок'
-    )
+    title = models.CharField(max_length=255, verbose_name='Заголовок')
     add_info = models.CharField(
         max_length=25,
         verbose_name='Плашка с дополнительной информацией ',
@@ -67,13 +62,8 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
         verbose_name='Место проведения',
         blank=True,
     )
-    short_description = models.TextField(
-        verbose_name='Краткое описание'
-    )
-    text = ckeditor_function(
-        blank=True, 
-        verbose_name='Текстовый блок'
-    )
+    short_description = models.TextField(verbose_name='Краткое описание')
+    text = ckeditor_function(blank=True, verbose_name='Текстовый блок')
     text_on_button = models.CharField(
         max_length=255,
         verbose_name='Текст на кнопке',
@@ -89,7 +79,7 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
         verbose_name='Произвольная ссылка',
         blank=True,
         null=True,
-        max_length=200, 
+        max_length=200,
     )
 
     class Meta(OrderedModel.Meta):
@@ -99,25 +89,21 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
         verbose_name_plural = 'Обучение и стажировки'
         ordering = ['order']
 
-
     def __str__(self):
         """Возвращает строковое представление обучения и стажировок."""
         return self.title
-    
 
     def validate(self, data):
         """Валидация полей модели."""
         action_on_button = data.get(
-            'action_on_button', 
-            self.instance.action_on_button if self.instance else None
+            'action_on_button',
+            self.instance.action_on_button if self.instance else None,
         )
         text_value = data.get(
-            'text', 
-            self.instance.text if self.instance else None
+            'text', self.instance.text if self.instance else None
         )
         linked_news = data.get(
-            'linked_news', 
-            self.instance.linked_news if self.instance else None
+            'linked_news', self.instance.linked_news if self.instance else None
         )
         if action_on_button == ActionOnButton.DETAIL and not text_value:
             raise ValidationError('Текстовый блок не может быть пустым')

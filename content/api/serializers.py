@@ -503,6 +503,7 @@ class TrainAndInternBaseSerializer(serializers.ModelSerializer):
 
 class TrainAndInternSerializer(TrainAndInternBaseSerializer):
     """Сериализатор для обучения и стажировок."""
+
     linked_news = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
 
@@ -513,22 +514,26 @@ class TrainAndInternSerializer(TrainAndInternBaseSerializer):
             'text_on_button',
             'action_on_button',
             'linked_news',
-            'image', 
+            'image',
         )
-    
+
     def get_linked_news(self, obj):
+        """Возвращает ссылки на новости."""
         if obj.action_on_button == 'detail':
             return self.context['request'].build_absolute_uri(
                 reverse('trainigs-detail', args=[obj.id])
             )
         return obj.linked_news
-    
+
     def get_image(self, obj):
+        """Возвращает ссылки на фотографии."""
         image = TAIPhoto.objects.filter(training=obj, on_main=True)
         return [image.image.url for image in image]
 
+
 class TrainAndInternDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для обучения и стажировок."""
+
     image = serializers.SerializerMethodField()
 
     class Meta:
@@ -537,7 +542,8 @@ class TrainAndInternDetailSerializer(serializers.ModelSerializer):
             'text',
             'image',
         )
-    
+
     def get_image(self, obj):
+        """Возвращает ссылки на фотографии."""
         image = TAIPhoto.objects.filter(training=obj).order_by('order')
         return [image.image.url for image in image]
