@@ -7,22 +7,29 @@
 
 from django.contrib import admin
 
+from content.base_models import BaseOrderedModelAdmin
 from content.models.training_and_internships import (
     TrainingAndInternships,
-    TAIPhoto,
+    TrainingAndInternshipsPhoto,
 )
 
 
-class TAIPhotoInline(admin.TabularInline):
+class TrainingAndInternshipsPhotoInline(admin.TabularInline):
     """Inline-класс для фотографий."""
 
-    model = TAIPhoto
-    extra = 3
+    model = TrainingAndInternshipsPhoto
+    min_num = 1
+    max_num = 3
 
 
 @admin.register(TrainingAndInternships)
-class TrainingAndInternshipsAdmin(admin.ModelAdmin):
+class TrainingAndInternshipsAdmin(BaseOrderedModelAdmin):
     """Конфигурация админки для модели TrainingAndInternships."""
 
-    list_display = ['title', 'date', 'price']
-    inlines = [TAIPhotoInline]
+    list_display = [
+        'title',
+        'date',
+        'price',
+        'move_up_down_links',
+    ]
+    inlines = [TrainingAndInternshipsPhotoInline]

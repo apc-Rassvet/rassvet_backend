@@ -30,9 +30,9 @@ from .report import Report, Chapter
 from .vacancies import Vacancy
 from .training_and_internships import (
     FormatStudy,
-    ActionOmButton,
+    ActionOnButton,
     TrainingAndInternships,
-    TAIPhoto,
+    TrainingAndInternshipsPhoto,
 )
 
 __all__ = [
@@ -58,7 +58,7 @@ __all__ = [
     'TypeDocument',
     'Vacancy',
     'FormatStudy',
-    'ActionOmButton',
+    'ActionOnButton',
     'TrainingAndInternships',
-    'TAIPhoto',
+    'TrainingAndInternshipsPhoto',
 ]

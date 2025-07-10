@@ -23,7 +23,6 @@
 
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
-from django.urls import reverse
 
 from content.models import (
     AboutUsVideo,
@@ -46,7 +45,7 @@ from content.models import (
     TypeDocument,
     Vacancy,
     TrainingAndInternships,
-    TAIPhoto,
+    TrainingAndInternshipsPhoto,
 )
 
 
@@ -485,65 +484,52 @@ class VacancyDetailSerializer(serializers.ModelSerializer):
         )
 
 
-class TrainAndInternBaseSerializer(serializers.ModelSerializer):
+class TrainAndInternPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор для фотографий обучений и стажировок."""
+
+    class Meta:
+        model = TrainingAndInternshipsPhoto
+        fields = ('id', 'image', 'on_main', 'order')
+
+
+class TrainAndInternSerializer(serializers.ModelSerializer):
     """Сериализатор для обучения и стажировок."""
+
+    photos = TrainAndInternPhotoSerializer(many=True)
 
     class Meta:
         model = TrainingAndInternships
         fields = (
             'id',
-            'add_info',
             'title',
+            'add_info',
             'price',
             'date',
             'format_study',
             'location',
-        )
-
-
-class TrainAndInternSerializer(TrainAndInternBaseSerializer):
-    """Сериализатор для обучения и стажировок."""
-
-    linked_news = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
-
-    class Meta:
-        model = TrainingAndInternships
-        fields = TrainAndInternBaseSerializer.Meta.fields + (
             'short_description',
-            'text_on_button',
             'action_on_button',
+            'photos',
             'linked_news',
-            'image',
         )
-
-    def get_linked_news(self, obj):
-        """Возвращает ссылки на новости."""
-        if obj.action_on_button == 'detail':
-            return self.context['request'].build_absolute_uri(
-                reverse('trainigs-detail', args=[obj.id])
-            )
-        return obj.linked_news
-
-    def get_image(self, obj):
-        """Возвращает ссылки на фотографии."""
-        image = TAIPhoto.objects.filter(training=obj, on_main=True)
-        return [image.image.url for image in image]
 
 
 class TrainAndInternDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для обучения и стажировок."""
 
-    image = serializers.SerializerMethodField()
+    photos = TrainAndInternPhotoSerializer(many=True)
 
     class Meta:
         model = TrainingAndInternships
-        fields = TrainAndInternBaseSerializer.Meta.fields + (
-            'text',
-            'image',
+        fields = (
+            'id',
+            'title',
+            'price',
+            'date',
+            'format_study',
+            'location',
+            'short_description',
+            'text_block',
+            'photos',
+            'linked_news',
         )
-
-    def get_image(self, obj):
-        """Возвращает ссылки на фотографии."""
-        image = TAIPhoto.objects.filter(training=obj).order_by('order')
-        return [image.image.url for image in image]

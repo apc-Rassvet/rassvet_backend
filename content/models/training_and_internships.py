@@ -4,7 +4,7 @@
     - FormatStudy: Перечисление фозможных форматов обученя
     - ActionOmButton: Перечисление действий при нажатии на кнопку
     - TrainingAndInternships: Содержит информацию об обучениях и стажировках
-    - TAIPhoto: Хранит фотографии карточек обучения и стажировок
+    - TrainingAndInternshipsPhoto: Хранит фотографии обучения и стажировок
 """
 
 from django.core.validators import FileExtensionValidator
@@ -13,8 +13,9 @@ from django.forms import ValidationError
 from ordered_model.models import OrderedModel
 
 from content.constants import IMAGE_CONTENT_TYPES
-from content.mixins import TitleMixin
+from content.mixins import CleanEmptyHTMLMixin, TitleMixin
 from content.utils import ckeditor_function
+from content.validators import validate_not_empty_html
 
 
 class FormatStudy(models.TextChoices):
@@ -33,13 +34,12 @@ class ActionOnButton(models.TextChoices):
     URL_NEWS = 'url', 'Ссылка на новость'
 
 
-class TrainingAndInternships(TitleMixin, OrderedModel):
+class TrainingAndInternships(TitleMixin, CleanEmptyHTMLMixin, OrderedModel):
     """Модель обучения и стажировки."""
 
-    title = models.CharField(max_length=255, verbose_name='Заголовок')
     add_info = models.CharField(
         max_length=25,
-        verbose_name='Плашка с дополнительной информацией ',
+        verbose_name='Дополнительная информация',
         blank=True,
     )
     price = models.CharField(
@@ -63,11 +63,11 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
         blank=True,
     )
     short_description = models.TextField(verbose_name='Краткое описание')
-    text = ckeditor_function(blank=True, verbose_name='Текстовый блок')
-    text_on_button = models.CharField(
-        max_length=255,
-        verbose_name='Текст на кнопке',
+    text_block = ckeditor_function(
         blank=True,
+        null=True,
+        verbose_name='Текстовый блок',
+        validators=[],
     )
     action_on_button = models.CharField(
         max_length=max(len(value) for value, _ in ActionOnButton.choices),
@@ -76,11 +76,11 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
         verbose_name='Действие на кнопке',
     )
     linked_news = models.URLField(
-        verbose_name='Произвольная ссылка',
+        verbose_name='Ссылка на новость',
         blank=True,
-        null=True,
         max_length=200,
     )
+    clean_html_fields = ('text_block',)
 
     class Meta(OrderedModel.Meta):
         """Класс Meta для TrainingAndInternships, содержащий мета-данные."""
@@ -93,32 +93,33 @@ class TrainingAndInternships(TitleMixin, OrderedModel):
         """Возвращает строковое представление обучения и стажировок."""
         return self.title
 
-    def validate(self, data):
-        """Валидация полей модели."""
-        action_on_button = data.get(
-            'action_on_button',
-            self.instance.action_on_button if self.instance else None,
-        )
-        text_value = data.get(
-            'text', self.instance.text if self.instance else None
-        )
-        linked_news = data.get(
-            'linked_news', self.instance.linked_news if self.instance else None
-        )
-        if action_on_button == ActionOnButton.DETAIL and not text_value:
-            raise ValidationError('Текстовый блок не может быть пустым')
-        elif action_on_button == ActionOnButton.URL_NEWS and not linked_news:
+    def save(self, *args, **kwargs):
+        """Сохранение объекта с предварительной валидацией."""
+        self.clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        """Валидация полей в зависимости от типа подробной страницы."""
+        if self.action_on_button == ActionOnButton.DETAIL:
+            validate_not_empty_html(
+                self.text_block,
+                'Для создания подробной страницы '
+                'необходимо заполнить текстовый блок:.',
+            )
+        elif (
+            self.action_on_button == ActionOnButton.URL_NEWS
+            and not self.linked_news
+        ):
             raise ValidationError('Ссылка на новость не может быть пустой')
-        return data
 
 
-class TAIPhoto(models.Model):
+class TrainingAndInternshipsPhoto(models.Model):
     """Модель Фотографий обучения и стажировок."""
 
     training = models.ForeignKey(
         TrainingAndInternships,
         on_delete=models.CASCADE,
-        related_name='photo',
+        related_name='photos',
         verbose_name='Обучение и стажировка',
     )
     image = models.ImageField(
@@ -126,7 +127,6 @@ class TAIPhoto(models.Model):
         verbose_name='Фотография',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
         blank=False,
-        null=False,
     )
     on_main = models.BooleanField(
         default=False,
@@ -142,6 +142,7 @@ class TAIPhoto(models.Model):
 
         verbose_name = 'Фотография карточки обучения и стажировок'
         verbose_name_plural = 'Фотографии карточек обучения и стажировок'
+        ordering = ['order']
 
     def __str__(self):
         """Возвращает строковое представление  фотографии."""
