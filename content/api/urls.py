@@ -26,12 +26,23 @@ v1_router_api.register(
 v1_router_api.register(
     r'gratitudes', views.GratitudeViewSet, basename='gratitude'
 )
+v1_router_api.register(
+    r'knowledge_base/articles', views.ArticleViewSet, basename='article'
+)
+v1_router_api.register(
+    r'knowledge_base/chapters',
+    views.ChapterKnowledgeBaseViewSet,
+    basename='сhapter',
+)
 v1_router_api.register(r'mission', views.MissionViewSet, basename='mission')
 v1_router_api.register(r'partners', views.PartnersViewSet, basename='partner')
 v1_router_api.register(r'projects', views.ProjectViewSet, basename='project')
 v1_router_api.register(r'reviews', views.ReviewViewSet, basename='review')
 v1_router_api.register(
     r'about-video', views.AboutUsVideoViewSet, basename='about-video'
+)
+v1_router_api.register(
+    r'supervisors', views.SupervisorViewSet, basename='supervisor'
 )
 v1_router_api.register(
     r'employees', views.EmployeeViewSet, basename='employee'
@@ -42,8 +53,15 @@ v1_router_api.register(
 )
 v1_router_api.register(r'reports', views.ReportViewSet, basename='report')
 v1_router_api.register(r'vacancies', views.VacancyViewSet, basename='vacancy')
+v1_router_api.register(r'coaching', views.CoachingViewSet, basename='coaching')
 v1_router_api.register(
-    r'trainigs', views.TrainingAndInternshipsViewSet, basename='trainigs'
+    r'useful_links', views.ChapterUsefulLinksViewSet, basename='useful_links'
+)
+v1_router_api.register(
+    r'literatures', views.LiteratureViewSet, basename='literatures'
+)
+v1_router_api.register(
+    r'trainings', views.TrainingAndInternshipsViewSet, basename='trainigs'
 )
 
 api_urls.extend(v1_router_api.urls)

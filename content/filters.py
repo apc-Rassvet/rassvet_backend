@@ -4,7 +4,7 @@ import django_filters
 
 from django.utils import timezone
 
-from .models import News
+from .models import Supervisor, News
 
 
 def get_max_year():
@@ -14,6 +14,10 @@ def get_max_year():
 
 class NewsFilter(django_filters.FilterSet):
     """Фильтр новостей по диапазону годов и направлениям деятельности."""
+
+    direction_slugs = django_filters.BaseInFilter(
+        field_name='directions__slug', lookup_expr='in'
+    )
 
     year_from = django_filters.NumberFilter(
         field_name='date',
@@ -32,4 +36,18 @@ class NewsFilter(django_filters.FilterSet):
         """Метаданные фильтра: настраивает модель и поля фильтрации."""
 
         model = News
-        fields = ('year_from', 'year_to', 'directions')
+        fields = ('year_from', 'year_to', 'project', 'direction_slugs')
+
+
+class SupervisorFilter(django_filters.FilterSet):
+    """Фильтр супервизоров по направлениям деятельности."""
+
+    direction_slugs = django_filters.BaseInFilter(
+        field_name='directions__slug', lookup_expr='in'
+    )
+
+    class Meta:
+        """Метаданные фильтра: настраивает модель и поля фильтрации."""
+
+        model = Supervisor
+        fields = ('direction_slugs',)

@@ -111,7 +111,6 @@ class FundraisingTextBlock(models.Model):
     content = CKEditor5Field(
         verbose_name='Текстовый блок',
         config_name='default',
-        blank=False,
         validators=[validate_not_empty_html],
     )
     position = models.PositiveSmallIntegerField(

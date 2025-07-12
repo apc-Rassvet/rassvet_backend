@@ -26,7 +26,15 @@ from rest_framework import serializers
 
 from content.models import (
     AboutUsVideo,
+    Article,
+    ArticleGallery,
+    ArticleTextBlock,
+    ArticleUsefulLinks,
     Chapter,
+    ChapterKnowledgeBase,
+    ChapterUsefulLinks,
+    Coaching,
+    CoachingPhoto,
     Direction,
     Document,
     Employee,
@@ -34,6 +42,7 @@ from content.models import (
     FundraisingTextBlock,
     GalleryImage,
     Gratitude,
+    Literature,
     Mission,
     News,
     Partner,
@@ -41,6 +50,7 @@ from content.models import (
     ProjectPhoto,
     Report,
     Review,
+    Supervisor,
     TargetedFundraising,
     TypeDocument,
     Vacancy,
@@ -363,7 +373,7 @@ class DirectionSerializer(serializers.ModelSerializer):
         """Meta класс с настройками сериализатора DirectionSerializer."""
 
         model = Direction
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'slug')
 
 
 class GalleryImageSerializer(serializers.ModelSerializer):
@@ -481,6 +491,175 @@ class VacancyDetailSerializer(serializers.ModelSerializer):
             'detailed_description',
             'external_link',
             'redirect_type',
+        )
+
+
+class CoachingPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор CoachingPhoto."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора CoachingPhotoSerializer."""
+
+        model = CoachingPhoto
+        fields = ('image',)
+
+
+class CoachingSerializer(serializers.ModelSerializer):
+    """Сериализатор Coaching."""
+
+    photo = CoachingPhotoSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора CoachingSerializer."""
+
+        model = Coaching
+        fields = (
+            'id',
+            'order',
+            'title',
+            'photo',
+            'short_text',
+            'service_price',
+            'date',
+            'place',
+            'course_format',
+            'button',
+            'link_button',
+        )
+
+
+class SupervisorSerializer(serializers.ModelSerializer):
+    """Сериализатор для супервизоров."""
+
+    directions = DirectionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Supervisor
+        fields = ('id', 'name', 'position', 'image', 'order', 'directions')
+
+
+class ArticleGallerySerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleGallery."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора ArticleGallerySerializer."""
+
+        model = ArticleGallery
+        fields = (
+            'id',
+            'foto',
+        )
+
+
+class ArticleTextBlockSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleTextBlock."""
+
+    class Meta:
+        """Meta класс с настройками сериализатор ArticleTextBlockSerializer."""
+
+        model = ArticleTextBlock
+        fields = (
+            'id',
+            'text',
+            'foto',
+        )
+
+
+class ArticlMiniSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticlMini."""
+
+    class Meta:
+        """Meta класс с настройками сериализатор ArticlMiniSerializer."""
+
+        model = Article
+        fields = (
+            'id',
+            'title',
+            'detailed_page',
+            'link',
+        )
+
+
+class ArticlSerializer(serializers.ModelSerializer):
+    """Сериализатор Articl."""
+
+    chapter = serializers.CharField(source='chapter.title')
+    gallery = ArticleGallerySerializer(many=True)
+    text_block = ArticleTextBlockSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатор ArticlSerializer."""
+
+        model = Article
+        fields = (
+            'id',
+            'title',
+            'chapter',
+            'detailed_page',
+            'link',
+            'video_link',
+            'text_block',
+            'gallery',
+        )
+
+
+class ChapterKnowledgeBaseSerializer(serializers.ModelSerializer):
+    """Сериализатор ChapterKnowledgeBase."""
+
+    article = ArticlMiniSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора."""
+
+        model = ChapterKnowledgeBase
+        fields = (
+            'id',
+            'title',
+            'article',
+        )
+
+
+class ArticleUsefulLinksSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleUsefulLinksSerializer."""
+
+    class Meta:
+        model = ArticleUsefulLinks
+        fields = (
+            'id',
+            'title',
+            'link',
+        )
+
+
+class ChapterUsefulLinksSerializer(serializers.ModelSerializer):
+    """Сериализатор ChapterUsefulLinks."""
+
+    article_useful_links = ArticleUsefulLinksSerializer(many=True)
+
+    class Meta:
+        model = ChapterUsefulLinks
+        fields = (
+            'id',
+            'title',
+            'article_useful_links',
+        )
+
+
+class LiteratureSerializer(serializers.ModelSerializer):
+    """Сериализатор Literature."""
+
+    class Meta:
+        model = Literature
+        fields = (
+            'id',
+            'title',
+            'author',
+            'publication_year',
+            'cover',
+            'description',
+            'button_type',
+            'file',
+            'literature_url',
         )
 
 

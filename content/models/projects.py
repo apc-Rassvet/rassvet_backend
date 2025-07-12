@@ -48,8 +48,6 @@ class Project(TitleMixin, OrderedModel):
         upload_to='projects/',
         verbose_name='Логотип',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
-        blank=False,
-        null=False,
     )
     status = models.CharField(
         max_length=max(len(value) for value, _ in ProjectsStatus.choices),
@@ -135,8 +133,6 @@ class ProjectPhoto(models.Model):
         upload_to='projects/',
         verbose_name='Фотография',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
-        blank=False,
-        null=False,
     )
 
     class Meta:

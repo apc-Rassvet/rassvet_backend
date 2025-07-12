@@ -24,11 +24,14 @@ repos:
    hooks:
    -  id: flake8
       additional_dependencies: [flake8-docstrings]
-      args: ['--docstring-convention=google', '--extend-ignore=D106']
+      args: [
+        '--docstring-convention=google', 
+        '--extend-ignore=D100,D104,D106'
+      ]
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.1.13
   hooks:
     - id: ruff
-      args: ['--extend-ignore=D106']
+      args: ['--extend-ignore=D100,D104,D106']
     - id: ruff-format
