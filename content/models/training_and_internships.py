@@ -126,7 +126,6 @@ class TrainingAndInternshipsPhoto(models.Model):
         upload_to='training/',
         verbose_name='Фотография',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
-        blank=False,
     )
     on_main = models.BooleanField(
         default=False,

@@ -1,8 +1,8 @@
-"""Административная конфигурация для отчётов и их вложенных элементов.
+"""Административная конфигурация для обучений и стажировок.
 
 Этот модуль содержит:
-- ChapterAdmin: конфигурация для модели Chapter.
-- ReportInline: inline-класс для отчётов.
+- TrainingAndInternshipsAdmin: конфигурация для модели TrainingAndInternships.
+- TrainingAndInternshipsPhotoInline: inline-класс для фотографий.
 """
 
 from django.contrib import admin
