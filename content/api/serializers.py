@@ -54,6 +54,8 @@ from content.models import (
     TargetedFundraising,
     TypeDocument,
     Vacancy,
+    TrainingAndInternships,
+    TrainingAndInternshipsPhoto,
 )
 
 
@@ -658,4 +660,56 @@ class LiteratureSerializer(serializers.ModelSerializer):
             'button_type',
             'file',
             'literature_url',
+        )
+
+
+class TrainAndInternPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор для фотографий обучений и стажировок."""
+
+    class Meta:
+        model = TrainingAndInternshipsPhoto
+        fields = ('id', 'image', 'on_main', 'order')
+
+
+class TrainAndInternSerializer(serializers.ModelSerializer):
+    """Сериализатор для обучения и стажировок."""
+
+    photos = TrainAndInternPhotoSerializer(many=True)
+
+    class Meta:
+        model = TrainingAndInternships
+        fields = (
+            'id',
+            'title',
+            'add_info',
+            'price',
+            'date',
+            'format_study',
+            'location',
+            'short_description',
+            'action_on_button',
+            'photos',
+            'linked_news',
+            'order',
+        )
+
+
+class TrainAndInternDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для обучения и стажировок."""
+
+    photos = TrainAndInternPhotoSerializer(many=True)
+
+    class Meta:
+        model = TrainingAndInternships
+        fields = (
+            'id',
+            'title',
+            'price',
+            'date',
+            'format_study',
+            'location',
+            'short_description',
+            'text_block',
+            'photos',
+            'linked_news',
         )

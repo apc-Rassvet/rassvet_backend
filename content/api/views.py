@@ -39,6 +39,7 @@ from content.models import (
     Supervisor,
     TargetedFundraising,
     Vacancy,
+    TrainingAndInternships,
 )
 from content.pagination import (
     LiteraturePageNumberPagination,
@@ -430,3 +431,24 @@ class LiteratureViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Literature.objects.all()
     pagination_class = LiteraturePageNumberPagination
     serializer_class = serializers.LiteratureSerializer
+
+
+@extend_schema(tags=['Training and internships'])
+@extend_schema_view(
+    list=extend_schema(
+        summary='Получить список обучений и стажировок.',
+    ),
+    retrieve=extend_schema(
+        summary='Получить подробно об обучению или стажировке.',
+    ),
+)
+class TrainingAndInternshipsViewSet(
+    MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
+    """Получить список Обучений и Стажировок, или конкретную по её ID."""
+
+    queryset = TrainingAndInternships.objects.all()
+    serializer_classes = {
+        'list': serializers.TrainAndInternSerializer,
+        'retrieve': serializers.TrainAndInternDetailSerializer,
+    }

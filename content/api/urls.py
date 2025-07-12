@@ -60,6 +60,9 @@ v1_router_api.register(
 v1_router_api.register(
     r'literatures', views.LiteratureViewSet, basename='literatures'
 )
+v1_router_api.register(
+    r'trainings', views.TrainingAndInternshipsViewSet, basename='trainigs'
+)
 
 api_urls.extend(v1_router_api.urls)
 

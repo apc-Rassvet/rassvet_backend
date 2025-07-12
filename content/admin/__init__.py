@@ -16,6 +16,7 @@ from .supervisors import SupervisorAdmin
 from .targeted_fundraisings import TargetedFundraisingAdmin
 from .useful_links import ChapterUsefulLinksAdmin
 from .vacancies import VacancyAdmin
+from .training_and_internships import TrainingAndInternshipsAdmin
 
 __all__ = [
     'AboutUsVideoAdmin',
@@ -37,4 +38,5 @@ __all__ = [
     'ReviewAdmin',
     'TargetedFundraisingAdmin',
     'VacancyAdmin',
+    'TrainingAndInternshipsAdmin',
 ]
