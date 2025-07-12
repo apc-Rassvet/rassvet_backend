@@ -690,6 +690,7 @@ class TrainAndInternSerializer(serializers.ModelSerializer):
             'action_on_button',
             'photos',
             'linked_news',
+            'order',
         )
 
 

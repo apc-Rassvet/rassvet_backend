@@ -442,17 +442,13 @@ class LiteratureViewSet(viewsets.ReadOnlyModelViewSet):
         summary='Получить подробно об обучению или стажировке.',
     ),
 )
-class TrainingAndInternshipsViewSet(viewsets.ReadOnlyModelViewSet):
+class TrainingAndInternshipsViewSet(
+    MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
     """Получить список Обучений и Стажировок, или конкретную по её ID."""
 
     queryset = TrainingAndInternships.objects.all()
-
-    def get_serializer_class(self):
-        """Выбирает сериализатор в зависимости от действия.
-
-        Возвращает краткий сериализатор для списка (list)
-        и детальный для отдельного сотрудника (retrieve).
-        """
-        if self.action == 'retrieve':
-            return serializers.TrainAndInternDetailSerializer
-        return serializers.TrainAndInternSerializer
+    serializer_classes = {
+        'list': serializers.TrainAndInternSerializer,
+        'retrieve': serializers.TrainAndInternDetailSerializer,
+    }
