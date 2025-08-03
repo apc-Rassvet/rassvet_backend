@@ -93,7 +93,7 @@ class CoachingPhoto(models.Model):
     coaching = models.ForeignKey(
         Coaching,
         on_delete=models.CASCADE,
-        related_name='photo',
+        related_name='photos',
         verbose_name='Консультации и обучение',
     )
     image = models.ImageField(

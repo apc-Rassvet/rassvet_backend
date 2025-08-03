@@ -48,7 +48,7 @@ class Article(TitleMixin, models.Model):
     chapter = models.ForeignKey(
         ChapterKnowledgeBase,
         on_delete=models.CASCADE,
-        related_name='article',
+        related_name='articles',
         verbose_name='Раздел Базы знаний',
     )
     detailed_page = models.CharField(
