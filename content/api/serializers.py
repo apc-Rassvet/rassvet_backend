@@ -507,7 +507,7 @@ class CoachingPhotoSerializer(serializers.ModelSerializer):
 class CoachingSerializer(serializers.ModelSerializer):
     """Сериализатор Coaching."""
 
-    photo = CoachingPhotoSerializer(many=True)
+    photos = CoachingPhotoSerializer(many=True)
 
     class Meta:
         """Meta класс с настройками сериализатора CoachingSerializer."""
@@ -517,7 +517,7 @@ class CoachingSerializer(serializers.ModelSerializer):
             'id',
             'order',
             'title',
-            'photo',
+            'photos',
             'short_text',
             'service_price',
             'date',
