@@ -320,7 +320,7 @@ class ProjectPhotoSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     """Сериализатор Project."""
 
-    photos = ProjectPhotoSerializer(many=True)
+    photo = ProjectPhotoSerializer(many=True)
     program = serializers.SerializerMethodField()
     source_financing = serializers.SerializerMethodField()
 
@@ -338,7 +338,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'project_end',
             'source_financing',
             'program',
-            'photos',
+            'photo',
             'project_goal',
             'project_tasks',
             'project_description',
