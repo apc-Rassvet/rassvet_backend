@@ -13,6 +13,7 @@
 Используются только для чтения (GET-запросов).
 """
 
+from django.db.models import Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
@@ -41,6 +42,7 @@ from content.models import (
     Vacancy,
     TrainingAndInternships,
 )
+from content.models.employees import Document
 from content.pagination import (
     LiteraturePageNumberPagination,
     NewsLimitOffsetPagination,
@@ -185,11 +187,33 @@ class EmployeeViewSet(
     Можно получить как весь список, так и одного сотрудника по ID.
     """
 
-    queryset = Employee.objects.all()
     serializer_classes = {
         'list': serializers.EmployeeSerializer,
         'retrieve': serializers.EmployeeDetailSerializer,
     }
+
+    def get_queryset(self):
+        """Оптимизирует выборку данных для разных типов запросов.
+
+        - Для retrieve использует prefetch_related для вложенных данных.
+        - Для list возвращает базовый queryset сотрудников.
+        """
+        if self.action == 'retrieve':
+            return Employee.objects.prefetch_related(
+                Prefetch(
+                    'documents',
+                    queryset=Document.objects.select_related('type'),
+                    to_attr='prefetched_documents',
+                ),
+                Prefetch(
+                    'documents',
+                    queryset=Document.objects.filter(
+                        on_main_page=True
+                    ).select_related('type'),
+                    to_attr='prefetched_documents_on_main',
+                ),
+            )
+        return Employee.objects.all()
 
 
 @extend_schema(tags=['Projects group'])

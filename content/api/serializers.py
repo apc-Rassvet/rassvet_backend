@@ -52,7 +52,6 @@ from content.models import (
     Review,
     Supervisor,
     TargetedFundraising,
-    TypeDocument,
     Vacancy,
     TrainingAndInternships,
     TrainingAndInternshipsPhoto,
@@ -227,28 +226,12 @@ class DocumentSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'file')
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    """Сериализатор для категорий документов (TypeDocument).
+class CategorySerializer(serializers.Serializer):
+    """Сериализатор для категории документов с вложенными документами."""
 
-    Добавляет поле documents, отфильтрованное по текущему сотруднику.
-    """
-
-    documents = serializers.SerializerMethodField()
-
-    class Meta:
-        """Meta класс с настройками сериализатора TypeDocument."""
-
-        model = TypeDocument
-        fields = ('id', 'name', 'documents')
-
-    def get_documents(self, obj):
-        """Возвращает документы для конкретного сотрудника и категории."""
-        document_obj = obj.documents.filter(
-            employee=self.context.get('employee')
-        )
-        return DocumentSerializer(
-            document_obj, many=True, context=self.context
-        ).data
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    documents = DocumentSerializer(many=True)
 
 
 class EmployeeDetailSerializer(serializers.ModelSerializer):
@@ -281,29 +264,32 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
     @extend_schema_field(list[dict])
     def get_main_documents(self, obj) -> list[dict]:
         """Возвращает список документов сотрудника отображаемых в ленте."""
-        if obj.category_on_main:
-            document = Document.objects.filter(
-                employee=self.instance, on_main_page=True
-            )
-            return DocumentSerializer(
-                document, many=True, context=self.context
-            ).data
-        document = Document.objects.filter(employee=self.instance)
-        return DocumentSerializer(
-            document, many=True, context=self.context
-        ).data
+        docs = getattr(obj, 'prefetched_documents_on_main', None)
+        if docs is None:
+            docs = Document.objects.filter(
+                employee=obj, on_main_page=True
+            ).select_related('type')
+        return DocumentSerializer(docs, many=True, context=self.context).data
 
     @extend_schema_field(list[dict])
     def get_category_documents(self, obj) -> list[dict]:
         """Возвращает документы, сгруппированные по категориям."""
-        if not obj.category_on_main:
-            return []
-        categories = TypeDocument.objects.filter(
-            documents__employee=obj
-        ).distinct()
-        self.context['employee'] = obj
+        docs = getattr(obj, 'prefetched_documents', None)
+        if docs is None:
+            docs = Document.objects.filter(employee=obj).select_related('type')
+        categories = {}
+        for doc in docs:
+            if doc.type is not None:
+                cat_id = doc.type.id
+                if cat_id not in categories:
+                    categories[cat_id] = {
+                        'id': doc.type.id,
+                        'name': doc.type.name,
+                        'documents': [],
+                    }
+                categories[cat_id]['documents'].append(doc)
         return CategorySerializer(
-            categories, many=True, context=self.context
+            categories.values(), many=True, context=self.context
         ).data
 
 

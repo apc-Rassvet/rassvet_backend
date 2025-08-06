@@ -17,6 +17,7 @@ class TypeDocumentInline(admin.ModelAdmin):
     """Настройка отображения модели TypeDocument в админке."""
 
     fields = ('name',)
+    search_fields = ('name',)
 
     def get_model_perms(self, request):
         """Отключает отображение модели в основном меню админки."""
@@ -29,8 +30,14 @@ class DocumentInline(admin.TabularInline):
     model = Document
     extra = 1
     validate_min = False
+    autocomplete_fields = ['type']
     verbose_name = 'Документ'
     verbose_name_plural = 'Документы'
+
+    def get_queryset(self, request):
+        """Оптимизация для инлайнов: select_related для ForeignKey (type)."""
+        qs = super().get_queryset(request)
+        return qs.select_related('type')
 
 
 @admin.register(Employee)
@@ -69,3 +76,8 @@ class EmployeeAdmin(BaseOrderedModelAdmin):
             {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
         ),
     )
+
+    def get_queryset(self, request):
+        """Оптимизация N+1 — prefetch_related для связанных документов."""
+        qs = super().get_queryset(request)
+        return qs.prefetch_related('documents')
