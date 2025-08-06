@@ -72,14 +72,14 @@ class Project(TitleMixin, OrderedModel):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='project',
+        related_name='projects',
         verbose_name='Источник софинансирования - Партнёр',
     )
     program = models.ForeignKey(
         ProgramsProjects,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='project',
+        related_name='projects',
         verbose_name='Программа',
     )
     project_goal = ckeditor_function(verbose_name='Цель проекта')
@@ -126,7 +126,7 @@ class ProjectPhoto(models.Model):
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
-        related_name='photo',
+        related_name='photos',
         verbose_name='Проект',
     )
     image = models.ImageField(

@@ -231,7 +231,7 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = (
         Project.objects.select_related('source_financing', 'program')
-        .prefetch_related('photo')
+        .prefetch_related('photos')
         .all()
     )
     serializer_class = serializers.ProjectSerializer
