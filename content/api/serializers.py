@@ -320,8 +320,8 @@ class ProjectPhotoSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     """Сериализатор Project."""
 
-    photo = ProjectPhotoSerializer(many=True)
-    program = serializers.CharField(source='program.title')
+    photos = ProjectPhotoSerializer(many=True)
+    program = serializers.SerializerMethodField()
     source_financing = serializers.SerializerMethodField()
 
     class Meta:
@@ -338,12 +338,16 @@ class ProjectSerializer(serializers.ModelSerializer):
             'project_end',
             'source_financing',
             'program',
-            'photo',
+            'photos',
             'project_goal',
             'project_tasks',
             'project_description',
             'achieved_results',
         )
+
+    def get_program(self, obj):
+        """Возвращает None, если не привязана программа."""
+        return obj.program.title if obj.program else None
 
     def get_source_financing(self, obj):
         """Возвращает None, если не привязан Партнёр."""
