@@ -67,7 +67,10 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
         verbose_name='Краткий текст',
     )
     directions = models.ManyToManyField(
-        Direction, verbose_name='Направление деятельности'
+        Direction,
+        verbose_name='Направление деятельности',
+        related_name='news',
+        related_query_name='news',
     )
     project = models.ForeignKey(
         Project,
@@ -75,6 +78,8 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
         null=True,
         blank=True,
         verbose_name='Проект',
+        related_name='news',
+        related_query_name='news',
     )
     detail_page_type = models.CharField(
         'Подробная страница',

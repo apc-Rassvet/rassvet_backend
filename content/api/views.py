@@ -43,6 +43,7 @@ from content.models import (
     TrainingAndInternships,
 )
 from content.models.employees import Document
+from content.models.news import GalleryImage
 from content.pagination import (
     LiteraturePageNumberPagination,
     NewsLimitOffsetPagination,
@@ -275,7 +276,10 @@ class NewsViewSet(MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """Получить список Новостей, или конкретную по её ID."""
 
     queryset = News.objects.select_related('project').prefetch_related(
-        'directions', 'gallery_images'
+        'directions',
+        Prefetch(
+            'gallery_images', queryset=GalleryImage.objects.order_by('order')
+        ),
     )
     filter_backends = [DjangoFilterBackend]
     filterset_class = filters.NewsFilter
