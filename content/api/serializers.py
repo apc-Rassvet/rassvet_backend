@@ -551,11 +551,11 @@ class ArticleTextBlockSerializer(serializers.ModelSerializer):
         )
 
 
-class ArticlMiniSerializer(serializers.ModelSerializer):
-    """Сериализатор ArticlMini."""
+class ArticleMiniSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleMini."""
 
     class Meta:
-        """Meta класс с настройками сериализатор ArticlMiniSerializer."""
+        """Meta класс с настройками сериализатор ArticleMiniSerializer."""
 
         model = Article
         fields = (
@@ -566,15 +566,15 @@ class ArticlMiniSerializer(serializers.ModelSerializer):
         )
 
 
-class ArticlSerializer(serializers.ModelSerializer):
-    """Сериализатор Articl."""
+class ArticleSerializer(serializers.ModelSerializer):
+    """Сериализатор Article."""
 
     chapter = serializers.CharField(source='chapter.title')
-    gallery = ArticleGallerySerializer(many=True)
-    text_block = ArticleTextBlockSerializer(many=True)
+    gallery_photos = ArticleGallerySerializer(many=True)
+    text_blocks = ArticleTextBlockSerializer(many=True)
 
     class Meta:
-        """Meta класс с настройками сериализатор ArticlSerializer."""
+        """Meta класс с настройками сериализатор ArticleSerializer."""
 
         model = Article
         fields = (
@@ -584,15 +584,15 @@ class ArticlSerializer(serializers.ModelSerializer):
             'detailed_page',
             'link',
             'video_link',
-            'text_block',
-            'gallery',
+            'text_blocks',
+            'gallery_photos',
         )
 
 
 class ChapterKnowledgeBaseSerializer(serializers.ModelSerializer):
     """Сериализатор ChapterKnowledgeBase."""
 
-    article = ArticlMiniSerializer(many=True)
+    articles = ArticleMiniSerializer(many=True)
 
     class Meta:
         """Meta класс с настройками сериализатора."""
@@ -601,7 +601,7 @@ class ChapterKnowledgeBaseSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
-            'article',
+            'articles',
         )
 
 

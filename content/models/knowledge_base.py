@@ -88,7 +88,7 @@ class ArticleTextBlock(models.Model):
     article = models.ForeignKey(
         Article,
         on_delete=models.CASCADE,
-        related_name='text_block',
+        related_name='text_blocks',
         verbose_name='статья',
     )
     text = ckeditor_function(verbose_name='текст статьи')
@@ -116,7 +116,7 @@ class ArticleGallery(models.Model):
     article = models.ForeignKey(
         Article,
         on_delete=models.CASCADE,
-        related_name='gallery',
+        related_name='gallery_photos',
         verbose_name='статья',
     )
     foto = models.ImageField(

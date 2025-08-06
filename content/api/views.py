@@ -394,7 +394,9 @@ class ChapterKnowledgeBaseViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список "Разделов Базы знаний", или конкретный по его ID."""
 
     queryset = ChapterKnowledgeBase.objects.prefetch_related(
-        'article',
+        'articles',
+        'articles__gallery_photos',
+        'articles__text_blocks',
     ).all()
     serializer_class = serializers.ChapterKnowledgeBaseSerializer
 
@@ -414,12 +416,12 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         Article.objects.select_related('chapter')
         .prefetch_related(
-            'gallery',
-            'text_block',
+            'gallery_photos',
+            'text_blocks',
         )
         .all()
     )
-    serializer_class = serializers.ArticlSerializer
+    serializer_class = serializers.ArticleSerializer
 
 
 @extend_schema(tags=['UsefulLinks group'])
