@@ -44,6 +44,7 @@ from content.models import (
 )
 from content.models.employees import Document
 from content.models.news import GalleryImage
+from content.models.report import Report
 from content.pagination import (
     LiteraturePageNumberPagination,
     NewsLimitOffsetPagination,
@@ -324,7 +325,12 @@ class DirectionViewSet(viewsets.ReadOnlyModelViewSet):
 class ReportViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список отчетов, или конкретный по его ID."""
 
-    queryset = Chapter.objects.prefetch_related('reports').all()
+    queryset = Chapter.objects.prefetch_related(
+        Prefetch(
+            'reports',
+            queryset=Report.objects.select_related(),
+        )
+    ).all()
     serializer_class = serializers.ChapterSerializer
 
 
