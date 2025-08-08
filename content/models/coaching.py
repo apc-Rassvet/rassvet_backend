@@ -43,6 +43,7 @@ class Coaching(TitleMixin, OrderedModel):
     date = models.DateField(
         verbose_name='Дата',
         default=timezone.now,
+        db_index=True,
     )
     place = models.CharField(
         max_length=CHAR_FIELD_LENGTH,
@@ -70,6 +71,7 @@ class Coaching(TitleMixin, OrderedModel):
     class Meta(OrderedModel.Meta):
         """Класс Meta для Coaching, содержащий мета-данные."""
 
+        indexes = [models.Index(fields=['order'])]
         verbose_name = 'Консультация и обучение'
         verbose_name_plural = 'Консультации и обучения'
 

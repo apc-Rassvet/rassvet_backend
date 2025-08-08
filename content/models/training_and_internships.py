@@ -142,6 +142,7 @@ class TrainingAndInternshipsPhoto(models.Model):
         verbose_name = 'Фотография карточки обучения и стажировок'
         verbose_name_plural = 'Фотографии карточек обучения и стажировок'
         ordering = ['order']
+        indexes = [models.Index(fields=['order'])]
 
     def __str__(self):
         """Возвращает строковое представление  фотографии."""

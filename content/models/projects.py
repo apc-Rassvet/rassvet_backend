@@ -98,6 +98,7 @@ class Project(TitleMixin, OrderedModel):
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
         ordering = ['order']
+        indexes = [models.Index(fields=['order'])]
         constraints = [
             CheckConstraint(
                 check=Q(project_end__gt=F('project_start')),
