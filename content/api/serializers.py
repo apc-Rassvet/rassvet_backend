@@ -167,9 +167,9 @@ class TargetedFundraisingListSerializer(serializers.ModelSerializer):
     @extend_schema_field(FundraisingPhotoSerializer(allow_null=True))
     def get_main_photo(self, obj):
         """Возвращает главное фото для сбора (position=1)."""
-        photo = obj.photos.filter(position=1).first()
-        if photo:
-            return FundraisingPhotoSerializer(photo, context=self.context).data
+        for p in obj.photos.all():
+            if p.position == 1:
+                return FundraisingPhotoSerializer(p, context=self.context).data
         return None
 
 

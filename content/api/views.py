@@ -164,11 +164,20 @@ class TargetedFundraisingViewSet(
     Можно получить как весь список, так и один адресный сбор по ID.
     """
 
-    queryset = TargetedFundraising.objects.all()
     serializer_classes = {
         'list': serializers.TargetedFundraisingListSerializer,
         'retrieve': serializers.TargetedFundraisingDetailSerializer,
     }
+
+    def get_queryset(self):
+        """Возвращает оптимизированный queryset."""
+        if self.action == 'retrieve':
+            return TargetedFundraising.objects.prefetch_related(
+                'photos',
+                'text_blocks',
+            )
+
+        return TargetedFundraising.objects.prefetch_related('photos')
 
 
 @extend_schema(tags=['Employees group'])
