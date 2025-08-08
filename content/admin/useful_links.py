@@ -15,6 +15,7 @@ class ArticleUsefulLinksInline(admin.StackedInline):
 
     model = ArticleUsefulLinks
     min_num = 1
+    show_change_link = True
 
 
 @admin.register(ChapterUsefulLinks)
@@ -24,3 +25,8 @@ class ChapterUsefulLinksAdmin(admin.ModelAdmin):
     list_display = ('title',)
     search_fields = ('title',)
     inlines = (ArticleUsefulLinksInline,)
+
+    def get_queryset(self, request):
+        """Возвращает queryset с предзагруженными зависимостями."""
+        q_set = super().get_queryset(request)
+        return q_set.prefetch_related('article_useful_links')
