@@ -47,6 +47,7 @@ class ProjectAdmin(BaseOrderedModelAdmin):
     )
     inlines = (ProjectPhotoAdmin,)
     empty_value_display = '-пусто-'
+    list_select_related = ('program', 'source_financing')
 
     @admin.display(description='Логотип')
     def logo_preview(self, obj):

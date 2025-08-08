@@ -13,6 +13,7 @@
 Используются только для чтения (GET-запросов).
 """
 
+from django.db.models import Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
@@ -41,6 +42,9 @@ from content.models import (
     Vacancy,
     TrainingAndInternships,
 )
+from content.models.employees import Document
+from content.models.news import GalleryImage
+from content.models.report import Report
 from content.pagination import (
     LiteraturePageNumberPagination,
     NewsLimitOffsetPagination,
@@ -160,11 +164,20 @@ class TargetedFundraisingViewSet(
     Можно получить как весь список, так и один адресный сбор по ID.
     """
 
-    queryset = TargetedFundraising.objects.all()
     serializer_classes = {
         'list': serializers.TargetedFundraisingListSerializer,
         'retrieve': serializers.TargetedFundraisingDetailSerializer,
     }
+
+    def get_queryset(self):
+        """Возвращает оптимизированный queryset."""
+        if self.action == 'retrieve':
+            return TargetedFundraising.objects.prefetch_related(
+                'photos',
+                'text_blocks',
+            )
+
+        return TargetedFundraising.objects.prefetch_related('photos')
 
 
 @extend_schema(tags=['Employees group'])
@@ -185,11 +198,33 @@ class EmployeeViewSet(
     Можно получить как весь список, так и одного сотрудника по ID.
     """
 
-    queryset = Employee.objects.all()
     serializer_classes = {
         'list': serializers.EmployeeSerializer,
         'retrieve': serializers.EmployeeDetailSerializer,
     }
+
+    def get_queryset(self):
+        """Оптимизирует выборку данных для разных типов запросов.
+
+        - Для retrieve использует prefetch_related для вложенных данных.
+        - Для list возвращает базовый queryset сотрудников.
+        """
+        if self.action == 'retrieve':
+            return Employee.objects.prefetch_related(
+                Prefetch(
+                    'documents',
+                    queryset=Document.objects.select_related('type'),
+                    to_attr='prefetched_documents',
+                ),
+                Prefetch(
+                    'documents',
+                    queryset=Document.objects.filter(
+                        on_main_page=True
+                    ).select_related('type'),
+                    to_attr='prefetched_documents_on_main',
+                ),
+            )
+        return Employee.objects.all()
 
 
 @extend_schema(tags=['Projects group'])
@@ -206,7 +241,7 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = (
         Project.objects.select_related('source_financing', 'program')
-        .prefetch_related('photo')
+        .prefetch_related('photos')
         .all()
     )
     serializer_class = serializers.ProjectSerializer
@@ -251,7 +286,10 @@ class NewsViewSet(MultiSerializerViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """Получить список Новостей, или конкретную по её ID."""
 
     queryset = News.objects.select_related('project').prefetch_related(
-        'directions', 'gallery_images'
+        'directions',
+        Prefetch(
+            'gallery_images', queryset=GalleryImage.objects.order_by('order')
+        ),
     )
     filter_backends = [DjangoFilterBackend]
     filterset_class = filters.NewsFilter
@@ -296,7 +334,12 @@ class DirectionViewSet(viewsets.ReadOnlyModelViewSet):
 class ReportViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список отчетов, или конкретный по его ID."""
 
-    queryset = Chapter.objects.prefetch_related('reports').all()
+    queryset = Chapter.objects.prefetch_related(
+        Prefetch(
+            'reports',
+            queryset=Report.objects.select_related(),
+        )
+    ).all()
     serializer_class = serializers.ChapterSerializer
 
 
@@ -313,7 +356,7 @@ class CoachingViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список "Консультация и обучение", или конкретный по его ID."""
 
     queryset = Coaching.objects.prefetch_related(
-        'photo',
+        'photos',
     ).all()
     serializer_class = serializers.CoachingSerializer
 
@@ -351,10 +394,25 @@ class VacancyViewSet(
 class SupervisorViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список Супервизоров, или конкретного по его ID."""
 
-    queryset = Supervisor.objects.prefetch_related('directions')
+    queryset = Supervisor.objects.only(
+        'id', 'name', 'position', 'image', 'order'
+    ).prefetch_related(
+        Prefetch(
+            'directions', queryset=Direction.objects.only('id', 'name', 'slug')
+        )
+    )
     serializer_class = serializers.SupervisorSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.SupervisorFilter
+
+    def get_queryset(self):
+        """Возвращает QuerySet с устранением дубликатов при фильтрации."""
+        queryset = super().get_queryset()
+        if self.request is not None and (
+            self.request.GET.get('direction_slugs')
+        ):
+            queryset = queryset.distinct()
+        return queryset
 
 
 @extend_schema(tags=['KnowledgeBase group'])
@@ -370,7 +428,9 @@ class ChapterKnowledgeBaseViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список "Разделов Базы знаний", или конкретный по его ID."""
 
     queryset = ChapterKnowledgeBase.objects.prefetch_related(
-        'article',
+        'articles',
+        'articles__gallery_photos',
+        'articles__text_blocks',
     ).all()
     serializer_class = serializers.ChapterKnowledgeBaseSerializer
 
@@ -390,12 +450,12 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         Article.objects.select_related('chapter')
         .prefetch_related(
-            'gallery',
-            'text_block',
+            'gallery_photos',
+            'text_blocks',
         )
         .all()
     )
-    serializer_class = serializers.ArticlSerializer
+    serializer_class = serializers.ArticleSerializer
 
 
 @extend_schema(tags=['UsefulLinks group'])
@@ -447,7 +507,7 @@ class TrainingAndInternshipsViewSet(
 ):
     """Получить список Обучений и Стажировок, или конкретную по её ID."""
 
-    queryset = TrainingAndInternships.objects.all()
+    queryset = TrainingAndInternships.objects.prefetch_related('photos')
     serializer_classes = {
         'list': serializers.TrainAndInternSerializer,
         'retrieve': serializers.TrainAndInternDetailSerializer,

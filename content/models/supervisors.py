@@ -20,7 +20,9 @@ class Supervisor(TimestampMixin, OrderedModel):
     )
     position = models.CharField(max_length=255, verbose_name='Должность')
     directions = models.ManyToManyField(
-        Direction, verbose_name='Направление деятельности'
+        Direction,
+        verbose_name='Направление деятельности',
+        related_name='supervisors',
     )
 
     class Meta:
@@ -29,6 +31,7 @@ class Supervisor(TimestampMixin, OrderedModel):
         ordering = [
             'order',
         ]
+        indexes = [models.Index(fields=['order'])]
 
     def __str__(self):
         """Возвращает строковое представление супервизора."""

@@ -54,6 +54,7 @@ class Literature(TitleMixin, OrderedModel):
         verbose_name = 'Литература'
         verbose_name_plural = 'Литература'
         ordering = ['order']
+        indexes = [models.Index(fields=['order'])]
 
     def __str__(self):
         """Возвращает строковое представление литературы."""

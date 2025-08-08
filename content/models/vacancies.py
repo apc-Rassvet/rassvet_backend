@@ -64,6 +64,7 @@ class Vacancy(TimestampMixin, OrderedModel):
         verbose_name = 'Вакансия'
         verbose_name_plural = 'Вакансии'
         ordering = ['order']
+        indexes = [models.Index(fields=['order'])]
 
     def __str__(self):
         """Возвращает строковое представление вакансии."""

@@ -32,6 +32,11 @@ class ArticleGallerykAdmin(admin.StackedInline):
     min_num = 0
     max_num = 15
 
+    def get_queryset(self, request):
+        """Оптимизация запросов к базе данных."""
+        qs = super().get_queryset(request)
+        return qs.select_related('article')
+
 
 class ArticleTextBlockAdmin(admin.StackedInline):
     """Inline-класс для Текстовый блок статьи Базы знаний."""
@@ -52,3 +57,8 @@ class ArticleAdmin(admin.ModelAdmin):
     list_filter = ('chapter',)
     search_fields = ('title',)
     inlines = (ArticleGallerykAdmin, ArticleTextBlockAdmin)
+
+    def get_queryset(self, request):
+        """Оптимизация запросов к базе данных."""
+        qs = super().get_queryset(request)
+        return qs.select_related('chapter')

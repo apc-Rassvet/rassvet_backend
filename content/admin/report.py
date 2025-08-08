@@ -5,6 +5,7 @@
 - ReportInline: inline-класс для отчётов.
 """
 
+from django.db.models import Count
 from django.contrib import admin
 
 from ordered_model.admin import (
@@ -38,8 +39,14 @@ class ChapterAdmin(OrderedInlineModelAdminMixin, OrderedModelAdmin):
     list_display = ('title', 'count', 'move_up_down_links')
     inlines = [ReportInline]
     search_fields = ('title',)
+    list_prefetch_related = ['reports']
+
+    def get_queryset(self, request):
+        """Возвращает оптимизированный QuerySet для разделов отчётов."""
+        qs = super().get_queryset(request)
+        return qs.annotate(report_count=Count('reports'))
 
     @admin.display(description='Количество документов')
     def count(self, obj):
-        """Возвращает количество отчётов."""
-        return obj.reports.count()
+        """Возвращает количество отчётов, связанных с разделом."""
+        return obj.report_count

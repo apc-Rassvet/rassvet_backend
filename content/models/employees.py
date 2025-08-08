@@ -73,6 +73,7 @@ class Employee(TimestampMixin, OrderedModel):
         ordering = [
             'order',
         ]
+        indexes = [models.Index(fields=['order'])]
 
     def __str__(self):
         """Возвращает строковое представление объекта сотрудника."""

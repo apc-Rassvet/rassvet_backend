@@ -26,6 +26,7 @@ class Chapter(TitleMixin, OrderedModel):
         """Мета-настройки модели Chapter."""
 
         ordering = ['order']
+        indexes = [models.Index(fields=['order'])]
         verbose_name = 'Раздел отчетов'
         verbose_name_plural = 'Разделы отчетов'
 
@@ -56,6 +57,9 @@ class Report(TitleMixin, OrderedModel):
     class Meta(OrderedModel.Meta):
         """Мета-настройки модели Report."""
 
+        indexes = [
+            models.Index(fields=['chapter', 'order']),
+        ]
         verbose_name = 'Отчет'
         verbose_name_plural = 'Отчеты'
 

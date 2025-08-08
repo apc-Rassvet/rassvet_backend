@@ -34,6 +34,7 @@ class Partner(TimestampMixin, OrderedModel):
         verbose_name = 'Партнер'
         verbose_name_plural = 'Партнеры'
         ordering = ['order']
+        indexes = [models.Index(fields=['order'])]
 
     def __str__(self):
         """Возвращает строковое представление партнёра."""
