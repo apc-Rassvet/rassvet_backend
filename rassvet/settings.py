@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'django_filters',
     'drf_spectacular',
     'django_ckeditor_5',
     'content',
@@ -102,7 +103,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'rassvet.wsgi.application'
-
 
 DATABASES = {
     'default': {
@@ -180,6 +180,8 @@ REST_FRAMEWORK = {
         'user': '1000/day',
         'feedback': '30/hour',
     },
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',  # noqa: E501
+    'PAGE_SIZE': 100,
 }
 
 SPECTACULAR_SETTINGS = {

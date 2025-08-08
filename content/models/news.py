@@ -32,6 +32,7 @@ class Direction(TimestampMixin, models.Model):
     """Модель направления деятельности, к которому может относиться новость."""
 
     name = models.CharField('Название', max_length=100, unique=True)
+    slug = models.SlugField('URL-слаг', max_length=100, unique=True)
 
     class Meta:
         """Мета-настройки модели Direction."""
@@ -66,7 +67,10 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
         verbose_name='Краткий текст',
     )
     directions = models.ManyToManyField(
-        Direction, verbose_name='Направление деятельности'
+        Direction,
+        verbose_name='Направление деятельности',
+        related_name='news',
+        related_query_name='news',
     )
     project = models.ForeignKey(
         Project,
@@ -74,6 +78,8 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
         null=True,
         blank=True,
         verbose_name='Проект',
+        related_name='news',
+        related_query_name='news',
     )
     detail_page_type = models.CharField(
         'Подробная страница',
@@ -100,6 +106,15 @@ class News(TimestampMixin, TitleMixin, CleanEmptyHTMLMixin, models.Model):
         """Мета-настройки модели News."""
 
         ordering = ['-date']
+        indexes = [
+            models.Index(
+                fields=['show_on_main', '-date'], name='news_main_date_idx'
+            ),
+            models.Index(
+                fields=['project', '-date'], name='news_project_date_idx'
+            ),
+            models.Index(fields=['-date', 'id'], name='news_date_id_idx'),
+        ]
         verbose_name = 'Новость'
         verbose_name_plural = 'Новости'
 
@@ -146,6 +161,9 @@ class GalleryImage(TimestampMixin, OrderedModel):
 
         ordering = [
             'order',
+        ]
+        indexes = [
+            models.Index(fields=['news', 'order']),
         ]
         verbose_name = 'Фотография'
         verbose_name_plural = 'Фотографии'

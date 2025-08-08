@@ -58,12 +58,22 @@ class FundraisingPhotoInline(BaseValidatedInline):
     model = FundraisingPhoto
     validation_error_message = 'Должна быть как минимум одна фотография.'
 
+    def get_queryset(self, request):
+        """Возвращает queryset фотографий с подгруженным FK на сбор."""
+        qs = super().get_queryset(request)
+        return qs.select_related('fundraising')
+
 
 class FundraisingTextBlockInline(BaseValidatedInline):
     """Inline-класс для текстовых блоков, прикреплённых к сбору."""
 
     model = FundraisingTextBlock
     validation_error_message = 'Должен быть как минимум один текстовый блок.'
+
+    def get_queryset(self, request):
+        """Возвращает queryset блоков текста с подгруженным FK на сбор."""
+        qs = super().get_queryset(request)
+        return qs.select_related('fundraising')
 
 
 @admin.register(TargetedFundraising)
@@ -99,6 +109,11 @@ class TargetedFundraisingAdmin(admin.ModelAdmin):
             {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)},
         ),
     )
+
+    def get_queryset(self, request):
+        """Возвращает queryset сборов с предзагруженными зависимостями."""
+        q_set = super().get_queryset(request)
+        return q_set.prefetch_related('photos', 'text_blocks')
 
     @admin.action(description='Переместить в актуальные')
     def move_to_active(self, request, queryset):

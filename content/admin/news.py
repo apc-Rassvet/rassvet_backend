@@ -56,6 +56,8 @@ class NewsAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     list_filter = ('date', 'show_on_main', ProjectFilter, 'detail_page_type')
     search_fields = ('title', 'summary', 'full_text')
     filter_horizontal = ('directions',)
+    list_select_related = ('project',)
+    list_per_page = 25
     fieldsets = (
         ('Сортировка', {'fields': ('date',)}),
         (
@@ -97,5 +99,5 @@ class NewsAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
 class DirectionAdmin(admin.ModelAdmin):
     """Настройка административного интерфейса для модели Direction."""
 
-    list_display = ('id', 'name')
+    list_display = ('id', 'name', 'slug')
     search_fields = ('name',)

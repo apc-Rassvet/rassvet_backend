@@ -1,7 +1,6 @@
 """Административная конфигурация для Консультации и обучение.
 
 Этот модуль содержит:
-- ButtonLinkAdmin: Inline-класс для кнопок, прикреплённых к coaching.
 - CoachingPhotoAdmin: Inline-класс для фотографий, прикреплённых к coaching.
 - CoachingAdmin: Админ зона Coaching..
 """
@@ -34,3 +33,8 @@ class CoachingAdmin(BaseOrderedModelAdmin):
     search_fields = ('date',)
     inlines = (CoachingPhotoAdmin,)
     empty_value_display = '-пусто-'
+
+    def get_queryset(self, request):
+        """Оптимизированный queryset для избежания N+1 (prefetch_related)."""
+        queryset = super().get_queryset(request)
+        return queryset.prefetch_related('photos')

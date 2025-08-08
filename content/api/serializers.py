@@ -26,7 +26,13 @@ from rest_framework import serializers
 
 from content.models import (
     AboutUsVideo,
+    Article,
+    ArticleGallery,
+    ArticleTextBlock,
+    ArticleUsefulLinks,
     Chapter,
+    ChapterKnowledgeBase,
+    ChapterUsefulLinks,
     Coaching,
     CoachingPhoto,
     Direction,
@@ -36,6 +42,7 @@ from content.models import (
     FundraisingTextBlock,
     GalleryImage,
     Gratitude,
+    Literature,
     Mission,
     News,
     Partner,
@@ -43,9 +50,11 @@ from content.models import (
     ProjectPhoto,
     Report,
     Review,
+    Supervisor,
     TargetedFundraising,
-    TypeDocument,
     Vacancy,
+    TrainingAndInternships,
+    TrainingAndInternshipsPhoto,
 )
 
 
@@ -158,9 +167,9 @@ class TargetedFundraisingListSerializer(serializers.ModelSerializer):
     @extend_schema_field(FundraisingPhotoSerializer(allow_null=True))
     def get_main_photo(self, obj):
         """Возвращает главное фото для сбора (position=1)."""
-        photo = obj.photos.filter(position=1).first()
-        if photo:
-            return FundraisingPhotoSerializer(photo, context=self.context).data
+        for p in obj.photos.all():
+            if p.position == 1:
+                return FundraisingPhotoSerializer(p, context=self.context).data
         return None
 
 
@@ -217,28 +226,12 @@ class DocumentSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'file')
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    """Сериализатор для категорий документов (TypeDocument).
+class CategorySerializer(serializers.Serializer):
+    """Сериализатор для категории документов с вложенными документами."""
 
-    Добавляет поле documents, отфильтрованное по текущему сотруднику.
-    """
-
-    documents = serializers.SerializerMethodField()
-
-    class Meta:
-        """Meta класс с настройками сериализатора TypeDocument."""
-
-        model = TypeDocument
-        fields = ('id', 'name', 'documents')
-
-    def get_documents(self, obj):
-        """Возвращает документы для конкретного сотрудника и категории."""
-        document_obj = obj.documents.filter(
-            employee=self.context.get('employee')
-        )
-        return DocumentSerializer(
-            document_obj, many=True, context=self.context
-        ).data
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    documents = DocumentSerializer(many=True)
 
 
 class EmployeeDetailSerializer(serializers.ModelSerializer):
@@ -271,29 +264,32 @@ class EmployeeDetailSerializer(serializers.ModelSerializer):
     @extend_schema_field(list[dict])
     def get_main_documents(self, obj) -> list[dict]:
         """Возвращает список документов сотрудника отображаемых в ленте."""
-        if obj.category_on_main:
-            document = Document.objects.filter(
-                employee=self.instance, on_main_page=True
-            )
-            return DocumentSerializer(
-                document, many=True, context=self.context
-            ).data
-        document = Document.objects.filter(employee=self.instance)
-        return DocumentSerializer(
-            document, many=True, context=self.context
-        ).data
+        docs = getattr(obj, 'prefetched_documents_on_main', None)
+        if docs is None:
+            docs = Document.objects.filter(
+                employee=obj, on_main_page=True
+            ).select_related('type')
+        return DocumentSerializer(docs, many=True, context=self.context).data
 
     @extend_schema_field(list[dict])
     def get_category_documents(self, obj) -> list[dict]:
         """Возвращает документы, сгруппированные по категориям."""
-        if not obj.category_on_main:
-            return []
-        categories = TypeDocument.objects.filter(
-            documents__employee=obj
-        ).distinct()
-        self.context['employee'] = obj
+        docs = getattr(obj, 'prefetched_documents', None)
+        if docs is None:
+            docs = Document.objects.filter(employee=obj).select_related('type')
+        categories = {}
+        for doc in docs:
+            if doc.type is not None:
+                cat_id = doc.type.id
+                if cat_id not in categories:
+                    categories[cat_id] = {
+                        'id': doc.type.id,
+                        'name': doc.type.name,
+                        'documents': [],
+                    }
+                categories[cat_id]['documents'].append(doc)
         return CategorySerializer(
-            categories, many=True, context=self.context
+            categories.values(), many=True, context=self.context
         ).data
 
 
@@ -310,8 +306,8 @@ class ProjectPhotoSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     """Сериализатор Project."""
 
-    photo = ProjectPhotoSerializer(many=True)
-    program = serializers.CharField(source='program.title')
+    photos = ProjectPhotoSerializer(many=True)
+    program = serializers.SerializerMethodField()
     source_financing = serializers.SerializerMethodField()
 
     class Meta:
@@ -328,12 +324,16 @@ class ProjectSerializer(serializers.ModelSerializer):
             'project_end',
             'source_financing',
             'program',
-            'photo',
+            'photos',
             'project_goal',
             'project_tasks',
             'project_description',
             'achieved_results',
         )
+
+    def get_program(self, obj):
+        """Возвращает None, если не привязана программа."""
+        return obj.program.title if obj.program else None
 
     def get_source_financing(self, obj):
         """Возвращает None, если не привязан Партнёр."""
@@ -363,7 +363,7 @@ class DirectionSerializer(serializers.ModelSerializer):
         """Meta класс с настройками сериализатора DirectionSerializer."""
 
         model = Direction
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'slug')
 
 
 class GalleryImageSerializer(serializers.ModelSerializer):
@@ -497,7 +497,7 @@ class CoachingPhotoSerializer(serializers.ModelSerializer):
 class CoachingSerializer(serializers.ModelSerializer):
     """Сериализатор Coaching."""
 
-    photo = CoachingPhotoSerializer(many=True)
+    photos = CoachingPhotoSerializer(many=True)
 
     class Meta:
         """Meta класс с настройками сериализатора CoachingSerializer."""
@@ -507,7 +507,7 @@ class CoachingSerializer(serializers.ModelSerializer):
             'id',
             'order',
             'title',
-            'photo',
+            'photos',
             'short_text',
             'service_price',
             'date',
@@ -515,4 +515,191 @@ class CoachingSerializer(serializers.ModelSerializer):
             'course_format',
             'button',
             'link_button',
+        )
+
+
+class SupervisorSerializer(serializers.ModelSerializer):
+    """Сериализатор для супервизоров."""
+
+    directions = DirectionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Supervisor
+        fields = ('id', 'name', 'position', 'image', 'order', 'directions')
+
+
+class ArticleGallerySerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleGallery."""
+
+    class Meta:
+        """Meta класс с настройками сериализатора ArticleGallerySerializer."""
+
+        model = ArticleGallery
+        fields = (
+            'id',
+            'foto',
+        )
+
+
+class ArticleTextBlockSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleTextBlock."""
+
+    class Meta:
+        """Meta класс с настройками сериализатор ArticleTextBlockSerializer."""
+
+        model = ArticleTextBlock
+        fields = (
+            'id',
+            'text',
+            'foto',
+        )
+
+
+class ArticleMiniSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleMini."""
+
+    class Meta:
+        """Meta класс с настройками сериализатор ArticleMiniSerializer."""
+
+        model = Article
+        fields = (
+            'id',
+            'title',
+            'detailed_page',
+            'link',
+        )
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    """Сериализатор Article."""
+
+    chapter = serializers.CharField(source='chapter.title')
+    gallery_photos = ArticleGallerySerializer(many=True)
+    text_blocks = ArticleTextBlockSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатор ArticleSerializer."""
+
+        model = Article
+        fields = (
+            'id',
+            'title',
+            'chapter',
+            'detailed_page',
+            'link',
+            'video_link',
+            'text_blocks',
+            'gallery_photos',
+        )
+
+
+class ChapterKnowledgeBaseSerializer(serializers.ModelSerializer):
+    """Сериализатор ChapterKnowledgeBase."""
+
+    articles = ArticleMiniSerializer(many=True)
+
+    class Meta:
+        """Meta класс с настройками сериализатора."""
+
+        model = ChapterKnowledgeBase
+        fields = (
+            'id',
+            'title',
+            'articles',
+        )
+
+
+class ArticleUsefulLinksSerializer(serializers.ModelSerializer):
+    """Сериализатор ArticleUsefulLinksSerializer."""
+
+    class Meta:
+        model = ArticleUsefulLinks
+        fields = (
+            'id',
+            'title',
+            'link',
+        )
+
+
+class ChapterUsefulLinksSerializer(serializers.ModelSerializer):
+    """Сериализатор ChapterUsefulLinks."""
+
+    article_useful_links = ArticleUsefulLinksSerializer(many=True)
+
+    class Meta:
+        model = ChapterUsefulLinks
+        fields = (
+            'id',
+            'title',
+            'article_useful_links',
+        )
+
+
+class LiteratureSerializer(serializers.ModelSerializer):
+    """Сериализатор Literature."""
+
+    class Meta:
+        model = Literature
+        fields = (
+            'id',
+            'title',
+            'author',
+            'publication_year',
+            'cover',
+            'description',
+            'button_type',
+            'file',
+            'literature_url',
+        )
+
+
+class TrainAndInternPhotoSerializer(serializers.ModelSerializer):
+    """Сериализатор для фотографий обучений и стажировок."""
+
+    class Meta:
+        model = TrainingAndInternshipsPhoto
+        fields = ('id', 'image', 'on_main', 'order')
+
+
+class TrainAndInternSerializer(serializers.ModelSerializer):
+    """Сериализатор для обучения и стажировок."""
+
+    photos = TrainAndInternPhotoSerializer(many=True)
+
+    class Meta:
+        model = TrainingAndInternships
+        fields = (
+            'id',
+            'title',
+            'add_info',
+            'price',
+            'date',
+            'format_study',
+            'location',
+            'short_description',
+            'action_on_button',
+            'photos',
+            'linked_news',
+            'order',
+        )
+
+
+class TrainAndInternDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для обучения и стажировок."""
+
+    photos = TrainAndInternPhotoSerializer(many=True)
+
+    class Meta:
+        model = TrainingAndInternships
+        fields = (
+            'id',
+            'title',
+            'price',
+            'date',
+            'format_study',
+            'location',
+            'short_description',
+            'text_block',
+            'photos',
+            'linked_news',
         )
