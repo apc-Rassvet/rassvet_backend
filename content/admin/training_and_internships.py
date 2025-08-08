@@ -33,3 +33,8 @@ class TrainingAndInternshipsAdmin(BaseOrderedModelAdmin):
         'move_up_down_links',
     ]
     inlines = [TrainingAndInternshipsPhotoInline]
+
+    def get_queryset(self, request):
+        """Возвращает queryset с предзагруженными зависимостями."""
+        q_set = super().get_queryset(request)
+        return q_set.prefetch_related('photos')

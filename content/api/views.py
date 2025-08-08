@@ -507,7 +507,7 @@ class TrainingAndInternshipsViewSet(
 ):
     """Получить список Обучений и Стажировок, или конкретную по её ID."""
 
-    queryset = TrainingAndInternships.objects.all()
+    queryset = TrainingAndInternships.objects.prefetch_related('photos')
     serializer_classes = {
         'list': serializers.TrainAndInternSerializer,
         'retrieve': serializers.TrainAndInternDetailSerializer,
