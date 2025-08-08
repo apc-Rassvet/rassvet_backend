@@ -385,10 +385,25 @@ class VacancyViewSet(
 class SupervisorViewSet(viewsets.ReadOnlyModelViewSet):
     """Получить список Супервизоров, или конкретного по его ID."""
 
-    queryset = Supervisor.objects.prefetch_related('directions')
+    queryset = Supervisor.objects.only(
+        'id', 'name', 'position', 'image', 'order'
+    ).prefetch_related(
+        Prefetch(
+            'directions', queryset=Direction.objects.only('id', 'name', 'slug')
+        )
+    )
     serializer_class = serializers.SupervisorSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.SupervisorFilter
+
+    def get_queryset(self):
+        """Возвращает QuerySet с устранением дубликатов при фильтрации."""
+        queryset = super().get_queryset()
+        if self.request is not None and (
+            self.request.GET.get('direction_slugs')
+        ):
+            queryset = queryset.distinct()
+        return queryset
 
 
 @extend_schema(tags=['KnowledgeBase group'])
