@@ -19,7 +19,6 @@ class AboutUsVideo(TimestampMixin, models.Model):
         max_length=TITLE_LENGTH,
         help_text='"Заголовок" не отображается на сайте.',
         blank=True,
-        null=True,
     )
     url = models.URLField('Ссылка на видео')
 
