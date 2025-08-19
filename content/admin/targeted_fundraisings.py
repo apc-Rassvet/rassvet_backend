@@ -10,7 +10,10 @@
 
 from django.contrib import admin
 from django.core.exceptions import ValidationError
-from ordered_model.admin import OrderedTabularInline
+from ordered_model.admin import (
+    OrderedTabularInline,
+    OrderedInlineModelAdminMixin,
+)
 
 from content.base_models import BaseOrderedModelAdmin
 from content.models import (
@@ -88,7 +91,9 @@ class FundraisingTextBlockInline(BaseValidatedInline):
 
 
 @admin.register(TargetedFundraising)
-class TargetedFundraisingAdmin(BaseOrderedModelAdmin):
+class TargetedFundraisingAdmin(
+    OrderedInlineModelAdminMixin, BaseOrderedModelAdmin
+):
     """Конфигурация админки для модели TargetedFundraising.
 
     Отвечает за отображение, фильтрацию, редактирование и действия для сборов.
