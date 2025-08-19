@@ -12,18 +12,14 @@
 
 from django.core.validators import (
     FileExtensionValidator,
-    # MaxValueValidator,
-    # MinValueValidator,
 )
 from django.db import models
 
-# from django_ckeditor_5.fields import CKEditor5Field
 from ordered_model.models import OrderedModel
 
 from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import TimestampMixin, TitleMixin
 
-# from content.validators import validate_not_empty_html
 from content.utils import ckeditor_function
 
 
@@ -57,20 +53,20 @@ class TargetedFundraising(
         default=FundraisingStatus.ACTIVE,
         verbose_name='Статус сбора',
     )
-    first_text_block = ckeditor_function(
-        verbose_name='Первый текстовый блок',
+    top_text_block = ckeditor_function(
+        verbose_name='Верхний текстовый блок, max количество символов - 370',
         blank=True,
         null=True,
         validators=[],
-        # help_text='максимальное количество символов - 350',
     )
-    second_text_block = ckeditor_function(verbose_name='Второй текстовый блок')
-    third_text_block = ckeditor_function(
-        verbose_name='Третий текстовый блок',
+    center_text_block = ckeditor_function(
+        verbose_name='Центральный текстовый блок',
+    )
+    bottom_text_block = ckeditor_function(
+        verbose_name='Нижний текстовый блок, max количество символов - 290',
         blank=True,
         null=True,
         validators=[],
-        # help_text='максимальное количество символов - 350',
     )
 
     class Meta(OrderedModel.Meta):
@@ -85,6 +81,18 @@ class TargetedFundraising(
     def __str__(self):
         """Возвращает строковое представление адресного сбора."""
         return self.title
+
+    def save(self, *args, **kwargs):
+        """Переопределяет метод сохранения для очистки HTML-контента в полях.
+
+        Этот метод проверяет поля на наличие
+        пустого HTML-контента и присваивает None.
+        """
+        if self.top_text_block == '<p>&nbsp;</p>':
+            self.top_text_block = None
+        if self.bottom_text_block == '<p>&nbsp;</p>':
+            self.bottom_text_block = None
+        super().save(*args, **kwargs)
 
 
 class FundraisingPhoto(OrderedModel):
@@ -118,41 +126,3 @@ class FundraisingPhoto(OrderedModel):
     def __str__(self):
         """Возвращает строковое представление фотографии."""
         return f'Фотография для {self.fundraising.title}'
-
-
-# class FundraisingTextBlock(models.Model):
-#     """Модель для хранения информации о текстовых блоках адресных сборов."""
-
-#     fundraising = models.ForeignKey(
-#         TargetedFundraising,
-#         on_delete=models.CASCADE,
-#         related_name='text_blocks',
-#         verbose_name='Адресный сбор',
-#     )
-#     content = CKEditor5Field(
-#         verbose_name='Текстовый блок',
-#         config_name='default',
-#         validators=[validate_not_empty_html],
-#     )
-#     position = models.PositiveSmallIntegerField(
-#         default=1,
-#         validators=[MinValueValidator(1), MaxValueValidator(3)],
-#         verbose_name='Позиция блока (1-3)',
-#     )
-
-#     class Meta:
-#         """Класс Meta для FundraisingTextBlock, содержащий мета-данные."""
-
-#         verbose_name = 'Текстовый блок'
-#         verbose_name_plural = 'Текстовые блоки'
-#         ordering = ['position']
-#         constraints = [
-#             models.UniqueConstraint(
-#                 fields=['fundraising', 'position'],
-#                 name='unique_text_position',
-#             ),
-#         ]
-
-#     def __str__(self):
-#         """Возвращает строковое представление текстового блока."""
-#         return f'Текстовый блок {self.position} для {self.fundraising.title}'

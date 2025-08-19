@@ -39,7 +39,6 @@ from content.models import (
     Document,
     Employee,
     FundraisingPhoto,
-    # FundraisingTextBlock,
     GalleryImage,
     Gratitude,
     Literature,
@@ -138,16 +137,6 @@ class FundraisingPhotoSerializer(serializers.ModelSerializer):
         )
 
 
-# class FundraisingTextBlockSerializer(serializers.ModelSerializer):
-#     """Сериализатор для текстовых блоков, связанных с TargetedFundraising."""
-
-#     class Meta:
-#         """Meta класс с настройками сериализатора FundraisingTextBlock."""
-
-#         model = FundraisingTextBlock
-#         fields = ('position', 'content')
-
-
 class TargetedFundraisingListSerializer(serializers.ModelSerializer):
     """Сериализатор списка адресных сборов (TargetedFundraising)."""
 
@@ -183,7 +172,6 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
     """
 
     photos = FundraisingPhotoSerializer(many=True)
-    # text_blocks = FundraisingTextBlockSerializer(many=True)
 
     class Meta:
         """Meta класс с настройками сериализатора TargetedFundraising."""
@@ -196,10 +184,9 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'fundraising_link',
             'status',
             'photos',
-            # 'text_blocks',
-            'first_text_block',
-            'second_text_block',
-            'third_text_block',
+            'top_text_block',
+            'center_text_block',
+            'bottom_text_block',
             'order',
         )
 
