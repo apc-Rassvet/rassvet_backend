@@ -39,7 +39,7 @@ from content.models import (
     Document,
     Employee,
     FundraisingPhoto,
-    FundraisingTextBlock,
+    # FundraisingTextBlock,
     GalleryImage,
     Gratitude,
     Literature,
@@ -132,17 +132,20 @@ class FundraisingPhotoSerializer(serializers.ModelSerializer):
         """Meta класс с настройками сериализатора FundraisingPhoto."""
 
         model = FundraisingPhoto
-        fields = ('title', 'position', 'image')
+        fields = (
+            'image',
+            'order',
+        )
 
 
-class FundraisingTextBlockSerializer(serializers.ModelSerializer):
-    """Сериализатор для текстовых блоков, связанных с TargetedFundraising."""
+# class FundraisingTextBlockSerializer(serializers.ModelSerializer):
+#     """Сериализатор для текстовых блоков, связанных с TargetedFundraising."""
 
-    class Meta:
-        """Meta класс с настройками сериализатора FundraisingTextBlock."""
+#     class Meta:
+#         """Meta класс с настройками сериализатора FundraisingTextBlock."""
 
-        model = FundraisingTextBlock
-        fields = ('position', 'content')
+#         model = FundraisingTextBlock
+#         fields = ('position', 'content')
 
 
 class TargetedFundraisingListSerializer(serializers.ModelSerializer):
@@ -166,9 +169,9 @@ class TargetedFundraisingListSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(FundraisingPhotoSerializer(allow_null=True))
     def get_main_photo(self, obj):
-        """Возвращает главное фото для сбора (position=1)."""
+        """Возвращает главное фото для сбора (order=1)."""
         for p in obj.photos.all():
-            if p.position == 1:
+            if p.order == 0:
                 return FundraisingPhotoSerializer(p, context=self.context).data
         return None
 
@@ -180,7 +183,7 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
     """
 
     photos = FundraisingPhotoSerializer(many=True)
-    text_blocks = FundraisingTextBlockSerializer(many=True)
+    # text_blocks = FundraisingTextBlockSerializer(many=True)
 
     class Meta:
         """Meta класс с настройками сериализатора TargetedFundraising."""
@@ -193,7 +196,10 @@ class TargetedFundraisingDetailSerializer(serializers.ModelSerializer):
             'fundraising_link',
             'status',
             'photos',
-            'text_blocks',
+            # 'text_blocks',
+            'first_text_block',
+            'second_text_block',
+            'third_text_block',
             'order',
         )
 
@@ -223,7 +229,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         """Meta класс с настройками сериализатора Document."""
 
         model = Document
-        fields = ('id', 'name', 'file')
+        fields = ('id', 'file')
 
 
 class CategorySerializer(serializers.Serializer):

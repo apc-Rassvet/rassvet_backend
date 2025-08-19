@@ -12,16 +12,19 @@
 
 from django.core.validators import (
     FileExtensionValidator,
-    MaxValueValidator,
-    MinValueValidator,
+    # MaxValueValidator,
+    # MinValueValidator,
 )
 from django.db import models
-from django_ckeditor_5.fields import CKEditor5Field
+
+# from django_ckeditor_5.fields import CKEditor5Field
 from ordered_model.models import OrderedModel
 
 from content.constants import IMAGE_CONTENT_TYPES
 from content.mixins import TimestampMixin, TitleMixin
-from content.validators import validate_not_empty_html
+
+# from content.validators import validate_not_empty_html
+from content.utils import ckeditor_function
 
 
 def upload_file(instance, filename):
@@ -43,13 +46,31 @@ class TargetedFundraising(
 ):
     """Модель для хранения информации об адресных сборах."""
 
-    short_description = models.TextField(verbose_name='Краткое описание')
+    short_description = models.TextField(
+        verbose_name='Краткое описание',
+        help_text='максимальное количество символов - 350',
+    )
     fundraising_link = models.URLField('Ссылка на сбор')
     status = models.CharField(
         max_length=max(len(value) for value, _ in FundraisingStatus.choices),
         choices=FundraisingStatus.choices,
         default=FundraisingStatus.ACTIVE,
         verbose_name='Статус сбора',
+    )
+    first_text_block = ckeditor_function(
+        verbose_name='Первый текстовый блок',
+        blank=True,
+        null=True,
+        validators=[],
+        # help_text='максимальное количество символов - 350',
+    )
+    second_text_block = ckeditor_function(verbose_name='Второй текстовый блок')
+    third_text_block = ckeditor_function(
+        verbose_name='Третий текстовый блок',
+        blank=True,
+        null=True,
+        validators=[],
+        # help_text='максимальное количество символов - 350',
     )
 
     class Meta(OrderedModel.Meta):
@@ -80,11 +101,6 @@ class FundraisingPhoto(OrderedModel):
         verbose_name='Фотография',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
-    # position = models.PositiveSmallIntegerField(
-    #     default=1,
-    #     validators=[MinValueValidator(1), MaxValueValidator(3)],
-    #     verbose_name='Позиция фотографии (1-3)',
-    # )
     order_with_respect_to = 'fundraising'
 
     class Meta(OrderedModel.Meta):
@@ -98,51 +114,45 @@ class FundraisingPhoto(OrderedModel):
         indexes = [
             models.Index(fields=['fundraising', 'order']),
         ]
-        # constraints = [
-        #     models.UniqueConstraint(
-        #         fields=['fundraising', 'position'],
-        #         name='unique_photo_position',
-        #     ),
-        # ]
 
     def __str__(self):
         """Возвращает строковое представление фотографии."""
         return f'Фотография для {self.fundraising.title}'
 
 
-class FundraisingTextBlock(models.Model):
-    """Модель для хранения информации о текстовых блоках адресных сборов."""
+# class FundraisingTextBlock(models.Model):
+#     """Модель для хранения информации о текстовых блоках адресных сборов."""
 
-    fundraising = models.ForeignKey(
-        TargetedFundraising,
-        on_delete=models.CASCADE,
-        related_name='text_blocks',
-        verbose_name='Адресный сбор',
-    )
-    content = CKEditor5Field(
-        verbose_name='Текстовый блок',
-        config_name='default',
-        validators=[validate_not_empty_html],
-    )
-    position = models.PositiveSmallIntegerField(
-        default=1,
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
-        verbose_name='Позиция блока (1-3)',
-    )
+#     fundraising = models.ForeignKey(
+#         TargetedFundraising,
+#         on_delete=models.CASCADE,
+#         related_name='text_blocks',
+#         verbose_name='Адресный сбор',
+#     )
+#     content = CKEditor5Field(
+#         verbose_name='Текстовый блок',
+#         config_name='default',
+#         validators=[validate_not_empty_html],
+#     )
+#     position = models.PositiveSmallIntegerField(
+#         default=1,
+#         validators=[MinValueValidator(1), MaxValueValidator(3)],
+#         verbose_name='Позиция блока (1-3)',
+#     )
 
-    class Meta:
-        """Класс Meta для FundraisingTextBlock, содержащий мета-данные."""
+#     class Meta:
+#         """Класс Meta для FundraisingTextBlock, содержащий мета-данные."""
 
-        verbose_name = 'Текстовый блок'
-        verbose_name_plural = 'Текстовые блоки'
-        ordering = ['position']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['fundraising', 'position'],
-                name='unique_text_position',
-            ),
-        ]
+#         verbose_name = 'Текстовый блок'
+#         verbose_name_plural = 'Текстовые блоки'
+#         ordering = ['position']
+#         constraints = [
+#             models.UniqueConstraint(
+#                 fields=['fundraising', 'position'],
+#                 name='unique_text_position',
+#             ),
+#         ]
 
-    def __str__(self):
-        """Возвращает строковое представление текстового блока."""
-        return f'Текстовый блок {self.position} для {self.fundraising.title}'
+#     def __str__(self):
+#         """Возвращает строковое представление текстового блока."""
+#         return f'Текстовый блок {self.position} для {self.fundraising.title}'
