@@ -17,9 +17,10 @@ from django.core.validators import (
 )
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
+from ordered_model.models import OrderedModel
 
 from content.constants import IMAGE_CONTENT_TYPES
-from content.mixins import OrderMixin, TimestampMixin, TitleMixin
+from content.mixins import TimestampMixin, TitleMixin
 from content.validators import validate_not_empty_html
 
 
@@ -36,7 +37,9 @@ class FundraisingStatus(models.TextChoices):
 
 
 class TargetedFundraising(
-    TitleMixin, OrderMixin, TimestampMixin, models.Model
+    TitleMixin,
+    TimestampMixin,
+    OrderedModel,
 ):
     """Модель для хранения информации об адресных сборах."""
 
@@ -49,19 +52,21 @@ class TargetedFundraising(
         verbose_name='Статус сбора',
     )
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         """Класс Meta для TargetedFundraising, содержащий мета-данные."""
 
         verbose_name = 'Адресный сбор'
         verbose_name_plural = 'Адресные сборы'
-        ordering = ['order', '-created_at']
+        ordering = [
+            'order',
+        ]
 
     def __str__(self):
         """Возвращает строковое представление адресного сбора."""
         return self.title
 
 
-class FundraisingPhoto(TitleMixin, models.Model):
+class FundraisingPhoto(OrderedModel):
     """Модель для хранения информации о фотографиях адресных сборов."""
 
     fundraising = models.ForeignKey(
@@ -75,28 +80,34 @@ class FundraisingPhoto(TitleMixin, models.Model):
         verbose_name='Фотография',
         validators=[FileExtensionValidator(IMAGE_CONTENT_TYPES)],
     )
-    position = models.PositiveSmallIntegerField(
-        default=1,
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
-        verbose_name='Позиция фотографии (1-3)',
-    )
+    # position = models.PositiveSmallIntegerField(
+    #     default=1,
+    #     validators=[MinValueValidator(1), MaxValueValidator(3)],
+    #     verbose_name='Позиция фотографии (1-3)',
+    # )
+    order_with_respect_to = 'fundraising'
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         """Класс Meta для FundraisingPhoto, содержащий мета-данные."""
 
         verbose_name = 'Фотография сбора'
         verbose_name_plural = 'Фотографии сборов'
-        ordering = ['position']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['fundraising', 'position'],
-                name='unique_photo_position',
-            ),
+        ordering = [
+            'order',
         ]
+        indexes = [
+            models.Index(fields=['fundraising', 'order']),
+        ]
+        # constraints = [
+        #     models.UniqueConstraint(
+        #         fields=['fundraising', 'position'],
+        #         name='unique_photo_position',
+        #     ),
+        # ]
 
     def __str__(self):
         """Возвращает строковое представление фотографии."""
-        return f'Фотография {self.position} для {self.fundraising.title}'
+        return f'Фотография для {self.fundraising.title}'
 
 
 class FundraisingTextBlock(models.Model):

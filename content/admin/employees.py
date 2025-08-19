@@ -7,8 +7,8 @@
 """
 
 from django.contrib import admin
+from ordered_model.admin import OrderedModelAdmin
 
-from content.base_models import BaseOrderedModelAdmin
 from content.models import Document, Employee, TypeDocument
 
 
@@ -41,7 +41,7 @@ class DocumentInline(admin.TabularInline):
 
 
 @admin.register(Employee)
-class EmployeeAdmin(BaseOrderedModelAdmin):
+class EmployeeAdmin(OrderedModelAdmin):
     """Конфигурация админки для модели Employee.
 
     Определяет отображаемые поля, фильтрацию, поиск, inline-классы и fieldsets.
@@ -61,13 +61,13 @@ class EmployeeAdmin(BaseOrderedModelAdmin):
                     'name',
                     'image',
                     'main_specialities',
+                    'trainings',
                     'interviews',
                     'specialists_register',
                     'category_on_main',
                     'specialities',
                     'education',
                     'additional_education',
-                    'trainings',
                 )
             },
         ),

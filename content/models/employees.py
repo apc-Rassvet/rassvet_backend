@@ -27,7 +27,11 @@ def upload_file(instance, filename):
 class Employee(TimestampMixin, OrderedModel):
     """Модель для хранения информации о членах команды."""
 
-    name = models.CharField(max_length=100, verbose_name='ФИО')
+    name = models.CharField(
+        max_length=100,
+        verbose_name='ФИО',
+        help_text='максимальное количество символов - 19',
+    )
     image = models.ImageField(
         upload_to='team',
         verbose_name='Фото',
@@ -41,13 +45,14 @@ class Employee(TimestampMixin, OrderedModel):
         verbose_name='Реестр специалистов', blank=True
     )
     category_on_main = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Отображать категории документов на главной странице',
     )
     specialities = CKEditor5Field(
         verbose_name='Специальности',
         config_name='default',
         validators=[validate_not_empty_html],
+        help_text='максимальное количество символов - 45',
     )
     education = CKEditor5Field(
         verbose_name='Образование',
@@ -122,7 +127,6 @@ class TypeDocument(models.Model):
 class Document(models.Model):
     """Модель для хранения документов."""
 
-    name = models.CharField(max_length=255, verbose_name='Название документа')
     file = models.ImageField(
         upload_to=upload_file,
         verbose_name='Файл документа',
@@ -130,7 +134,7 @@ class Document(models.Model):
     )
     type = models.ForeignKey(
         TypeDocument,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
         related_name='documents',
@@ -150,8 +154,8 @@ class Document(models.Model):
         """Класс Meta для модели Document, содержащий мета-данные."""
 
         verbose_name = 'Документ'
-        verbose_name_plural = 'Документы'
+        verbose_name_plural = 'Дипломы и сертификаты'
 
     def __str__(self):
         """Возвращает строковое представление документа."""
-        return self.name
+        return 'Документ'

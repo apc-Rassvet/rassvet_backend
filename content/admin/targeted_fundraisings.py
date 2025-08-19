@@ -10,7 +10,9 @@
 
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from ordered_model.admin import OrderedTabularInline
 
+from content.base_models import BaseOrderedModelAdmin
 from content.models import (
     FundraisingPhoto,
     FundraisingTextBlock,
@@ -33,7 +35,7 @@ class BaseValidatedInline(admin.TabularInline):
     """Базовый inline-класс с валидацией минимального количества объектов."""
 
     extra = 0
-    min_num = 1
+    min_num = 3
     max_num = 3
     validate_min = True
     validation_error_message = 'Необходим минимум один элемент'
@@ -52,16 +54,25 @@ class BaseValidatedInline(admin.TabularInline):
         return formset
 
 
-class FundraisingPhotoInline(BaseValidatedInline):
+class FundraisingPhotoInline(OrderedTabularInline):
     """Inline-класс для фотографий, прикреплённых к сбору."""
 
     model = FundraisingPhoto
-    validation_error_message = 'Должна быть как минимум одна фотография.'
+    fields = (
+        'image',
+        'move_up_down_links',
+    )
+    readonly_fields = ('move_up_down_links',)
+    ordering = ('order',)
+    min_num = 1
+    max_num = 3
+    # validate_min = True
+    # validation_error_message = 'Должна быть как минимум одна фотография.'
 
-    def get_queryset(self, request):
-        """Возвращает queryset фотографий с подгруженным FK на сбор."""
-        qs = super().get_queryset(request)
-        return qs.select_related('fundraising')
+    # def get_queryset(self, request):
+    #     """Возвращает queryset фотографий с подгруженным FK на сбор."""
+    #     qs = super().get_queryset(request)
+    #     return qs.select_related('fundraising')
 
 
 class FundraisingTextBlockInline(BaseValidatedInline):
@@ -77,19 +88,33 @@ class FundraisingTextBlockInline(BaseValidatedInline):
 
 
 @admin.register(TargetedFundraising)
-class TargetedFundraisingAdmin(admin.ModelAdmin):
+class TargetedFundraisingAdmin(BaseOrderedModelAdmin):
     """Конфигурация админки для модели TargetedFundraising.
 
     Отвечает за отображение, фильтрацию, редактирование и действия для сборов.
     """
 
-    list_display = ('title', 'status', 'fundraising_link', 'order')
-    list_editable = ('order', 'status')
-    list_filter = ('status', 'created_at')
+    list_display = (
+        'title',
+        'status',
+        'fundraising_link',
+        'move_up_down_links',
+    )
+    list_editable = ('status',)
+    list_filter = (
+        'status',
+        'created_at',
+    )
     search_fields = ('title',)
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = (
+        'created_at',
+        'updated_at',
+    )
     inlines = [FundraisingPhotoInline, FundraisingTextBlockInline]
-    actions = ['move_to_active', 'move_to_completed']
+    actions = [
+        'move_to_active',
+        'move_to_completed',
+    ]
 
     fieldsets = (
         (
@@ -100,7 +125,6 @@ class TargetedFundraisingAdmin(admin.ModelAdmin):
                     'short_description',
                     'fundraising_link',
                     'status',
-                    'order',
                 )
             },
         ),
