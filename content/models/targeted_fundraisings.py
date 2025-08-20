@@ -44,7 +44,6 @@ class TargetedFundraising(
 
     short_description = models.TextField(
         verbose_name='Краткое описание',
-        help_text='максимальное количество символов - 350',
     )
     fundraising_link = models.URLField('Ссылка на сбор')
     status = models.CharField(
@@ -54,19 +53,19 @@ class TargetedFundraising(
         verbose_name='Статус сбора',
     )
     top_text_block = ckeditor_function(
-        verbose_name='Верхний текстовый блок, max количество символов - 370',
+        verbose_name='Верхний текстовый блок',
         blank=True,
-        null=True,
         validators=[],
+        help_text='Рекомендованное количество символов - 370',
     )
     center_text_block = ckeditor_function(
         verbose_name='Центральный текстовый блок',
     )
     bottom_text_block = ckeditor_function(
-        verbose_name='Нижний текстовый блок, max количество символов - 290',
+        verbose_name='Нижний текстовый блок',
         blank=True,
-        null=True,
         validators=[],
+        help_text='Рекомендованное количество символов - 290',
     )
 
     class Meta(OrderedModel.Meta):

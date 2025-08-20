@@ -16,6 +16,7 @@ from ordered_model.admin import (
 )
 
 from content.base_models import BaseOrderedModelAdmin
+from content.mixins import CharCountAdminMixin
 from content.models import (
     FundraisingPhoto,
     TargetedFundraising,
@@ -57,13 +58,17 @@ class FundraisingPhotoInline(OrderedTabularInline):
 
 @admin.register(TargetedFundraising)
 class TargetedFundraisingAdmin(
-    OrderedInlineModelAdminMixin, BaseOrderedModelAdmin
+    CharCountAdminMixin, OrderedInlineModelAdminMixin, BaseOrderedModelAdmin
 ):
     """Конфигурация админки для модели TargetedFundraising.
 
     Отвечает за отображение, фильтрацию, редактирование и действия для сборов.
     """
 
+    charcount_fields = {
+        'title': 60,
+        'short_description': 350,
+    }
     list_display = (
         'title',
         'status',
