@@ -31,7 +31,6 @@ class Employee(TimestampMixin, OrderedModel):
     name = models.CharField(
         max_length=100,
         verbose_name='ФИО',
-        help_text='максимальное количество символов - 19',
     )
     image = models.ImageField(
         upload_to='team',
@@ -53,7 +52,6 @@ class Employee(TimestampMixin, OrderedModel):
         verbose_name='Специальности',
         config_name='default',
         validators=[validate_not_empty_html],
-        help_text='максимальное количество символов - 45',
     )
     education = CKEditor5Field(
         verbose_name='Образование',

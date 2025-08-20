@@ -9,6 +9,7 @@
 from django.contrib import admin
 from ordered_model.admin import OrderedModelAdmin
 
+from content.mixins import CharCountAdminMixin
 from content.models import Document, Employee, TypeDocument
 
 
@@ -41,12 +42,16 @@ class DocumentInline(admin.TabularInline):
 
 
 @admin.register(Employee)
-class EmployeeAdmin(OrderedModelAdmin):
+class EmployeeAdmin(CharCountAdminMixin, OrderedModelAdmin):
     """Конфигурация админки для модели Employee.
 
     Определяет отображаемые поля, фильтрацию, поиск, inline-классы и fieldsets.
     """
 
+    charcount_fields = {
+        'name': 19,
+        'main_specialities': 45,
+    }
     list_display = ('name', 'category_on_main', 'move_up_down_links')
     list_editable = ('category_on_main',)
     list_filter = ('created_at', 'updated_at')
