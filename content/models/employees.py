@@ -7,6 +7,7 @@
 """
 
 import html
+import os
 
 from django.core.validators import FileExtensionValidator
 from django.db import models
@@ -134,7 +135,7 @@ class Document(models.Model):
     )
     type = models.ForeignKey(
         TypeDocument,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         blank=True,
         null=True,
         related_name='documents',
@@ -155,7 +156,14 @@ class Document(models.Model):
 
         verbose_name = 'Документ'
         verbose_name_plural = 'Дипломы и сертификаты'
+        ordering = ['employee__name', 'type__name', 'file']
 
     def __str__(self):
         """Возвращает строковое представление документа."""
-        return 'Документ'
+        filename = os.path.basename(self.file.name or '')
+        parts = [
+            self.employee.name if self.employee_id else 'без сотрудника',
+            self.type.name if self.type_id else 'без типа',
+            filename or 'без файла',
+        ]
+        return ' — '.join(parts)
