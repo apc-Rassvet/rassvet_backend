@@ -32,7 +32,7 @@ class DocumentInline(admin.TabularInline):
     validate_min = False
     autocomplete_fields = ['type']
     verbose_name = 'Документ'
-    verbose_name_plural = 'Документы'
+    verbose_name_plural = 'Дипломы и сертификаты'
 
     def get_queryset(self, request):
         """Оптимизация для инлайнов: select_related для ForeignKey (type)."""
