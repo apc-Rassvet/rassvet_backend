@@ -142,7 +142,7 @@ LANGUAGE_CODE = 'ru-RU'
 
 USE_I18N = True
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Irkutsk'
 
 USE_TZ = True
 
@@ -160,7 +160,7 @@ LOGIN_URL = '/admin/login/'
 
 EMAIL_BACKEND = os.getenv(
     'EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend'
-)  # noqa: E501
+)
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.yandex.ru')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '465'))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False') == 'True'
