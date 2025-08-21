@@ -7,6 +7,11 @@
 """
 
 from django.contrib import admin
+from django.http import Http404, HttpResponseForbidden, JsonResponse
+from django.shortcuts import get_object_or_404
+from django.urls import path
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
 from ordered_model.admin import OrderedModelAdmin
 
 from content.mixins import CharCountAdminMixin
@@ -34,6 +39,12 @@ class DocumentInline(admin.TabularInline):
     autocomplete_fields = ['type']
     verbose_name = 'Документ'
     verbose_name_plural = 'Дипломы и сертификаты'
+
+    class Media:
+        js = (
+            'admin/js/jquery.init.js',
+            'custom_admin/js/inline_instant_delete.js',
+        )
 
     def get_queryset(self, request):
         """Оптимизация для инлайнов: select_related для ForeignKey (type)."""
@@ -86,3 +97,37 @@ class EmployeeAdmin(CharCountAdminMixin, OrderedModelAdmin):
         """Оптимизация N+1 — prefetch_related для связанных документов."""
         qs = super().get_queryset(request)
         return qs.prefetch_related('documents')
+
+    def get_urls(self):
+        """Добавляет URL для удаления записи в inline модели."""
+        return [
+            path(
+                'inline-delete/<int:pk>/',
+                self.admin_site.admin_view(self.inline_delete_view),
+                name='content_document_inline_delete',
+            ),
+        ] + super().get_urls()
+
+    @method_decorator(csrf_protect)
+    def inline_delete_view(self, request, pk: int):
+        """Удаляет запись в inline модели."""
+        if request.method != 'POST':
+            return HttpResponseForbidden('POST required')
+
+        if not request.user.has_perm('content.delete_document'):
+            return HttpResponseForbidden('No permission')
+
+        doc = get_object_or_404(Document, pk=pk)
+
+        employee_pk = request.POST.get('employee_id')
+        if employee_pk and str(doc.employee_id) != str(employee_pk):
+            raise Http404('Document does not belong to this employee')
+
+        if hasattr(doc, 'file') and getattr(doc.file, 'name', None):
+            try:
+                doc.file.delete(save=False)
+            except Exception:
+                pass
+
+        doc.delete()
+        return JsonResponse({'ok': True, 'deleted': pk})
