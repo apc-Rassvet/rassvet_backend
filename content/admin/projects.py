@@ -10,6 +10,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from content.base_models import BaseOrderedModelAdmin
+from content.mixins import CharCountAdminMixin
 from content.models.projects import ProgramsProjects, Project, ProjectPhoto
 
 
@@ -19,6 +20,10 @@ class ProgramsProjectsAdmin(admin.ModelAdmin):
 
     list_display = ('title',)
     search_fields = ('title',)
+
+    def has_delete_permission(self, request, obj=None):
+        """Запрещает удаление объекта ProgramsProjects в админке."""
+        return False
 
 
 class ProjectPhotoAdmin(admin.StackedInline):
@@ -30,17 +35,24 @@ class ProjectPhotoAdmin(admin.StackedInline):
 
 
 @admin.register(Project)
-class ProjectAdmin(BaseOrderedModelAdmin):
+class ProjectAdmin(CharCountAdminMixin, BaseOrderedModelAdmin):
     """Админ зона Проектов."""
 
+    charcount_fields = {
+        'title': 100,
+    }
     list_display = (
         'title',
+        'program',
         'status',
         'logo_preview',
         'move_up_down_links',
     )
     list_editable = ('status',)
-    list_filter = ('status',)
+    list_filter = (
+        'status',
+        'program',
+    )
     search_fields = (
         'title',
         'status',
